@@ -17,7 +17,7 @@ export default function PatientPanel({ data, xC, smin }) {
     <div style={card}>
       <div style={row}>
         <div>
-          <div style={title}>Chart 2 — Patient Welfare Gain Across Equilibria</div>
+          <div style={title}>Chart 3 — Patient Welfare Gain Decomposed</div>
           <div style={sub}>
             Δ(x) = (σ_min − σ<sup>I*</sup>) · S<sup>I</sup>(x) &gt; 0 everywhere under (BW).
             Patients always prefer the Regime II equilibrium.

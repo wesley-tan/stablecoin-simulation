@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { computeSeries, sigmaMin, isBW, xI_opt, xII_opt } from "./model";
 import Param from "./components/Param";
 import IssuerPanel from "./panels/IssuerPanel";
+import PatientChoicePanel from "./panels/PatientChoicePanel";
 import PatientPanel from "./panels/PatientPanel";
 import SweepPanel from "./panels/SweepPanel";
 
@@ -101,6 +102,13 @@ export default function App() {
                       : <span style={badge("#f3f4f6","#6b7280")}>No crossover</span>}
                 </td>
               </tr>
+              <tr style={{ background: "#fafafa" }}>
+                <td style={td}><strong>Conflict region</strong></td>
+                <td colSpan={2} style={td}>
+                  x &lt; x<sub>C</sub>{xC ? ` = ${xC.toFixed(3)}` : ""} — issuer prefers I, patients want II
+                </td>
+                <td style={td}><span style={badge("#fef9c3","#d97706")}>Chart 2 (red zone)</span></td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -122,6 +130,7 @@ export default function App() {
       {tab === "main" && filing && (
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           <IssuerPanel data={data} xC={xC} xH={xH} xI={xI} xII={xII} smin={smin} />
+          <PatientChoicePanel data={data} xC={xC} smin={smin} BW={BW} />
           <PatientPanel data={data} xC={xC} smin={smin} />
         </div>
       )}

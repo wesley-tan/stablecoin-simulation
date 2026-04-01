@@ -152,6 +152,10 @@ export function computeSeries(R, r, beta, eta, r_b, r_g, N = 300) {
     const sI = sigmaI_opt(x, R, r, eta, r_b);
     const bc = bribeCost(x, beta, eta);
     const carryGain = Math.max(0, (smin - sI) * SI(x, R, r));
+    // Patient welfare in each regime (σ^{I*}·S^I vs σ_min·S^I — same S^I basis → gap = Δ)
+    const siVal = Math.max(0, SI(x, R, r));
+    const wI_pat = sI * siVal;
+    const wII_pat = smin * siVal;
 
     const diff = piII_c - piI;
     if (prevDiff !== null && prevDiff < 0 && diff >= 0) {
@@ -170,6 +174,8 @@ export function computeSeries(R, r, beta, eta, r_b, r_g, N = 300) {
       bribeCost: +bc.toFixed(6),
       sigmaI: +sI.toFixed(4),
       issuerDiff: +(diff).toFixed(6),
+      wI_pat: +wI_pat.toFixed(6),
+      wII_pat: +wII_pat.toFixed(6),
     });
   }
 
