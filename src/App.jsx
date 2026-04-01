@@ -32,7 +32,6 @@ export default function App() {
       <div style={header}>
         <div>
           <h1 style={h1}>Regime Preference Simulation</h1>
-          <p style={h1sub}>Wesley Tan & R. Izumi — δ = 1 fixed</p>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <Badge ok={filing} yes="β+η < 1 ✓ filing rational" no="β+η ≥ 1 — no filing" />

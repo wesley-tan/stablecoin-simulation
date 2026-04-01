@@ -10,7 +10,8 @@ import {
 
 export default function PatientPanel({ data, xC, smin }) {
   const fC = xC ? +xC.toFixed(4) : null;
-  const smallX = data.filter((d) => d.x <= 0.5);
+  // x ≤ 0.3: the O(x) vs O(x²) asymptotic argument is clearest here
+  const smallX = data.filter((d) => d.x <= 0.3);
 
   return (
     <div style={card}>
@@ -28,7 +29,7 @@ export default function PatientPanel({ data, xC, smin }) {
         {/* Left: Δ across all x */}
         <div>
           <div style={chartTitle}>Patient welfare gain Δ(x)</div>
-          <div style={chartNote}>Positive = patients prefer Regime II equilibrium</div>
+          <div style={chartNote}>Positive where S^I &gt; 0 (Regime I viable). Zero beyond.</div>
           <ResponsiveContainer width="100%" height={230}>
             <LineChart data={data} margin={{ top: 4, right: 10, bottom: 16, left: 4 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -47,8 +48,8 @@ export default function PatientPanel({ data, xC, smin }) {
 
         {/* Right: carry gain vs bribe cost */}
         <div>
-          <div style={chartTitle}>Carry gain vs bribe cost (x ≤ 0.5)</div>
-          <div style={chartNote}>Carry gain O(x) always exceeds bribe cost O(x²) under (BW)</div>
+          <div style={chartTitle}>Carry gain vs bribe cost (x ≤ 0.3)</div>
+          <div style={chartNote}>Carry gain O(x) exceeds bribe cost O(x²) for small x under (BW)</div>
           <ResponsiveContainer width="100%" height={230}>
             <LineChart data={smallX} margin={{ top: 4, right: 10, bottom: 16, left: 4 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />

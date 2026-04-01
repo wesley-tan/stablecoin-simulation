@@ -120,11 +120,13 @@ export function xH_compute(R, r, beta, eta, r_b) {
 
 // ── Patient welfare difference across equilibria ──────────────────────────────
 // Δ(x) = (σ_min − σ^{I*}(x)) · S^I(x)
-// Positive whenever σ^{I*}(x) < σ_min and S^I(x) > 0  [always under BW]
+// Positive whenever σ^{I*}(x) < σ_min and S^I(x) > 0 [always under BW]
+// Returns 0 when S^I ≤ 0 (Regime I not viable — no meaningful comparison)
 export function patientDiff(x, R, r, beta, eta, r_b) {
+  const s = SI(x, R, r);
+  if (s <= 0) return 0;
   const smin = sigmaMin(R, r, beta, eta);
   const sI = sigmaI_opt(x, R, r, eta, r_b);
-  const s = SI(x, R, r);
   return (smin - sI) * s;
 }
 
