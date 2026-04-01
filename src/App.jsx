@@ -19,7 +19,7 @@ export default function App() {
   const [r_g, setRg] = useState(1.15);
   const [tab, setTab] = useState("main");
 
-  const { data, smin, BW, xI, xII, xC } = useMemo(
+  const { data, smin, BW, xI, xII, xC, xH } = useMemo(
     () => computeSeries(R, r, beta, eta, r_b, r_g),
     [R, r, beta, eta, r_b, r_g]
   );
@@ -37,11 +37,12 @@ export default function App() {
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <Badge ok={filing} yes="β+η < 1 ✓ filing rational" no="β+η ≥ 1 — no filing" />
           <Badge ok={BW} yes="(BW) ✓" no="(BW) ✗" />
-          <div style={pill}>
-            σ_min = {filing ? smin.toFixed(4) : "N/A"}
-          </div>
-          <div style={{ ...pill, background: xC ? "#fef9c3" : "#f3f4f6" }}>
+          <div style={pill}>σ_min = {filing ? smin.toFixed(4) : "N/A"}</div>
+          <div style={{ ...pill, background: xC ? "#fee2e2" : "#f3f4f6" }}>
             x<sub>C</sub> = {xC ? xC.toFixed(4) : "none"}
+          </div>
+          <div style={{ ...pill, background: xH ? "#fef9c3" : "#f3f4f6" }}>
+            x<sub>H</sub> = {xH ? xH.toFixed(4) : "none"}
           </div>
         </div>
       </div>
@@ -71,36 +72,34 @@ export default function App() {
           <table style={tbl}>
             <thead>
               <tr style={{ background: "#f9fafb" }}>
-                {["Perspective", "Prefers Regime II when…", "Prefers Regime I when…", "Verified?"].map(h => (
+                {["", "Prefers Regime II", "Prefers Regime I", "Status"].map(h => (
                   <th key={h} style={th}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td style={td}><strong>Patients</strong> (fixed σ)</td>
-                <td style={td}>σ &gt; σ_min = {smin.toFixed(4)}</td>
+                <td style={td}><strong>Patients</strong> — fixed σ</td>
+                <td style={td}>σ &gt; σ_min ({smin.toFixed(4)})</td>
                 <td style={td}>σ &lt; σ_min</td>
                 <td style={td}><span style={badge("#dcfce7","#16a34a")}>Analytic ✓</span></td>
               </tr>
               <tr style={{ background: "#fafafa" }}>
-                <td style={td}><strong>Patients</strong> (across equil.)</td>
-                <td style={td}>Always under (BW)</td>
-                <td style={td}>Never under (BW)</td>
+                <td style={td}><strong>Patients</strong> — across equilibria</td>
+                <td style={td}>Always (under BW)</td>
+                <td style={td}>—</td>
                 <td style={td}>
-                  {BW
-                    ? <span style={badge("#dcfce7","#16a34a")}>Chart 2 ✓</span>
-                    : <span style={badge("#f3f4f6","#6b7280")}>(BW) fails</span>}
+                  {BW ? <span style={badge("#dcfce7","#16a34a")}>Chart 2 ✓</span>
+                      : <span style={badge("#f3f4f6","#6b7280")}>(BW) fails</span>}
                 </td>
               </tr>
               <tr>
-                <td style={td}><strong>Issuer</strong> (across equil.)</td>
+                <td style={td}><strong>Issuer</strong> — across equilibria</td>
                 <td style={td}>x ≥ x<sub>C</sub>{xC ? ` = ${xC.toFixed(3)}` : ""}</td>
                 <td style={td}>x &lt; x<sub>C</sub></td>
                 <td style={td}>
-                  {xC
-                    ? <span style={badge("#dcfce7","#16a34a")}>Chart 1 ✓</span>
-                    : <span style={badge("#f3f4f6","#6b7280")}>No crossover</span>}
+                  {xC ? <span style={badge("#dcfce7","#16a34a")}>Chart 1 ✓</span>
+                      : <span style={badge("#f3f4f6","#6b7280")}>No crossover</span>}
                 </td>
               </tr>
             </tbody>
@@ -123,7 +122,7 @@ export default function App() {
       {/* ── Main tab ── */}
       {tab === "main" && filing && (
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-          <IssuerPanel data={data} xC={xC} xI={xI} xII={xII} smin={smin} />
+          <IssuerPanel data={data} xC={xC} xH={xH} xI={xI} xII={xII} smin={smin} />
           <PatientPanel data={data} xC={xC} smin={smin} />
         </div>
       )}

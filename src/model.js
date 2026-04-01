@@ -102,6 +102,22 @@ export function xII_opt(R, beta, eta) {
   return Math.min(1, (beta * (R - 1)) / denom);
 }
 
+// x_H: smallest x where σ^{II*}(x) = σ_min  (Regime II becomes unconstrained)
+// Quadratic: A·x² + B·x + C = 0
+//   A = 1−β−η
+//   B = 2(R−1)[β(R−r) − 2r(1−β−η)] / (R−r)
+//   C = −2β·φ₀
+export function xH_compute(R, r, beta, eta, r_b) {
+  const A = 1 - beta - eta;
+  if (A <= 0) return null;
+  const B = (2 * (R - 1) * (beta * (R - r) - 2 * r * (1 - beta - eta))) / (R - r);
+  const C = -2 * beta * phi0(eta, r_b);
+  const disc = B * B - 4 * A * C;
+  if (disc < 0) return null;
+  const root = (-B + Math.sqrt(disc)) / (2 * A);
+  return root > 0 && root <= 1 ? root : (root > 1 ? 1 : null);
+}
+
 // ── Patient welfare difference across equilibria ──────────────────────────────
 // Δ(x) = (σ_min − σ^{I*}(x)) · S^I(x)
 // Positive whenever σ^{I*}(x) < σ_min and S^I(x) > 0  [always under BW]
@@ -118,6 +134,7 @@ export function computeSeries(R, r, beta, eta, r_b, r_g, N = 300) {
   const BW = isBW(R, r, beta, eta);
   const xI = xI_opt(R, r);
   const xII = xII_opt(R, beta, eta);
+  const xH = xH_compute(R, r, beta, eta, r_b);
 
   // crossover x_C: smallest x where Π^{II}(x,σ_min) ≥ Π^{I*}(x)
   let xC = null;
@@ -154,7 +171,7 @@ export function computeSeries(R, r, beta, eta, r_b, r_g, N = 300) {
     });
   }
 
-  return { data, smin, BW, xI, xII, xC };
+  return { data, smin, BW, xI, xII, xC, xH };
 }
 
 // ── BW sweep over (β, R) ──────────────────────────────────────────────────────
