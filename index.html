@@ -26,6 +26,7 @@
   .col-ctrl { flex: 1; min-width: 220px; }
   canvas { border: 1px solid #ddd; border-radius: 6px; width: 100%; display: block; }
   h3 { font-size: 14px; font-weight: 500; margin-bottom: 10px; }
+  h4 { font-size: 13px; font-weight: 500; margin-bottom: 8px; color: #333; }
   .slider-row { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
   .slider-row label { font-size: 12px; color: #666; width: 76px; flex-shrink: 0; }
   .slider-row input[type=range] { flex: 1; }
@@ -36,6 +37,7 @@
   .note { font-size: 11px; color: #777; line-height: 1.5; margin-top: 8px;
           border-top: 1px solid #e5e5e3; padding-top: 8px; }
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
   .mcard { background: #f0efeb; border-radius: 6px; padding: 8px 10px; }
   .mcard .ml { font-size: 10px; color: #888; margin-bottom: 2px; }
   .mcard .mv { font-size: 13px; font-weight: 500; }
@@ -54,6 +56,7 @@
   }
   .warn { color: #993C1D; font-weight: 500; }
   .good { color: #185FA5; font-weight: 500; }
+  .env-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top:10px; }
 </style>
 </head>
 <body>
@@ -62,40 +65,42 @@
 <p class="subtitle">Interactive simulation — Wesley Tan, Wesleyan University 2026 · Advisor: Prof. Ryuichiro Izumi</p>
 
 <div class="section-note">
-  <strong>Model (§6–7).</strong>
-  Contract = (σ, x). Regime I (σ &lt; σ̄): fire sales absorb congestion. Regime II (σ ≥ σ̄ = (1−β−η)r/[β(R−r)]): patient stayers block, paying T* = (1−β−η)/β per deferred unit.
-  Government replicates Regime I at (x̃, σ̂<sup>A</sup>). Aggregate welfare W = M · E[Ω], where market size M = (A + σ·f − g)/Δ, A = 1+η/2−r<sub>b</sub>.
-  <br><strong>W<sub>G</sub> &gt; W<sub>P</sub></strong> occurs only in the <em>B-constrained</em> regime (BW holds, σ̂<sup>B</sup> &lt; σ̄):
-  the required carry rate σ̄ is high, compressing M<sup>P</sup> via the congestion cost g<sup>II</sup> = T*x²/2.
-  Government dominance requires large A (low r<sub>b</sub>), moderate β (high T*), and moderate R.
+  <strong>Model (§1–6).</strong>
+  Contract = (σ, x). Two regimes: Regime I (σ &lt; σ̄, fire sales); Regime II (σ ≥ σ̄, patient stayers block).
+  σ̄ = (1−β−η)r/[β(R−r)], T* = (1−β−η)/β. M locks in before x is chosen (timing: σ announced → M forms → x optimised).
+  Government forces full accommodation iff r &gt; δ<sup>G</sup> = R/(2−β), replicating Regime I.<br>
+  <strong>Key welfare result (Prop. 4):</strong>
+  At B-interior: W<sub>P</sub>−W<sub>G</sub> = (w<sup>B</sup>−w<sup>G</sup>)(w<sup>B</sup>+w<sup>G</sup>−r<sub>b</sub>)/[2Δ] &gt; 0 whenever (BW) holds
+  — sign equals sign(BW), so private <em>always</em> dominates at B-interior.
+  W<sub>G</sub> &gt; W<sub>P</sub> arises only in <strong>B-constrained</strong> (BW holds, σ̂<sup>B</sup> &lt; σ̄):
+  the forced carry rate σ̄ compresses M<sup>P</sup> via congestion cost g<sup>II</sup> = T*x²/2.
 </div>
 
 <div class="tabs">
-  <button class="tab active" onclick="showTab('map1',this)">W<sub>G</sub> vs W<sub>P</sub>: (r, β) plane</button>
-  <button class="tab" onclick="showTab('map2',this)">W<sub>G</sub> vs W<sub>P</sub>: (R, β) plane</button>
-  <button class="tab" onclick="showTab('sigma',this)">σ* comparative statics</button>
+  <button class="tab active" onclick="showTab('map1',this)">W<sub>G</sub> vs W<sub>P</sub>: (r, β)</button>
+  <button class="tab" onclick="showTab('map2',this)">W<sub>G</sub> vs W<sub>P</sub>: (R, β)</button>
+  <button class="tab" onclick="showTab('sigma',this)">σ* &amp; welfare statics</button>
+  <button class="tab" onclick="showTab('env',this)">Π(σ) envelope</button>
 </div>
 
-<!-- ── TAB 1: (r, β) plane ─────────────────────────────────────────── -->
+<!-- ── TAB 1 ─────────────────────────────────────────────────────────── -->
 <div id="map1" class="panel active">
 <div class="row">
 <div class="col-map">
-  <h3>Aggregate welfare: β vs r &nbsp;<span style="font-weight:400;font-size:12px;color:#888">(axes swept, others fixed)</span></h3>
-  <div style="font-size:11px;color:#888;margin-bottom:5px">
-    x-axis: r (fire-sale price) &nbsp;|&nbsp; y-axis: β (patience)
-  </div>
+  <h3>Aggregate welfare: β vs r &nbsp;<span style="font-weight:400;font-size:12px;color:#888">(swept)</span></h3>
+  <div style="font-size:11px;color:#888;margin-bottom:5px">x: r (fire-sale price) &nbsp;|&nbsp; y: β (patience)</div>
   <canvas id="canvas1" width="410" height="330"></canvas>
   <div class="legend" style="margin-top:8px">
-    <div class="leg-item"><div class="leg-dot" style="background:#DC3C37"></div>W<sub>G</sub> &gt; W<sub>P</sub> — gov dominates</div>
-    <div class="leg-item"><div class="leg-dot" style="background:#1D9E75"></div>W<sub>P</sub> &gt; W<sub>G</sub> — private dominates</div>
-    <div class="leg-item"><div class="leg-dot" style="background:#7BB8E8"></div>Tie (Regime I / BW fails)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#DC3C37"></div>W<sub>G</sub> &gt; W<sub>P</sub> (B-constrained)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#1D9E75"></div>W<sub>P</sub> &gt; W<sub>G</sub> (B-interior)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#7BB8E8"></div>Tie (BW fails or Regime I)</div>
     <div class="leg-item"><div class="leg-dot" style="background:#D3D1C7"></div>Infeasible</div>
   </div>
   <div class="note">
-    <strong>Dashed black</strong>: (BW) boundary r<sub>BW</sub> = βR/(1−η) — above this BW fails (tie).<br>
-    <strong>Dashed orange</strong>: δ<sup>G</sup> = R/(2−β) — below this r, government does not fully accommodate (Prop. 1).<br>
-    W<sub>G</sub> &gt; W<sub>P</sub> (red) requires BW + B-constrained + large A (low r<sub>b</sub>).<br>
-    Click map to inspect a point.
+    <strong>Black dashed</strong>: (BW) boundary r<sub>BW</sub> = βR/(1−η) — above → BW fails → tie.<br>
+    <strong>Orange dashed</strong>: δ<sup>G</sup> = R/(2−β) — government doesn't accommodate below this r (Prop. 1).<br>
+    At B-interior: W<sub>P</sub> &gt; W<sub>G</sub> always (sign = sign BW). Red only in B-constrained.<br>
+    Click to inspect.
   </div>
 </div>
 <div class="col-ctrl">
@@ -113,45 +118,44 @@
     <input type="range" id="p1rg" min="0.41" max="1.10" step="0.01" value="0.75">
     <span id="v1rg">0.75</span></div>
   <div style="font-size:11px;color:#888;margin-bottom:6px">
-    A = 1+η/2−r<sub>b</sub> = <span id="v1A">—</span> &nbsp;|&nbsp; Δ = r<sub>g</sub>−r<sub>b</sub> = <span id="v1D">—</span>
+    A = 1+η/2−r<sub>b</sub> = <span id="v1A">—</span> &nbsp;|&nbsp; Δ = <span id="v1D">—</span>
   </div>
   <div class="sep"></div>
-  <h3>Inspect point <span style="font-weight:400;font-size:11px;color:#888">(click map)</span></h3>
+  <h3>Inspect <span style="font-weight:400;font-size:11px;color:#888">(click map)</span></h3>
   <div class="grid2">
-    <div class="mcard"><div class="ml">β (clicked)</div><div class="mv" id="i1b">—</div></div>
-    <div class="mcard"><div class="ml">r (clicked)</div><div class="mv" id="i1r">—</div></div>
+    <div class="mcard"><div class="ml">β</div><div class="mv" id="i1b">—</div></div>
+    <div class="mcard"><div class="ml">r</div><div class="mv" id="i1r">—</div></div>
     <div class="mcard"><div class="ml">W<sub>P</sub></div><div class="mv" id="i1wp">—</div></div>
     <div class="mcard"><div class="ml">W<sub>G</sub></div><div class="mv" id="i1wg">—</div></div>
-    <div class="mcard"><div class="ml">σ̄ (blocking floor)</div><div class="mv" id="i1sbar">—</div></div>
-    <div class="mcard"><div class="ml">σ̂<sup>B</sup> (B interior)</div><div class="mv" id="i1sb">—</div></div>
+    <div class="mcard"><div class="ml">w<sup>G</sup> = 1+η/2+C<sub>I</sub></div><div class="mv" id="i1wgper">—</div></div>
+    <div class="mcard"><div class="ml">w<sup>B</sup> = 1+η/2+C<sub>II</sub>/2</div><div class="mv" id="i1wbper">—</div></div>
+    <div class="mcard"><div class="ml">σ̄</div><div class="mv" id="i1sbar">—</div></div>
+    <div class="mcard"><div class="ml">σ̂<sup>B</sup></div><div class="mv" id="i1sb">—</div></div>
     <div class="mcard"><div class="ml">Config</div><div class="mv" id="i1cfg">—</div></div>
-    <div class="mcard"><div class="ml">δ<sup>G</sup> = R/(2−β)</div><div class="mv" id="i1dg">—</div></div>
+    <div class="mcard"><div class="ml">δ<sup>G</sup></div><div class="mv" id="i1dg">—</div></div>
   </div>
   <div id="i1text" style="font-size:11px;color:#777;line-height:1.6;margin-top:4px"></div>
 </div>
 </div>
 </div>
 
-<!-- ── TAB 2: (R, β) plane ─────────────────────────────────────────── -->
+<!-- ── TAB 2 ─────────────────────────────────────────────────────────── -->
 <div id="map2" class="panel">
 <div class="row">
 <div class="col-map">
-  <h3>Aggregate welfare: β vs R &nbsp;<span style="font-weight:400;font-size:12px;color:#888">(axes swept, others fixed)</span></h3>
-  <div style="font-size:11px;color:#888;margin-bottom:5px">
-    x-axis: R (illiquid return) &nbsp;|&nbsp; y-axis: β (patience)
-  </div>
+  <h3>Aggregate welfare: β vs R &nbsp;<span style="font-weight:400;font-size:12px;color:#888">(swept)</span></h3>
+  <div style="font-size:11px;color:#888;margin-bottom:5px">x: R (illiquid return) &nbsp;|&nbsp; y: β (patience)</div>
   <canvas id="canvas2" width="410" height="330"></canvas>
   <div class="legend" style="margin-top:8px">
     <div class="leg-item"><div class="leg-dot" style="background:#DC3C37"></div>W<sub>G</sub> &gt; W<sub>P</sub></div>
     <div class="leg-item"><div class="leg-dot" style="background:#1D9E75"></div>W<sub>P</sub> &gt; W<sub>G</sub></div>
-    <div class="leg-item"><div class="leg-dot" style="background:#7BB8E8"></div>Tie (Regime I)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#7BB8E8"></div>Tie</div>
     <div class="leg-item"><div class="leg-dot" style="background:#D3D1C7"></div>Infeasible</div>
   </div>
   <div class="note">
-    <strong>Dashed black</strong>: (BW) boundary R<sub>BW</sub> = r(1−η)/β — left of this BW fails (tie).<br>
-    <strong>Dashed orange</strong>: δ<sup>G</sup> = R/(2−β) = r boundary — where government accommodation switches.<br>
-    High R → BW holds → B-interior (green). Low β + moderate R → B-constrained → W<sub>G</sub> &gt; W<sub>P</sub> (red).<br>
-    Click to inspect.
+    <strong>Black dashed</strong>: (BW) boundary R<sub>BW</sub> = r(1−η)/β.<br>
+    <strong>Orange dashed</strong>: δ<sup>G</sup>=r line (R such that δ<sup>G</sup>=R/(2−β)=r).<br>
+    Higher R → B-interior → W<sub>P</sub>&gt;W<sub>G</sub>. Moderate R + low β → B-constrained → red.
   </div>
 </div>
 <div class="col-ctrl">
@@ -169,64 +173,66 @@
     <input type="range" id="p2rg" min="0.41" max="1.10" step="0.01" value="0.75">
     <span id="v2rg">0.75</span></div>
   <div style="font-size:11px;color:#888;margin-bottom:6px">
-    A = 1+η/2−r<sub>b</sub> = <span id="v2A">—</span> &nbsp;|&nbsp; Δ = r<sub>g</sub>−r<sub>b</sub> = <span id="v2D">—</span>
+    A = <span id="v2A">—</span> &nbsp;|&nbsp; Δ = <span id="v2D">—</span>
   </div>
   <div class="sep"></div>
-  <h3>Inspect point <span style="font-weight:400;font-size:11px;color:#888">(click map)</span></h3>
+  <h3>Inspect <span style="font-weight:400;font-size:11px;color:#888">(click map)</span></h3>
   <div class="grid2">
-    <div class="mcard"><div class="ml">β (clicked)</div><div class="mv" id="i2b">—</div></div>
-    <div class="mcard"><div class="ml">R (clicked)</div><div class="mv" id="i2R">—</div></div>
+    <div class="mcard"><div class="ml">β</div><div class="mv" id="i2b">—</div></div>
+    <div class="mcard"><div class="ml">R</div><div class="mv" id="i2R">—</div></div>
     <div class="mcard"><div class="ml">W<sub>P</sub></div><div class="mv" id="i2wp">—</div></div>
     <div class="mcard"><div class="ml">W<sub>G</sub></div><div class="mv" id="i2wg">—</div></div>
+    <div class="mcard"><div class="ml">w<sup>G</sup></div><div class="mv" id="i2wgper">—</div></div>
+    <div class="mcard"><div class="ml">w<sup>B</sup></div><div class="mv" id="i2wbper">—</div></div>
     <div class="mcard"><div class="ml">σ̄</div><div class="mv" id="i2sbar">—</div></div>
     <div class="mcard"><div class="ml">σ̂<sup>B</sup></div><div class="mv" id="i2sb">—</div></div>
     <div class="mcard"><div class="ml">Config</div><div class="mv" id="i2cfg">—</div></div>
-    <div class="mcard"><div class="ml">BW holds?</div><div class="mv" id="i2bw">—</div></div>
+    <div class="mcard"><div class="ml">BW?</div><div class="mv" id="i2bw">—</div></div>
   </div>
   <div id="i2text" style="font-size:11px;color:#777;line-height:1.6;margin-top:4px"></div>
 </div>
 </div>
 </div>
 
-<!-- ── TAB 3: σ* comparative statics ─────────────────────────────── -->
+<!-- ── TAB 3: σ* and welfare statics ──────────────────────────────────── -->
 <div id="sigma" class="panel">
-  <h3>Comparative statics: optimal carry rates σ* &nbsp;
-    <span style="font-weight:400;font-size:12px;color:#888">§6 Prop. 2–3</span></h3>
-  <p style="font-size:12px;color:#777;margin-bottom:10px">
-    σ<sup>I*</sup> = σ̂<sup>A</sup> = ½ − A/(2C<sub>I</sub>) &nbsp;|&nbsp;
-    σ<sup>II*</sup> = max(σ̄, σ̂<sup>B</sup>) where σ̂<sup>B</sup> = ¾ − AT*/(2(R−1)²)
-  </p>
-  <table>
-    <thead>
-      <tr>
-        <th>Parameter ↑</th>
-        <th style="text-align:center">∂σ<sup>I*</sup>/∂(·)</th>
-        <th style="text-align:center">∂σ<sup>II*</sup>/∂(·)</th>
-        <th style="text-align:center">Monotone?</th>
-        <th>Mechanism</th>
-      </tr>
-    </thead>
-    <tbody id="sigTable"></tbody>
-  </table>
-  <div class="note" style="margin-top:10px">
-    † η is the only non-monotone case for σ<sup>II*</sup>.
-    Sign of ∂σ<sup>II*</sup>/∂η = sign(1+β+2η−2r<sub>b</sub>).
-    At USDC calibration (r<sub>b</sub>=0.99, β=0.95, η=0.01): 1+0.95+0.02 = 1.97 &lt; 1.98 = 2r<sub>b</sub>,
-    so σ<sup>II*</sup> decreases in η. For low r<sub>b</sub> the sign flips.
-    <br><br>
-    <strong>Key for W<sub>G</sub> &gt; W<sub>P</sub>:</strong>
-    Low β raises T* and σ̄ simultaneously. If σ̂<sup>B</sup> &lt; σ̄ (B-constrained),
-    the issuer is forced to carry at σ̄, compressing market size M<sup>P</sup> = (A + σ̄·f<sup>II</sup> − g<sup>II</sup>)/Δ
-    below M<sup>G</sup> = (A + σ<sup>A*</sup>·C<sub>I</sub>)/Δ when A is large (low r<sub>b</sub>).
+  <div class="row" style="align-items:flex-start">
+  <div style="flex:1;min-width:300px">
+    <h3>Comparative statics: σ* (carry rates) &amp; w<sup>B</sup>−w<sup>G</sup> (welfare gap)</h3>
+    <p style="font-size:12px;color:#777;margin-bottom:10px">
+      σ<sup>I*</sup> = ½ − A/(2C<sub>I</sub>) &nbsp;|&nbsp;
+      σ<sup>II*</sup> = max(σ̄, σ̂<sup>B</sup>) &nbsp;|&nbsp;
+      w<sup>G</sup> = 1+η/2+C<sub>I</sub> &nbsp;|&nbsp; w<sup>B</sup> = 1+η/2+C<sub>II</sub>/2
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>↑ param</th>
+          <th style="text-align:center">∂σ<sup>I*</sup></th>
+          <th style="text-align:center">∂σ<sup>II*</sup></th>
+          <th style="text-align:center">∂(w<sup>B</sup>−w<sup>G</sup>)</th>
+          <th>Key mechanism</th>
+        </tr>
+      </thead>
+      <tbody id="sigTable"></tbody>
+    </table>
+
+    <div class="note" style="margin-top:10px">
+      <strong>Sign of w<sup>B</sup>−w<sup>G</sup> = C<sub>II</sub>/2 − C<sub>I</sub>:</strong>
+      positive iff (BW) holds. At B-interior:
+      W<sub>P</sub>−W<sub>G</sub> = (w<sup>B</sup>−w<sup>G</sup>)(w<sup>B</sup>+w<sup>G</sup>−r<sub>b</sub>)/[2Δ],
+      so sign(W<sub>P</sub>−W<sub>G</sub>) = sign(BW) always.<br>
+      <strong>Counterintuitive:</strong> ∂(w<sup>B</sup>−w<sup>G</sup>)/∂r &lt; 0 — higher fire-sale recovery
+      raises w<sup>G</sup> while leaving w<sup>B</sup> unchanged, <em>shrinking</em> private advantage.
+      The B-interior green region is larger at <em>lower</em> r (but low r may force B-constrained → red).
+    </div>
   </div>
 
-  <div style="margin-top:22px">
-  <h3>Live σ* and W calculator</h3>
-  <p style="font-size:12px;color:#777;margin-bottom:10px">
-    Adjust any parameter to see σ<sup>I*</sup>, σ<sup>II*</sup>, and the welfare comparison in real time.
-  </p>
-  <div class="row">
-  <div style="flex:1;min-width:240px">
+  <div style="flex:1;min-width:260px">
+    <h3>Live σ* and W calculator</h3>
+    <p style="font-size:12px;color:#777;margin-bottom:10px">
+      Adjust parameters. Shows all derived quantities.
+    </p>
     <div class="slider-row"><label>R</label>
       <input type="range" id="sR2" min="1.01" max="2.00" step="0.01" value="1.30">
       <span id="vsR2">1.30</span></div>
@@ -245,46 +251,93 @@
     <div class="slider-row"><label>r<sub>g</sub></label>
       <input type="range" id="srg2" min="0.41" max="1.10" step="0.01" value="0.75">
       <span id="vsrg2">0.75</span></div>
-  </div>
-  <div style="flex:1;min-width:200px">
+
+    <h4 style="margin-top:10px">Optimal carry rates</h4>
     <div class="grid2" id="sigCards"></div>
-    <div id="sigNote"></div>
-  </div>
+
+    <h4 style="margin-top:12px">Per-depositor welfare (at optimal x)</h4>
+    <div class="grid3" id="wCards"></div>
+
+    <h4 style="margin-top:12px">Market sizes &amp; aggregate welfare</h4>
+    <div class="grid2" id="mCards"></div>
+
+    <div id="wDecomp" style="background:#f5f0ff;border-left:3px solid #7c3aed;padding:7px 10px;
+        border-radius:0 4px 4px 0;font-size:11px;color:#444;line-height:1.8;margin-top:8px"></div>
+    <div id="sigNote" style="font-size:11px;color:#777;line-height:1.5;margin-top:6px"></div>
   </div>
   </div>
 </div>
 
+<!-- ── TAB 4: Π(σ) Envelope ───────────────────────────────────────────── -->
+<div id="env" class="panel">
+<div class="row">
+<div class="col-map">
+  <h3>Profit envelope Π(σ) &nbsp;
+    <span style="font-weight:400;font-size:12px;color:#888">§4.2 Tan (2026)</span>
+  </h3>
+  <div style="font-size:11px;color:#888;margin-bottom:5px">
+    Π<sup>A</sup>(σ) at x = x̃ (blue) &nbsp;|&nbsp;
+    Π<sup>B</sup>(σ) at x = x<sup>II*</sup> (red)
+  </div>
+  <canvas id="canvasEnv" width="420" height="300"></canvas>
+  <div class="note">
+    <strong>Blue:</strong> Π<sup>A</sup>(σ) = (A+σC<sub>I</sub>)(1−σ)C<sub>I</sub>/Δ — Solution A, x fixed at x̃.<br>
+    <strong>Red solid:</strong> Π<sup>B</sup>(σ) = (A+σC<sub>II</sub>−C<sub>II</sub>/2)(1−σ)C<sub>II</sub>/Δ — Solution B at x=x<sup>II*</sup>.<br>
+    Jump at σ̄: upward (orange ▲) when (BW) holds, downward (gray ▼) when not.<br>
+    σ* = global optimum (star ★). Dotted verticals at σ̂<sup>A</sup>, σ̂<sup>B</sup>.
+  </div>
+</div>
+<div class="col-ctrl">
+  <h3>Parameters</h3>
+  <div class="slider-row"><label>R</label>
+    <input type="range" id="eR" min="1.01" max="2.00" step="0.01" value="1.30">
+    <span id="veR">1.30</span></div>
+  <div class="slider-row"><label>r</label>
+    <input type="range" id="er" min="0.40" max="0.99" step="0.005" value="0.70">
+    <span id="ver">0.700</span></div>
+  <div class="slider-row"><label>β</label>
+    <input type="range" id="ebeta" min="0.05" max="0.94" step="0.01" value="0.60">
+    <span id="vebeta">0.60</span></div>
+  <div class="slider-row"><label>η</label>
+    <input type="range" id="eeta" min="0.001" max="0.20" step="0.001" value="0.05">
+    <span id="veeta">0.050</span></div>
+  <div class="slider-row"><label>r<sub>b</sub></label>
+    <input type="range" id="erb" min="0.40" max="0.98" step="0.01" value="0.70">
+    <span id="verb">0.70</span></div>
+  <div class="slider-row"><label>r<sub>g</sub></label>
+    <input type="range" id="erg" min="0.41" max="1.10" step="0.01" value="0.75">
+    <span id="verg">0.75</span></div>
+  <div class="sep"></div>
+  <h3>Key values</h3>
+  <div class="env-cards" id="envCards"></div>
+  <div id="envNote" style="font-size:11px;color:#777;line-height:1.7;margin-top:8px"></div>
+</div>
+</div>
+</div>
+
 <script>
 /* ════════════════════════════════════════════════════════════════════
-   Model functions — exact from §6 (Tan 2026)
+   Model — exact from §1-6, Tan (2026)
    ════════════════════════════════════════════════════════════════════ */
+function Av(eta,rb)          { return 1 + eta/2 - rb; }
+function Dv(rb,rg)           { return rg - rb; }
+function Tstar(beta,eta)     { return (1-beta-eta)/beta; }
+function sigBar(beta,R,r,eta){ return (1-beta-eta)*r/(beta*(R-r)); }
+function CI(R,r)             { return r*(R-1)**2/(2*(R-r)); }
+function CII(R,beta,eta)     { return beta*(R-1)**2/(1-beta-eta); }
+function xTilde(R,r)         { return r*(R-1)/(R-r); }
+function xIIstar(R,beta,eta) { return Math.min(1, beta*(R-1)/(1-beta-eta)); }
+function deltaG(R,beta)      { return R/(2-beta); }
 
-/* Primitives */
-function Av(eta,rb)         { return 1 + eta/2 - rb; }          // A = 1+η/2−r_b
-function Dv(rb,rg)          { return rg - rb; }                  // Δ = r_g−r_b
-function Tstar(beta,eta)    { return (1-beta-eta)/beta; }        // T* = (1−β−η)/β
-function sigBar(beta,R,r,eta){ return (1-beta-eta)*r/(beta*(R-r)); } // σ̄
-function CI(R,r)            { return r*(R-1)**2/(2*(R-r)); }     // C_I (max carry, Regime I)
-function CII(R,beta,eta)    { return beta*(R-1)**2/(1-beta-eta); } // C_II
-function xTilde(R,r)        { return r*(R-1)/(R-r); }           // x̃ = x^{A*}
-function xIIstar(R,beta,eta){ return Math.min(1, beta*(R-1)/(1-beta-eta)); } // x^{II*}
-function deltaG(R,beta)     { return R/(2-beta); }               // δ^G government threshold
-
-/* σ̂^A = ½ − A/(2C_I)  (unconstrained Solution A optimum) */
 function sighatA(R,r,eta,rb){
   const ci = CI(R,r);
   if(ci <= 0) return -Infinity;
   return 0.5 - Av(eta,rb)/(2*ci);
 }
-
-/* sighatB = 3/4 - A*Tstar / (2*(R-1)^2)  (unconstrained Sol B optimum) */
 function sighatB(R,beta,eta,rb){
   if((R-1) === 0) return -Infinity;
   return 0.75 - Av(eta,rb)*Tstar(beta,eta)/(2*(R-1)**2);
 }
-
-/* x^{B*}(σ) = positive root of 3T*x²/2 − 2σ(R−1)x − A = 0
-   Eq. (22): x = [2σ(R−1) + √(4σ²(R−1)² + 6A·T*)] / (3T*)  */
 function xBstar(sigma,R,beta,eta,rb){
   const T = Tstar(beta,eta), A = Av(eta,rb);
   const disc = 4*sigma**2*(R-1)**2 + 6*A*T;
@@ -292,107 +345,91 @@ function xBstar(sigma,R,beta,eta,rb){
   return (2*sigma*(R-1) + Math.sqrt(disc))/(3*T);
 }
 
-/* Interior profit at Solution A optimum (Eq. 12) */
+/* Interior profit values */
 function PiAstar(R,r,eta,rb,rg){
   const A = Av(eta,rb), ci = CI(R,r), D = Dv(rb,rg);
   const sA = sighatA(R,r,eta,rb);
-  if(sA <= 0) return A*ci/D;          // corner σ^A* = 0
-  return (A+ci)**2/(4*D);             // interior
+  if(sA <= 0) return A*ci/D;
+  return (A+ci)**2/(4*D);
 }
-
-/* Interior profit at Solution B optimum (Eq. 24, interior) */
 function PiBstar(R,beta,eta,rb,rg){
   const A = Av(eta,rb), cii = CII(R,beta,eta), D = Dv(rb,rg);
   return (A + cii/2)**2/(4*D);
 }
 
-/* Aggregate welfare W = M · E[Ω]
-   f^I = c^I(x), g^I = 0;  f^II = x(R−1), g^II = T*x²/2
-   M = (A + σ·f − g)/Δ,  E[Ω] = 1+η/2+f−g              */
+/* Profit envelope functions (§4.2):
+   Π^A(σ) at x = x̃:  (A+σ·CI)(1-σ)·CI/Δ
+   Π^B(σ) at x = x^II*: (A+σ·CII−CII/2)(1-σ)·CII/Δ  */
+function piA_env(sigma, ci, A, D){
+  return Math.max(0, (A + sigma*ci)*(1-sigma)*ci/D);
+}
+function piB_env(sigma, cii, A, D){
+  return Math.max(0, (A + sigma*cii - cii/2)*(1-sigma)*cii/D);
+}
+
+/* Aggregate welfare W = M · E[Ω] */
 function aggW(sigma,x,R,r,beta,eta,rb,rg,regime){
   const A = Av(eta,rb), D = Dv(rb,rg), T = Tstar(beta,eta);
   let fk, gk;
-  if(regime === 'I'){
-    fk = x*(R-1) - (R-r)*x**2/(2*r);  gk = 0;
-  } else {
-    fk = x*(R-1);  gk = T*x**2/2;
-  }
+  if(regime === 'I'){ fk = x*(R-1)-(R-r)*x**2/(2*r); gk = 0; }
+  else              { fk = x*(R-1); gk = T*x**2/2; }
   const EOm = 1 + eta/2 + fk - gk;
   const M   = Math.max(0, (A + sigma*fk - gk)/D);
   return M * EOm;
 }
 
-/* ── Core computation: returns welfare and config ──────────────────── */
+/* Core computation */
 function computeWP(R,r,beta,eta,rb,rg){
   const A = Av(eta,rb), D = Dv(rb,rg);
-
-  // Feasibility
   if(1-beta-eta <= 0.001) return {WP:0,WG:0,cfg:'β+η≥1',bw:false,feasible:false};
   if(A <= 0)              return {WP:0,WG:0,cfg:'A≤0',bw:false,feasible:false};
-  if(D <= 0)              return {WP:0,WG:0,cfg:'r_g≤r_b',bw:false,feasible:false};
+  if(D <= 0)              return {WP:0,WG:0,cfg:'Δ≤0',bw:false,feasible:false};
   if(R <= r || r <= 0)    return {WP:0,WG:0,cfg:'R≤r',bw:false,feasible:false};
 
   const T   = Tstar(beta,eta);
-  const sb  = sigBar(beta,R,r,eta);   // σ̄ — blocking threshold
-  const sA  = sighatA(R,r,eta,rb);   // σ̂^A
-  const sB  = sighatB(R,beta,eta,rb); // σ̂^B
+  const sb  = sigBar(beta,R,r,eta);
+  const sA  = sighatA(R,r,eta,rb);
+  const sB  = sighatB(R,beta,eta,rb);
   const pA  = PiAstar(R,r,eta,rb,rg);
   const pB  = PiBstar(R,beta,eta,rb,rg);
   const xi  = xTilde(R,r);
+  const bw  = pB > pA;
 
-  // (BW): C_{II}/2 > C_I  ↔  pB > pA  ↔  β(R−r) > r(1−β−η)
-  const bw = pB > pA;
-
-  // Government: Regime I at (x̃, σ^{G*}), σ^{G*} = clamp(σ̂^A, 0, σ̄⁻)
   const sigG = Math.max(0, Math.min(sb > 0 ? sb - 1e-10 : 0, sA));
   const WG   = aggW(sigG, xi, R, r, beta, eta, rb, rg, 'I');
 
   let WP, cfg;
-
   if(!bw){
-    // Solution A wins (BW fails)
-    WP  = WG;
-    cfg = sA <= 0 ? 'A-corner' : 'A-int';
+    WP = WG; cfg = sA <= 0 ? 'A-corner' : 'A-int';
   } else if(sB >= sb){
-    // B-interior: σ̂^B ≥ σ̄, blocking self-sustaining
     const xii = xIIstar(R,beta,eta);
-    WP  = aggW(sB, xii, R, r, beta, eta, rb, rg, 'II');
+    WP = aggW(sB, xii, R, r, beta, eta, rb, rg, 'II');
     cfg = 'B-int';
   } else {
-    // B-constrained: σ̂^B < σ̄, optimal σ = σ̄ for Solution B
     const xbs  = Math.min(1, xBstar(sb, R, beta, eta, rb));
     const fbs  = xbs*(R-1), gbs = T*xbs**2/2;
     const Ncon = A + sb*fbs - gbs;
-    const PBc  = Math.max(0, Ncon*(1-sb)*fbs/D);  // Π^{B-con}
-
+    const PBc  = Math.max(0, Ncon*(1-sb)*fbs/D);
     if(PBc > pA){
-      // B-constrained beats A
-      WP  = aggW(sb, xbs, R, r, beta, eta, rb, rg, 'II');
+      WP = aggW(sb, xbs, R, r, beta, eta, rb, rg, 'II');
       cfg = 'B-con';
     } else {
-      // Reverts to Solution A
-      WP  = WG;
-      cfg = sA <= 0 ? 'A-corner' : 'A-int';
+      WP = WG; cfg = sA <= 0 ? 'A-corner' : 'A-int';
     }
   }
-
   return {WP, WG, cfg, bw, sb, sB, feasible:true};
 }
 
-/* ── Region colour ─────────────────────────────────────────────────── */
 function regionColor(WP, WG, cfg){
   if(!cfg || !['A-corner','A-int','B-int','B-con'].includes(cfg))
-    return 'rgba(211,209,199,0.90)';   // infeasible / grey
-  if(cfg === 'A-corner' || cfg === 'A-int')
-    return 'rgba(123,184,232,0.75)';   // tie (Regime I)
-  if(WG > WP + 1e-9)
-    return 'rgba(220,60,55,0.70)';     // W_G > W_P (red)
-  if(WP > WG + 1e-9)
-    return 'rgba(29,158,117,0.65)';    // W_P > W_G (green)
-  return 'rgba(123,184,232,0.75)';     // numerical tie
+    return 'rgba(211,209,199,0.90)';
+  if(cfg === 'A-corner' || cfg === 'A-int') return 'rgba(123,184,232,0.75)';
+  if(WG > WP + 1e-9)  return 'rgba(220,60,55,0.70)';
+  if(WP > WG + 1e-9)  return 'rgba(29,158,117,0.65)';
+  return 'rgba(123,184,232,0.75)';
 }
 
-/* ── Canvas drawing engine ─────────────────────────────────────────── */
+/* ── Map drawing engine ─────────────────────────────────────────────── */
 const PAD = {l:34, r:8, t:8, b:30};
 
 function drawMap(canvasId, xMin,xMax, yMin,yMax, getParams, drawExtra){
@@ -400,146 +437,126 @@ function drawMap(canvasId, xMin,xMax, yMin,yMax, getParams, drawExtra){
   const ctx = cvs.getContext('2d');
   const W = cvs.width, H = cvs.height;
   const iW = W-PAD.l-PAD.r, iH = H-PAD.t-PAD.b;
-
   const toX = v => PAD.l + ((v-xMin)/(xMax-xMin))*iW;
   const toY = v => PAD.t + (1-(v-yMin)/(yMax-yMin))*iH;
 
   ctx.clearRect(0,0,W,H);
-
-  // Grid
   ctx.strokeStyle = 'rgba(0,0,0,0.07)'; ctx.lineWidth = 0.5;
   for(let i=1;i<5;i++){
-    const vx = xMin + i*(xMax-xMin)/5;
+    const vx = xMin+i*(xMax-xMin)/5;
     ctx.beginPath(); ctx.moveTo(toX(vx),PAD.t); ctx.lineTo(toX(vx),PAD.t+iH); ctx.stroke();
-    const vy = yMin + i*(yMax-yMin)/5;
+    const vy = yMin+i*(yMax-yMin)/5;
     ctx.beginPath(); ctx.moveTo(PAD.l,toY(vy)); ctx.lineTo(PAD.l+iW,toY(vy)); ctx.stroke();
   }
 
-  // Region fill (pixel-by-pixel)
   const step = 3;
   for(let px=PAD.l; px<PAD.l+iW; px+=step){
     for(let py=PAD.t; py<PAD.t+iH; py+=step){
-      const xv = xMin + ((px-PAD.l)/iW)*(xMax-xMin);
-      const yv = yMin + (1-(py-PAD.t)/iH)*(yMax-yMin);
+      const xv = xMin+((px-PAD.l)/iW)*(xMax-xMin);
+      const yv = yMin+(1-(py-PAD.t)/iH)*(yMax-yMin);
       const p = getParams(xv,yv);
       if(!p){ ctx.fillStyle='rgba(211,209,199,0.9)'; ctx.fillRect(px,py,step+1,step+1); continue; }
       const res = computeWP(...p);
-      ctx.fillStyle = regionColor(res.WP, res.WG, res.cfg);
+      ctx.fillStyle = regionColor(res.WP,res.WG,res.cfg);
       ctx.fillRect(px,py,step+1,step+1);
     }
   }
 
-  // Overlay curves
   if(drawExtra) drawExtra(ctx, toX, toY, xMin,xMax, yMin,yMax);
 
-  // Axis ticks
   ctx.fillStyle = 'rgba(0,0,0,0.50)'; ctx.font = '9px sans-serif';
-  const nTick = 5;
-  for(let i=0; i<=nTick; i++){
-    const vx = xMin + i*(xMax-xMin)/nTick;
+  for(let i=0; i<=5; i++){
+    const vx = xMin+i*(xMax-xMin)/5;
     ctx.fillText(vx.toFixed(2), toX(vx)-10, PAD.t+iH+15);
-    const vy = yMin + i*(yMax-yMin)/nTick;
+    const vy = yMin+i*(yMax-yMin)/5;
     ctx.fillText(vy.toFixed(2), 1, toY(vy)+3);
   }
 }
 
-/* ── Map 1: (r, β) plane ───────────────────────────────────────────── */
+/* ── Map 1 ──────────────────────────────────────────────────────────── */
 function drawMap1(){
-  const R   = +document.getElementById('p1R').value;
-  const eta = +document.getElementById('p1eta').value;
-  const rb  = +document.getElementById('p1rb').value;
-  const rg  = +document.getElementById('p1rg').value;
-
-  // Update computed labels
+  const R=+document.getElementById('p1R').value;
+  const eta=+document.getElementById('p1eta').value;
+  const rb=+document.getElementById('p1rb').value;
+  const rg=+document.getElementById('p1rg').value;
   document.getElementById('v1A').textContent = (1+eta/2-rb).toFixed(4);
   document.getElementById('v1D').textContent = (rg-rb).toFixed(4);
 
   drawMap('canvas1', 0.40,0.95, 0.30,0.95,
-    (rv, bv) => {
-      if(1-bv-eta <= 0.001 || R <= rv) return null;
-      return [R, rv, bv, eta, rb, rg];
-    },
-    (ctx, toX, toY) => {
-      // (BW) boundary: r_BW = β·R/(1−η)  →  r = β·R/(1−η)
-      ctx.save();
-      ctx.setLineDash([5,3]);
-      ctx.strokeStyle = 'rgba(0,0,0,0.65)'; ctx.lineWidth = 1.5;
+    (rv,bv) => (1-bv-eta<=0.001||R<=rv) ? null : [R,rv,bv,eta,rb,rg],
+    (ctx,toX,toY) => {
+      ctx.save(); ctx.setLineDash([5,3]);
+      // BW boundary: r = βR/(1-η)
+      ctx.strokeStyle='rgba(0,0,0,0.65)'; ctx.lineWidth=1.5;
       ctx.beginPath(); let first=true;
       for(let bv=0.30; bv<=0.95; bv+=0.002){
-        const rv = bv*R/(1-eta);
-        if(rv < 0.40 || rv > 0.95) continue;
-        const px=toX(rv), py=toY(bv);
-        if(first){ ctx.moveTo(px,py); first=false; } else ctx.lineTo(px,py);
+        const rv=bv*R/(1-eta);
+        if(rv<0.40||rv>0.95) continue;
+        const px=toX(rv),py=toY(bv);
+        if(first){ctx.moveTo(px,py);first=false;}else ctx.lineTo(px,py);
       }
       ctx.stroke();
       ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.font='9px sans-serif';
-      const rwLabel = Math.min(0.93, 0.5*R/(1-eta));
-      const bwLabel = 0.5*(1-eta)/R;
-      if(rwLabel>=0.40 && rwLabel<=0.95 && bwLabel>=0.30 && bwLabel<=0.95)
-        ctx.fillText('(BW)', toX(rwLabel)+3, toY(bwLabel)-4);
-
-      // δ^G boundary: r = R/(2−β)
-      ctx.strokeStyle = 'rgba(200,100,0,0.75)'; ctx.lineWidth = 1.5;
+      const rwL=Math.min(0.92,0.55*R/(1-eta)), bwL=0.55*(1-eta)/R;
+      if(rwL>=0.40&&rwL<=0.94&&bwL>=0.31&&bwL<=0.94)
+        ctx.fillText('(BW)',toX(rwL)+3,toY(bwL)-4);
+      // δ^G: r = R/(2-β)
+      ctx.strokeStyle='rgba(200,100,0,0.75)'; ctx.lineWidth=1.5;
       ctx.setLineDash([4,3]);
       ctx.beginPath(); first=true;
       for(let bv=0.30; bv<=0.95; bv+=0.002){
-        const rv = deltaG(R,bv);
-        if(rv < 0.40 || rv > 0.95) continue;
-        const px=toX(rv), py=toY(bv);
-        if(first){ ctx.moveTo(px,py); first=false; } else ctx.lineTo(px,py);
+        const rv=deltaG(R,bv);
+        if(rv<0.40||rv>0.95) continue;
+        const px=toX(rv),py=toY(bv);
+        if(first){ctx.moveTo(px,py);first=false;}else ctx.lineTo(px,py);
       }
       ctx.stroke();
       ctx.fillStyle='rgba(180,80,0,0.80)'; ctx.font='9px sans-serif';
-      ctx.fillText('δᴳ', toX(Math.min(0.92, deltaG(R,0.50)))+3, toY(0.50)-4);
+      ctx.fillText('δᴳ',toX(Math.min(0.93,deltaG(R,0.50)))+3,toY(0.50)-4);
       ctx.restore();
     }
   );
 }
 
-/* ── Map 2: (R, β) plane ───────────────────────────────────────────── */
+/* ── Map 2 ──────────────────────────────────────────────────────────── */
 function drawMap2(){
-  const r   = +document.getElementById('p2r').value;
-  const eta = +document.getElementById('p2eta').value;
-  const rb  = +document.getElementById('p2rb').value;
-  const rg  = +document.getElementById('p2rg').value;
-
+  const r=+document.getElementById('p2r').value;
+  const eta=+document.getElementById('p2eta').value;
+  const rb=+document.getElementById('p2rb').value;
+  const rg=+document.getElementById('p2rg').value;
   document.getElementById('v2A').textContent = (1+eta/2-rb).toFixed(4);
   document.getElementById('v2D').textContent = (rg-rb).toFixed(4);
 
   drawMap('canvas2', 1.05,1.60, 0.30,0.95,
-    (Rv, bv) => {
-      if(1-bv-eta <= 0.001 || Rv <= r) return null;
-      return [Rv, r, bv, eta, rb, rg];
-    },
-    (ctx, toX, toY) => {
-      // (BW) boundary: R_BW = r(1−η)/β  →  R = r(1−η)/β
-      ctx.save();
-      ctx.setLineDash([5,3]);
-      ctx.strokeStyle = 'rgba(0,0,0,0.65)'; ctx.lineWidth = 1.5;
+    (Rv,bv) => (1-bv-eta<=0.001||Rv<=r) ? null : [Rv,r,bv,eta,rb,rg],
+    (ctx,toX,toY) => {
+      ctx.save(); ctx.setLineDash([5,3]);
+      // BW boundary: R = r(1-η)/β
+      ctx.strokeStyle='rgba(0,0,0,0.65)'; ctx.lineWidth=1.5;
       ctx.beginPath(); let first=true;
       for(let bv=0.30; bv<=0.95; bv+=0.002){
-        const Rv = r*(1-eta)/bv;
-        if(Rv < 1.05 || Rv > 1.60) continue;
-        const px=toX(Rv), py=toY(bv);
-        if(first){ ctx.moveTo(px,py); first=false; } else ctx.lineTo(px,py);
+        const Rv=r*(1-eta)/bv;
+        if(Rv<1.05||Rv>1.60) continue;
+        const px=toX(Rv),py=toY(bv);
+        if(first){ctx.moveTo(px,py);first=false;}else ctx.lineTo(px,py);
       }
       ctx.stroke();
       ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.font='9px sans-serif';
-      ctx.fillText('(BW)', toX(1.08), toY(0.60)-4);
-
-      // δ^G boundary: δ^G = R/(2−β) = r → R = r(2−β)  (line in R-β plane)
-      ctx.strokeStyle = 'rgba(200,100,0,0.75)'; ctx.lineWidth = 1.5;
+      ctx.fillText('(BW)',toX(1.08),toY(0.60)-4);
+      // δ^G = r line: R = r(2-β)
+      ctx.strokeStyle='rgba(200,100,0,0.75)'; ctx.lineWidth=1.5;
       ctx.setLineDash([4,3]);
       ctx.beginPath(); first=true;
       for(let bv=0.30; bv<=0.95; bv+=0.002){
-        const Rv = r*(2-bv);   // R such that δ^G = R/(2−β) = r
-        if(Rv < 1.05 || Rv > 1.60) continue;
-        const px=toX(Rv), py=toY(bv);
-        if(first){ ctx.moveTo(px,py); first=false; } else ctx.lineTo(px,py);
+        const Rv=r*(2-bv);
+        if(Rv<1.05||Rv>1.60) continue;
+        const px=toX(Rv),py=toY(bv);
+        if(first){ctx.moveTo(px,py);first=false;}else ctx.lineTo(px,py);
       }
       ctx.stroke();
       ctx.fillStyle='rgba(180,80,0,0.80)'; ctx.font='9px sans-serif';
-      ctx.fillText('δᴳ=r', toX(r*(2-0.50))+3, toY(0.50)-4);
+      const Rl=r*(2-0.55); if(Rl>=1.05&&Rl<=1.58)
+        ctx.fillText('δᴳ=r',toX(Rl)+3,toY(0.55)-4);
       ctx.restore();
     }
   );
@@ -548,178 +565,437 @@ function drawMap2(){
 /* ── Click handlers ─────────────────────────────────────────────────── */
 function makeClick(canvasId, xMin,xMax, yMin,yMax, cb){
   document.getElementById(canvasId).addEventListener('click', function(e){
-    const rect = this.getBoundingClientRect();
-    const sx = this.width/rect.width, sy = this.height/rect.height;
-    const px = (e.clientX-rect.left)*sx, py = (e.clientY-rect.top)*sy;
-    const iW = this.width-PAD.l-PAD.r, iH = this.height-PAD.t-PAD.b;
-    const xv = Math.max(xMin, Math.min(xMax, xMin+((px-PAD.l)/iW)*(xMax-xMin)));
-    const yv = Math.max(yMin, Math.min(yMax, yMin+(1-(py-PAD.t)/iH)*(yMax-yMin)));
-    cb(xv, yv);
+    const rect=this.getBoundingClientRect();
+    const sx=this.width/rect.width, sy=this.height/rect.height;
+    const px=(e.clientX-rect.left)*sx, py=(e.clientY-rect.top)*sy;
+    const iW=this.width-PAD.l-PAD.r, iH=this.height-PAD.t-PAD.b;
+    const xv=Math.max(xMin,Math.min(xMax,xMin+((px-PAD.l)/iW)*(xMax-xMin)));
+    const yv=Math.max(yMin,Math.min(yMax,yMin+(1-(py-PAD.t)/iH)*(yMax-yMin)));
+    cb(xv,yv);
   });
+}
+
+function inspectResult(res, R, r, beta, eta, rb){
+  const ci=CI(R,r), cii=CII(R,beta,eta);
+  const wG=1+eta/2+ci, wB=1+eta/2+cii/2;
+  const msgs={
+    'A-corner': 'Tie: Solution A at corner σ*=0. W_P = W_G. (BW fails or Π^B ≤ Π^A)',
+    'A-int':    'Tie: Solution A interior. W_P = W_G.',
+    'B-int':    'B-interior: W_P > W_G. Formula: (w^B−w^G)(w^B+w^G−r_b)/(2Δ) > 0.',
+    'B-con':    res.WG > res.WP+1e-9
+                  ? 'B-constrained. Forced σ=σ̄ compresses M^P via T*x²/2 → W_G > W_P.'
+                  : 'B-constrained, but W_P ≥ W_G here.',
+  };
+  return {wG, wB, msg: msgs[res.cfg] || res.cfg};
 }
 
 makeClick('canvas1', 0.40,0.95, 0.30,0.95, (rv,bv) => {
   const R=+document.getElementById('p1R').value, eta=+document.getElementById('p1eta').value;
   const rb=+document.getElementById('p1rb').value, rg=+document.getElementById('p1rg').value;
-  const res = computeWP(R,rv,bv,eta,rb,rg);
+  const res=computeWP(R,rv,bv,eta,rb,rg);
+  const {wG,wB,msg}=inspectResult(res,R,rv,bv,eta,rb);
   document.getElementById('i1b').textContent    = bv.toFixed(3);
   document.getElementById('i1r').textContent    = rv.toFixed(3);
-  document.getElementById('i1wp').textContent   = res.feasible ? res.WP.toFixed(5) : '—';
-  document.getElementById('i1wg').textContent   = res.feasible ? res.WG.toFixed(5) : '—';
-  document.getElementById('i1sbar').textContent = res.feasible ? res.sb.toFixed(4) : '—';
-  document.getElementById('i1sb').textContent   = res.feasible ? res.sB.toFixed(4) : '—';
+  document.getElementById('i1wp').textContent   = res.feasible?res.WP.toFixed(5):'—';
+  document.getElementById('i1wg').textContent   = res.feasible?res.WG.toFixed(5):'—';
+  document.getElementById('i1wgper').textContent= wG.toFixed(5);
+  document.getElementById('i1wbper').textContent= wB.toFixed(5);
+  document.getElementById('i1sbar').textContent = res.feasible?res.sb.toFixed(4):'—';
+  document.getElementById('i1sb').textContent   = res.feasible?res.sB.toFixed(4):'—';
   document.getElementById('i1cfg').textContent  = res.cfg;
   document.getElementById('i1dg').textContent   = deltaG(R,bv).toFixed(4);
-
-  const msgs = {
-    'A-corner':  'BW fails or Π^B ≤ Π^A. Issuer at Solution A, σ* = 0. W_P = W_G (tie).',
-    'A-int':     'BW fails or Π^B ≤ Π^A. Issuer at Solution A interior. W_P = W_G (tie).',
-    'B-int':     'BW holds, σ̂^B ≥ σ̄ → B-interior. Blocking self-sustaining. W_P > W_G.',
-    'B-con':     res.feasible && res.WG > res.WP + 1e-9
-                   ? 'BW holds, B-constrained (σ̂^B < σ̄). High T* compresses M^P → W_G > W_P.'
-                   : 'BW holds, B-constrained (σ̂^B < σ̄). W_P ≥ W_G here.',
-  };
-  document.getElementById('i1text').textContent = msgs[res.cfg] || res.cfg;
+  document.getElementById('i1text').textContent = msg;
 });
 
 makeClick('canvas2', 1.05,1.60, 0.30,0.95, (Rv,bv) => {
   const r=+document.getElementById('p2r').value, eta=+document.getElementById('p2eta').value;
   const rb=+document.getElementById('p2rb').value, rg=+document.getElementById('p2rg').value;
-  const res = computeWP(Rv,r,bv,eta,rb,rg);
+  const res=computeWP(Rv,r,bv,eta,rb,rg);
+  const {wG,wB,msg}=inspectResult(res,Rv,r,bv,eta,rb);
   document.getElementById('i2b').textContent    = bv.toFixed(3);
   document.getElementById('i2R').textContent    = Rv.toFixed(3);
-  document.getElementById('i2wp').textContent   = res.feasible ? res.WP.toFixed(5) : '—';
-  document.getElementById('i2wg').textContent   = res.feasible ? res.WG.toFixed(5) : '—';
-  document.getElementById('i2sbar').textContent = res.feasible ? res.sb.toFixed(4) : '—';
-  document.getElementById('i2sb').textContent   = res.feasible ? res.sB.toFixed(4) : '—';
+  document.getElementById('i2wp').textContent   = res.feasible?res.WP.toFixed(5):'—';
+  document.getElementById('i2wg').textContent   = res.feasible?res.WG.toFixed(5):'—';
+  document.getElementById('i2wgper').textContent= wG.toFixed(5);
+  document.getElementById('i2wbper').textContent= wB.toFixed(5);
+  document.getElementById('i2sbar').textContent = res.feasible?res.sb.toFixed(4):'—';
+  document.getElementById('i2sb').textContent   = res.feasible?res.sB.toFixed(4):'—';
   document.getElementById('i2cfg').textContent  = res.cfg;
-  document.getElementById('i2bw').textContent   = res.bw ? 'Yes' : 'No';
-  const msgs = {
-    'A-corner': 'Tie — Solution A, σ* = 0. W_P = W_G.',
-    'A-int':    'Tie — Solution A interior. W_P = W_G.',
-    'B-int':    'B-interior: blocking self-sustaining. W_P > W_G.',
-    'B-con':    res.feasible && res.WG > res.WP + 1e-9
-                  ? 'B-constrained: σ = σ̄ forced. W_G > W_P (government dominates).'
-                  : 'B-constrained: W_P ≥ W_G.',
-  };
-  document.getElementById('i2text').textContent = msgs[res.cfg] || res.cfg;
+  document.getElementById('i2bw').textContent   = res.bw?'Yes':'No';
+  document.getElementById('i2text').textContent = msg;
 });
 
-/* ── σ* monotonicity table ──────────────────────────────────────────── */
+/* ── σ* + Welfare statics table ─────────────────────────────────────── */
 const rows = [
-  ['R ↑', '+', '+',   'Yes (both)', 'Higher return expands C_I and C_II; issuer shares more'],
-  ['r ↑', '+', '0',   'I only',    'r enters C_I but not C_II (no fire sales in Regime II)'],
-  ['β ↑', '0', '+',   'II only',   'β lowers T*, expanding C_II; σ̄ falls (blocking cheaper)'],
-  ['η ↑', '−', '± †', 'I only',   'η raises A, compressing σ̂^A; σ^{II*} sign depends on r_b'],
-  ['r_b ↑','+','+',  'Yes (both)', 'Higher outside option forces more yield-sharing'],
-  ['r_g ↑','0','0',   '—',         'Scales market distribution; does not shift optimal σ'],
+  ['R ↑', '+', '+',   '+',   'Higher return raises C_I, C_II; both regimes share more, w^B gains faster'],
+  ['r ↑', '+', '0',   '−',   'r raises C_I → w^G rises, leaves w^B unchanged → gap shrinks. High r → government looks better'],
+  ['β ↑', '0', '+',   '+',   'β lowers T*, expands C_II → w^B rises, w^G unchanged. Private advantage grows'],
+  ['η ↑', '−', '± †', '+',   '∂(C_II/2)/∂η > 0: T* falls → w^B rises. Net: w^B−w^G rises'],
+  ['r_b↑','+', '+',   '0',   'Raises A, compresses optimal σ* to share yield. Gap independent of r_b'],
+  ['r_g↑','0', '0',   '0',   'Scales Δ only; does not shift σ* or per-dep welfare'],
 ];
 const tb = document.getElementById('sigTable');
-rows.forEach(([p,si,sii,mono,mech]) => {
-  const tr = document.createElement('tr');
-  function sc(s){ return s.startsWith('+')? 'pos' : s.startsWith('-')||s.startsWith('−')? 'neg' : s==='0'? 'zero' : 'amb'; }
-  tr.innerHTML = `
-    <td><strong>${p}</strong></td>
+rows.forEach(([p,si,sii,sw,mech]) => {
+  const tr=document.createElement('tr');
+  function sc(s){ return s.startsWith('+')? 'pos': s.startsWith('-')||s.startsWith('−')? 'neg': s==='0'? 'zero': 'amb'; }
+  tr.innerHTML=`<td><strong>${p}</strong></td>
     <td style="text-align:center" class="${sc(si)}">${si}</td>
     <td style="text-align:center" class="${sc(sii)}">${sii}</td>
-    <td style="text-align:center;font-size:12px">${mono}</td>
+    <td style="text-align:center" class="${sc(sw)}">${sw}</td>
     <td style="color:#666;font-size:12px">${mech}</td>`;
   tb.appendChild(tr);
 });
 
-/* ── Live σ* and W calculator ───────────────────────────────────────── */
+/* ── Live calculator ────────────────────────────────────────────────── */
 function updateSig(){
-  const R    = +document.getElementById('sR2').value;
-  const r    = +document.getElementById('sr2').value;
-  const beta = +document.getElementById('sbeta2').value;
-  const eta  = +document.getElementById('seta2').value;
-  const rb   = +document.getElementById('srb2').value;
-  const rg   = +document.getElementById('srg2').value;
+  const R    =+document.getElementById('sR2').value;
+  const r    =+document.getElementById('sr2').value;
+  const beta =+document.getElementById('sbeta2').value;
+  const eta  =+document.getElementById('seta2').value;
+  const rb   =+document.getElementById('srb2').value;
+  const rg   =+document.getElementById('srg2').value;
 
-  const cards = document.getElementById('sigCards');
-  const note  = document.getElementById('sigNote');
+  const sc = document.getElementById('sigCards');
+  const wc = document.getElementById('wCards');
+  const mc = document.getElementById('mCards');
+  const wd = document.getElementById('wDecomp');
+  const sn = document.getElementById('sigNote');
 
-  if(1-beta-eta <= 0.001){
-    cards.innerHTML = '';
-    note.textContent = 'Infeasible: β+η ≥ 1 (FR violated).'; return;
+  if(1-beta-eta<=0.001){
+    sc.innerHTML=wc.innerHTML=mc.innerHTML='';
+    wd.innerHTML=sn.innerHTML='Infeasible: β+η≥1.'; return;
   }
-  const A  = Av(eta,rb), D = Dv(rb,rg);
-  if(A <= 0){ note.textContent = 'A ≤ 0: r_b ≥ 1+η/2. Increase η or decrease r_b.'; return; }
-  if(D <= 0){ note.textContent = 'r_g ≤ r_b. Increase r_g.'; return; }
+  const A=Av(eta,rb), D=Dv(rb,rg);
+  if(A<=0||D<=0||R<=r){
+    wd.innerHTML=sn.innerHTML='Check parameters: A>0, Δ>0, R>r required.'; return;
+  }
 
-  const T  = Tstar(beta,eta);
-  const sb = sigBar(beta,R,r,eta);
-  const sA = Math.max(0, Math.min(sb-1e-10, sighatA(R,r,eta,rb)));
-  const sB = sighatB(R,beta,eta,rb);
+  const T   = Tstar(beta,eta);
+  const sb  = sigBar(beta,R,r,eta);
+  const sA  = sighatA(R,r,eta,rb);
+  const sB  = sighatB(R,beta,eta,rb);
   const sBc = Math.max(sb, sB);
-  const ci = CI(R,r), cii = CII(R,beta,eta);
-  const xi = xTilde(R,r), xii = xIIstar(R,beta,eta);
+  const ci  = CI(R,r), cii = CII(R,beta,eta);
+  const xi  = xTilde(R,r), xii = xIIstar(R,beta,eta);
   const res = computeWP(R,r,beta,eta,rb,rg);
   const dg  = deltaG(R,beta);
+  const sigGv = Math.max(0, Math.min(sb>0?sb-1e-10:0, sA));
 
-  const wLabel = res.cfg;
-  const wComp  = res.feasible
-    ? (Math.abs(res.WP-res.WG) < 1e-8 ? 'W_P = W_G' : res.WP > res.WG ? 'W_P > W_G' : 'W_G > W_P') : '—';
-  const wClass  = res.feasible && res.WG > res.WP+1e-9 ? 'warn' : 'good';
+  // Per-depositor welfare (at optimal x)
+  const wG = 1 + eta/2 + ci;        // at x = x̃
+  const wB = 1 + eta/2 + cii/2;     // at x = x^II*
+  const wdiff = wB - wG;
 
-  cards.innerHTML = `
-    <div class="mcard"><div class="ml">σ<sup>I*</sup></div><div class="mv">${sA.toFixed(4)}</div></div>
-    <div class="mcard"><div class="ml">σ<sup>II*</sup> (= max(σ̄,σ̂<sup>B</sup>))</div><div class="mv">${sBc.toFixed(4)}</div></div>
+  // Market sizes at interior optima
+  const MG_int = Math.max(0, (wG-rb)/(2*D));  // A-interior formula
+  const MG_cor = Math.max(0, A/D);             // A-corner formula (σ=0)
+  const MG     = sA > 0 ? MG_int : MG_cor;    // actual
+  const MP_int = Math.max(0, (wB-rb)/(2*D));   // B-interior formula
+
+  // Welfare at interior optima (for reference)
+  const WG_form = MG * wG;
+  const WP_int  = MP_int * wB;
+
+  // Welfare difference (closed-form, B-interior case)
+  const Wdiff_closed = wdiff * (wB + wG - rb) / (2*D);
+
+  const wClass = res.feasible && res.WG > res.WP+1e-9 ? 'warn' : 'good';
+  const wComp  = !res.feasible ? '—' :
+    Math.abs(res.WP-res.WG)<1e-8 ? 'W_P = W_G' :
+    res.WP>res.WG ? 'W_P > W_G' : 'W_G > W_P';
+
+  sc.innerHTML=`
+    <div class="mcard"><div class="ml">σ<sup>I*</sup> = max(0,σ̂<sup>A</sup>)</div><div class="mv">${Math.max(0,sA).toFixed(4)}</div></div>
+    <div class="mcard"><div class="ml">σ<sup>II*</sup> = max(σ̄,σ̂<sup>B</sup>)</div><div class="mv">${sBc.toFixed(4)}</div></div>
     <div class="mcard"><div class="ml">σ̄ (blocking floor)</div><div class="mv">${sb.toFixed(4)}</div></div>
     <div class="mcard"><div class="ml">σ̂<sup>B</sup> (unconstrained)</div><div class="mv">${sB.toFixed(4)}</div></div>
-    <div class="mcard"><div class="ml">B-interior? σ̂<sup>B</sup>≥σ̄</div><div class="mv">${sB >= sb ? 'Yes' : 'No (constrained)'}</div></div>
-    <div class="mcard"><div class="ml">Config</div><div class="mv">${wLabel}</div></div>
-    <div class="mcard"><div class="ml">W<sub>P</sub></div><div class="mv">${res.feasible ? res.WP.toFixed(5) : '—'}</div></div>
-    <div class="mcard"><div class="ml">W<sub>G</sub></div><div class="mv">${res.feasible ? res.WG.toFixed(5) : '—'}</div></div>
-    <div class="mcard"><div class="ml">Welfare verdict</div><div class="mv ${wClass}">${wComp}</div></div>
-    <div class="mcard"><div class="ml">x̃ = x<sup>I*</sup></div><div class="mv">${xi.toFixed(4)}</div></div>
-    <div class="mcard"><div class="ml">x<sup>II*</sup></div><div class="mv">${xii.toFixed(4)}</div></div>
+    <div class="mcard"><div class="ml">B-interior? σ̂<sup>B</sup>≥σ̄</div><div class="mv">${sB>=sb?'Yes ✓':'No — constrained'}</div></div>
+    <div class="mcard"><div class="ml">Config</div><div class="mv">${res.cfg}</div></div>`;
+
+  wc.innerHTML=`
+    <div class="mcard"><div class="ml">w<sup>G</sup> = 1+η/2+C<sub>I</sub></div><div class="mv">${wG.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">w<sup>B</sup> = 1+η/2+C<sub>II</sub>/2</div><div class="mv">${wB.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">w<sup>B</sup>−w<sup>G</sup> = C<sub>II</sub>/2−C<sub>I</sub></div><div class="mv ${wdiff>1e-9?'pos':wdiff<-1e-9?'neg':'zero'}">${wdiff.toFixed(5)}</div></div>`;
+
+  mc.innerHTML=`
+    <div class="mcard"><div class="ml">M<sup>G</sup> (at ${sA>0?'interior':'corner'})</div><div class="mv">${MG.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">M<sup>P</sup> (B-int formula)</div><div class="mv">${MP_int.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">W<sub>P</sub> (actual)</div><div class="mv">${res.feasible?res.WP.toFixed(5):'—'}</div></div>
+    <div class="mcard"><div class="ml">W<sub>G</sub> (actual)</div><div class="mv">${res.feasible?res.WG.toFixed(5):'—'}</div></div>
+    <div class="mcard"><div class="ml">Verdict</div><div class="mv ${wClass}">${wComp}</div></div>
     <div class="mcard"><div class="ml">δ<sup>G</sup> = R/(2−β)</div><div class="mv">${dg.toFixed(4)}</div></div>`;
 
+  const bwLHS=(beta*(R-r)).toFixed(4), bwRHS=(r*(1-beta-eta)).toFixed(4);
+  const bwHolds = +bwLHS > +bwRHS;
+  wd.innerHTML=`<strong>Welfare decomposition (B-interior closed form):</strong><br>
+    W<sub>P</sub>−W<sub>G</sub> = (w<sup>B</sup>−w<sup>G</sup>)(w<sup>B</sup>+w<sup>G</sup>−r<sub>b</sub>)/[2Δ]
+    = <strong>${Wdiff_closed.toFixed(5)}</strong>
+    &nbsp;|&nbsp; sign = sign(w<sup>B</sup>−w<sup>G</sup>) = sign(BW)<br>
+    (BW): β(R−r) > r(1−β−η) → ${bwLHS} ${bwHolds?'>':'≤'} ${bwRHS}
+    → BW ${bwHolds?'<span class="good">holds</span>':'<span style="color:#888">fails</span>'}
+    &nbsp;|&nbsp; Actual config: ${res.cfg}<br>
+    ${res.cfg==='B-int'
+      ? `At B-interior: actual W<sub>P</sub>−W<sub>G</sub> = ${(res.WP-res.WG).toFixed(5)} matches closed form.`
+      : res.cfg==='B-con'
+      ? `At B-constrained: formula above is for interior reference. Actual W<sub>P</sub>−W<sub>G</sub> = ${res.feasible?(res.WP-res.WG).toFixed(5):'—'}.`
+      : 'Solution A: W_P = W_G (tie).'}`;
+
   const etaSign = 1+beta+2*eta-2*rb;
-  note.innerHTML =
-    `A = <strong>${A.toFixed(4)}</strong> &nbsp; T* = <strong>${T.toFixed(4)}</strong> &nbsp; C<sub>I</sub> = <strong>${ci.toFixed(4)}</strong> &nbsp; C<sub>II</sub> = <strong>${cii.toFixed(4)}</strong><br>
-    BW condition β(R−r) > r(1−β−η): &nbsp;
-    ${(beta*(R-r)).toFixed(4)} ${beta*(R-r) > r*(1-beta-eta) ? '>' : '≤'} ${(r*(1-beta-eta)).toFixed(4)} &nbsp;
-    → BW ${beta*(R-r) > r*(1-beta-eta) ? '<span class="good">holds</span>' : '<span style="color:#888">fails</span>'}<br>
-    η-ambiguity: sign(1+β+2η−2r<sub>b</sub>) = sign(${etaSign.toFixed(4)}) → σ<sup>II*</sup>
-    ${etaSign > 0 ? 'increases' : 'decreases'} in η.`;
+  sn.innerHTML=`A=${A.toFixed(4)} &nbsp;T*=${T.toFixed(4)} &nbsp;C<sub>I</sub>=${ci.toFixed(4)} &nbsp;C<sub>II</sub>=${cii.toFixed(4)}<br>
+    x̃=${xi.toFixed(4)} &nbsp;x<sup>II*</sup>=${xii.toFixed(4)} &nbsp;σ<sup>G*</sup>=${sigGv.toFixed(4)}<br>
+    η-ambiguity: sign(∂σ<sup>II*</sup>/∂η) = sign(${etaSign.toFixed(3)}) →
+    σ<sup>II*</sup> ${etaSign>0?'increases':'decreases'} in η.`;
+}
+
+/* ── Profit Envelope (Tab 4) ─────────────────────────────────────────── */
+function drawEnvelope(){
+  const R    =+document.getElementById('eR').value;
+  const r    =+document.getElementById('er').value;
+  const beta =+document.getElementById('ebeta').value;
+  const eta  =+document.getElementById('eeta').value;
+  const rb   =+document.getElementById('erb').value;
+  const rg   =+document.getElementById('erg').value;
+
+  const cvs = document.getElementById('canvasEnv');
+  const ctx = cvs.getContext('2d');
+  const W = cvs.width, H = cvs.height;
+  const pad = {l:50, r:15, t:20, b:38};
+  const iW = W-pad.l-pad.r, iH = H-pad.t-pad.b;
+
+  ctx.clearRect(0,0,W,H);
+
+  const A=Av(eta,rb), D=Dv(rb,rg);
+  if(1-beta-eta<=0.001||A<=0||D<=0||R<=r||r<=0){
+    ctx.fillStyle='#888'; ctx.font='13px sans-serif';
+    ctx.fillText('Infeasible parameters',W/2-80,H/2); return;
+  }
+
+  const ci  = CI(R,r), cii = CII(R,beta,eta);
+  const sb  = sigBar(beta,R,r,eta);
+  const sA  = sighatA(R,r,eta,rb);
+  const sB  = sighatB(R,beta,eta,rb);
+  const bw  = cii/2 > ci;
+  const sbClamped = Math.min(Math.max(sb, 0), 1);
+
+  const pA = s => piA_env(s, ci, A, D);
+  const pB = s => piB_env(s, cii, A, D);
+
+  // Y-range
+  const N=300;
+  let yMax=0;
+  for(let i=0;i<=N;i++){
+    const s=i/N;
+    yMax=Math.max(yMax, pA(s), pB(s));
+  }
+  if(yMax<1e-12){ ctx.fillStyle='#888'; ctx.font='13px sans-serif';
+    ctx.fillText('Zero profit',W/2-40,H/2); return; }
+  yMax*=1.20;
+
+  const toX = s => pad.l + s*iW;
+  const toY = v => pad.t + (1 - Math.max(0,v)/yMax)*iH;
+  const dot  = (x,y,r,fill,stroke) => {
+    ctx.beginPath(); ctx.arc(x,y,r,0,2*Math.PI);
+    if(fill){ctx.fillStyle=fill;ctx.fill();}
+    if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.5;ctx.stroke();}
+  };
+
+  // Grid
+  ctx.strokeStyle='rgba(0,0,0,0.06)'; ctx.lineWidth=0.5;
+  for(let i=1;i<=4;i++){
+    const s=i/5;
+    ctx.beginPath();ctx.moveTo(toX(s),pad.t);ctx.lineTo(toX(s),pad.t+iH);ctx.stroke();
+    const v=i*yMax/5;
+    ctx.beginPath();ctx.moveTo(pad.l,toY(v));ctx.lineTo(pad.l+iW,toY(v));ctx.stroke();
+  }
+  // Axes
+  ctx.strokeStyle='rgba(0,0,0,0.25)'; ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,pad.t+iH);
+  ctx.lineTo(pad.l+iW,pad.t+iH);ctx.stroke();
+
+  // σ̄ vertical dashed line
+  if(sbClamped>0&&sbClamped<1){
+    ctx.save(); ctx.setLineDash([6,3]);
+    ctx.strokeStyle='rgba(0,0,0,0.35)'; ctx.lineWidth=1.2;
+    ctx.beginPath();ctx.moveTo(toX(sbClamped),pad.t);ctx.lineTo(toX(sbClamped),pad.t+iH);ctx.stroke();
+    ctx.restore();
+    ctx.fillStyle='rgba(0,0,0,0.45)'; ctx.font='9px sans-serif';
+    ctx.fillText('σ̄',toX(sbClamped)+3,pad.t+10);
+  }
+
+  // Draw Π^A (blue) for σ ∈ [0, min(σ̄,1)]
+  const sbA = Math.min(sbClamped<1e-9?1:sbClamped, 1);
+  ctx.save(); ctx.setLineDash([]);
+  ctx.strokeStyle='#2563eb'; ctx.lineWidth=2.5;
+  ctx.beginPath(); let first=true;
+  for(let i=0;i<=N;i++){
+    const s=i/N;
+    if(s>sbA+0.001) continue;
+    const x=toX(s),y=toY(pA(s));
+    if(first){ctx.moveTo(x,y);first=false;}else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  // Draw Π^B (red) for σ ∈ [σ̄, 1]
+  if(sbClamped<1){
+    ctx.strokeStyle=bw?'#DC3C37':'#DC3C37';
+    ctx.lineWidth=2.5; ctx.setLineDash(bw?[]:[5,3]);
+    ctx.beginPath(); first=true;
+    for(let i=0;i<=N;i++){
+      const s=i/N;
+      if(s<sbClamped-0.001) continue;
+      const x=toX(s),y=toY(pB(s));
+      if(first){ctx.moveTo(x,y);first=false;}else ctx.lineTo(x,y);
+    }
+    ctx.stroke(); ctx.setLineDash([]);
+  }
+  ctx.restore();
+
+  // σ̂^A marker (dotted blue vertical)
+  const sAv=Math.max(0,Math.min(sA, sbClamped<1?sbClamped:1));
+  if(sA>0&&sA<sbClamped){
+    ctx.save(); ctx.setLineDash([3,3]);
+    ctx.strokeStyle='rgba(37,99,235,0.45)'; ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(toX(sAv),pad.t+iH);ctx.lineTo(toX(sAv),toY(pA(sAv)));ctx.stroke();
+    ctx.restore();
+    dot(toX(sAv),toY(pA(sAv)),4,'#2563eb',null);
+    ctx.fillStyle='#2563eb'; ctx.font='9px sans-serif';
+    ctx.fillText('σ̂ᴬ',toX(sAv)+4,toY(pA(sAv))-5);
+  }
+
+  // σ̂^B marker (dotted red vertical)
+  if(sbClamped<1&&sB>=sbClamped&&sB<=1){
+    ctx.save(); ctx.setLineDash([3,3]);
+    ctx.strokeStyle='rgba(220,60,55,0.45)'; ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(toX(sB),pad.t+iH);ctx.lineTo(toX(sB),toY(pB(sB)));ctx.stroke();
+    ctx.restore();
+    dot(toX(sB),toY(pB(sB)),4,'#DC3C37',null);
+    ctx.fillStyle='#DC3C37'; ctx.font='9px sans-serif';
+    ctx.fillText('σ̂ᴮ',toX(sB)+4,toY(pB(sB))-5);
+  }
+
+  // Jump at σ̄
+  if(sbClamped>0&&sbClamped<1){
+    const pAl = pA(sbClamped);  // left limit (A branch)
+    const pBr = pB(sbClamped);  // right limit (B branch, at x=x^II*)
+    const jump = pBr - pAl;
+    // Open circle on A branch
+    dot(toX(sbClamped),toY(pAl),4,null,'#2563eb');
+    ctx.fillStyle='#fff'; ctx.fill();
+    // Filled circle on B branch
+    dot(toX(sbClamped),toY(pBr),4,bw?'#DC3C37':'#888',null);
+    // Jump arrow
+    if(Math.abs(jump)>0.02*yMax&&sbClamped>0.05){
+      const ax=toX(sbClamped)-15;
+      const y1=toY(pAl), y2=toY(pBr);
+      const col=bw?'rgb(180,90,0)':'rgb(120,120,120)';
+      ctx.save(); ctx.strokeStyle=col; ctx.fillStyle=col;
+      ctx.lineWidth=1.5; ctx.setLineDash([]);
+      ctx.beginPath(); ctx.moveTo(ax,y1); ctx.lineTo(ax,y2); ctx.stroke();
+      const arrowDir = bw ? -1 : 1;
+      ctx.beginPath(); ctx.moveTo(ax,y2); ctx.lineTo(ax-4,y2+arrowDir*7); ctx.lineTo(ax+4,y2+arrowDir*7);
+      ctx.closePath(); ctx.fill();
+      ctx.font='9px sans-serif'; ctx.fillText(bw?'▲(BW)':'▼(no BW)',ax-28,(y1+y2)/2);
+      ctx.restore();
+    }
+  }
+
+  // Global optimum σ* (star)
+  const res = computeWP(R,r,beta,eta,rb,rg);
+  let sigStar, piStar;
+  if(res.cfg==='A-corner'){ sigStar=0; piStar=pA(0); }
+  else if(res.cfg==='A-int'){ sigStar=Math.max(0,sA); piStar=pA(sigStar); }
+  else if(res.cfg==='B-int'){ sigStar=Math.min(1,Math.max(sbClamped,sB)); piStar=pB(sigStar); }
+  else if(res.cfg==='B-con'){ sigStar=sbClamped; piStar=pB(sigStar); }
+  if(sigStar!=null&&piStar!=null){
+    const sx=toX(sigStar),sy=toY(piStar);
+    ctx.save(); ctx.fillStyle='gold'; ctx.strokeStyle='#333'; ctx.lineWidth=1;
+    ctx.font='bold 16px sans-serif'; ctx.textAlign='center';
+    ctx.fillText('★',sx,sy+5);
+    ctx.strokeText('★',sx,sy+5);
+    ctx.textAlign='left'; ctx.restore();
+    ctx.fillStyle='#333'; ctx.font='9px sans-serif';
+    ctx.fillText(`σ*=${sigStar.toFixed(3)}`,sx+8,sy+5);
+  }
+
+  // Axis labels
+  ctx.fillStyle='rgba(0,0,0,0.45)'; ctx.font='9px sans-serif';
+  for(let i=0;i<=5;i++){
+    ctx.fillText((i/5).toFixed(1),toX(i/5)-6,pad.t+iH+16);
+    const yv=i*yMax/5;
+    ctx.fillText(yv.toFixed(3),2,toY(yv)+3);
+  }
+  ctx.save(); ctx.translate(13,pad.t+iH/2); ctx.rotate(-Math.PI/2);
+  ctx.fillText('Π(σ)',-10,0); ctx.restore();
+  ctx.fillText('σ →',pad.l+iW-22,pad.t+iH+28);
+
+  // Legend
+  ctx.font='10px sans-serif';
+  ctx.fillStyle='#2563eb'; ctx.fillText('— Π^A(σ), Sol.A (x = x̃)',pad.l+5,pad.t+14);
+  ctx.fillStyle='#DC3C37'; ctx.fillText(`${bw?'—':'- -'} Π^B(σ), Sol.B (x = x^II*)  [${bw?'(BW)':'¬(BW)'}]`,pad.l+5,pad.t+25);
+
+  // Update sidebar cards
+  updateEnvCards(R,r,beta,eta,rb,rg,sb,sA,sB,ci,cii,bw,D,A,res);
+}
+
+function updateEnvCards(R,r,beta,eta,rb,rg,sb,sA,sB,ci,cii,bw,D,A,res){
+  const xi=xTilde(R,r), xii=xIIstar(R,beta,eta);
+  const pA_peak=piA_env(Math.max(0,sA),ci,A,D);
+  const pB_peak=piB_env(Math.max(sb,sB),cii,A,D);
+  const wG=1+eta/2+ci, wB=1+eta/2+cii/2;
+
+  document.getElementById('envCards').innerHTML=`
+    <div class="mcard"><div class="ml">C<sub>I</sub> = r(R−1)²/[2(R−r)]</div><div class="mv">${ci.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">C<sub>II</sub>/2 = β(R−1)²/[2(1−β−η)]</div><div class="mv">${(cii/2).toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">σ̄ = (1−β−η)r/[β(R−r)]</div><div class="mv">${sb.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">σ̂<sup>A</sup> = ½ − A/(2C<sub>I</sub>)</div><div class="mv">${sA.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">σ̂<sup>B</sup> = ¾ − AT*/(2(R−1)²)</div><div class="mv">${sB.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">(BW): C<sub>II</sub>/2 > C<sub>I</sub></div><div class="mv ${bw?'good':'zero'}">${bw?'Yes ✓':'No'}</div></div>
+    <div class="mcard"><div class="ml">Π<sup>A*</sup> (peak of A branch)</div><div class="mv">${pA_peak.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">Π<sup>B*</sup> (peak of B branch)</div><div class="mv">${pB_peak.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">x̃ = x<sup>I*</sup></div><div class="mv">${xi.toFixed(4)}</div></div>
+    <div class="mcard"><div class="ml">x<sup>II*</sup></div><div class="mv">${xii.toFixed(4)}</div></div>`;
+
+  document.getElementById('envNote').innerHTML=
+    `Jump at σ̄ = ${sb.toFixed(4)}: &nbsp;
+    Π<sup>A</sup>(σ̄) = ${piA_env(Math.min(sb,1),ci,A,D).toFixed(5)}  &nbsp;|&nbsp;
+    Π<sup>B</sup>(σ̄) = ${piB_env(Math.min(sb,1),cii,A,D).toFixed(5)}<br>
+    Jump = ${(piB_env(Math.min(sb,1),cii,A,D)-piA_env(Math.min(sb,1),ci,A,D)).toFixed(5)}
+    (${bw?'upward — (BW) holds':'downward — (BW) fails'})<br>
+    Global optimum: σ* = ${res.cfg}, &nbsp;
+    w<sup>G</sup> = ${(1+eta/2+ci).toFixed(4)}, &nbsp; w<sup>B</sup> = ${(1+eta/2+cii/2).toFixed(4)}<br>
+    Structural symmetry: Π<sup>k*</sup> = (A + C<sup>k</sup>/2)²/(4Δ)
+    where C<sup>A</sup>=C<sub>I</sub>, C<sup>B</sup>=C<sub>II</sub>/2.`;
 }
 
 /* ── Slider binding ─────────────────────────────────────────────────── */
 function bindSliders(ids, fn){
   ids.forEach(([id,outId,dec]) => {
-    document.getElementById(id).addEventListener('input', function(){
-      document.getElementById(outId).textContent = parseFloat(this.value).toFixed(dec);
+    document.getElementById(id).addEventListener('input',function(){
+      document.getElementById(outId).textContent=parseFloat(this.value).toFixed(dec);
       fn();
     });
   });
 }
-
-bindSliders([
-  ['p1R','v1R',2],['p1eta','v1eta',3],['p1rb','v1rb',2],['p1rg','v1rg',2]
-], drawMap1);
-
-bindSliders([
-  ['p2r','v2r',3],['p2eta','v2eta',3],['p2rb','v2rb',2],['p2rg','v2rg',2]
-], drawMap2);
-
-bindSliders([
-  ['sR2','vsR2',2],['sr2','vsr2',3],['sbeta2','vsbeta2',2],
-  ['seta2','vseta2',3],['srb2','vsrb2',2],['srg2','vsrg2',2]
-], updateSig);
+bindSliders([['p1R','v1R',2],['p1eta','v1eta',3],['p1rb','v1rb',2],['p1rg','v1rg',2]], drawMap1);
+bindSliders([['p2r','v2r',3],['p2eta','v2eta',3],['p2rb','v2rb',2],['p2rg','v2rg',2]], drawMap2);
+bindSliders([['sR2','vsR2',2],['sr2','vsr2',3],['sbeta2','vsbeta2',2],
+             ['seta2','vseta2',3],['srb2','vsrb2',2],['srg2','vsrg2',2]], updateSig);
+bindSliders([['eR','veR',2],['er','ver',3],['ebeta','vebeta',2],
+             ['eeta','veeta',3],['erb','verb',2],['erg','verg',2]], drawEnvelope);
 
 function showTab(id, btn){
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   btn.classList.add('active');
   if(id==='map1') drawMap1();
   if(id==='map2') drawMap2();
+  if(id==='sigma') updateSig();
+  if(id==='env')  drawEnvelope();
 }
 
 /* Initial render */
-drawMap1(); drawMap2(); updateSig();
+drawMap1(); drawMap2(); updateSig(); drawEnvelope();
 </script>
 </body>
 </html>
