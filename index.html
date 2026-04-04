@@ -1,16 +1,582 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Regime Preference Simulation</title>
-    <style>
-      *, *::before, *::after { box-sizing: border-box; }
-      body { margin: 0; background: #fafafa; }
-    </style>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stablecoin Welfare Simulation — Tan (2026)</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 14px;
+    background: #f9f9f7;
+    color: #1a1a18;
+    padding: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
+  .subtitle { font-size: 12px; color: #666; margin-bottom: 20px; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+  .tab {
+    padding: 5px 14px; border: 1px solid #ccc; border-radius: 6px;
+    cursor: pointer; font-size: 13px; background: transparent; color: #555;
+  }
+  .tab.active { background: #eee; color: #111; font-weight: 500; border-color: #aaa; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .row { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+  .col-map { flex: 0 0 400px; }
+  .col-ctrl { flex: 1; min-width: 220px; }
+  canvas { border: 1px solid #ddd; border-radius: 6px; width: 100%; display: block; }
+  h3 { font-size: 14px; font-weight: 500; margin-bottom: 10px; }
+  .slider-row { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
+  .slider-row label { font-size: 12px; color: #666; width: 76px; flex-shrink: 0; }
+  .slider-row input[type=range] { flex: 1; }
+  .slider-row span { font-size: 12px; font-weight: 500; width: 46px; text-align: right; }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; font-size: 11px; color: #555; }
+  .leg-item { display: flex; align-items: center; gap: 5px; }
+  .leg-dot { width: 11px; height: 11px; border-radius: 2px; flex-shrink: 0; }
+  .note { font-size: 11px; color: #777; line-height: 1.5; margin-top: 8px;
+          border-top: 1px solid #e5e5e3; padding-top: 8px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .mcard { background: #f0efeb; border-radius: 6px; padding: 8px 10px; }
+  .mcard .ml { font-size: 10px; color: #888; margin-bottom: 2px; }
+  .mcard .mv { font-size: 14px; font-weight: 500; }
+  .sep { border-top: 1px solid #e5e5e3; margin: 10px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 7px 10px; font-weight: 500; color: #666;
+       border-bottom: 1px solid #e5e5e3; }
+  td { padding: 6px 10px; border-bottom: 1px solid #f0efeb; }
+  .pos { color: #185FA5; } .neg { color: #993C1D; }
+  .zero { color: #888; }    .amb { color: #BA7517; }
+  #sigNote { font-size: 11px; color: #777; line-height: 1.5; margin-top: 6px; }
+  .section-note {
+    background: #fffbe6; border-left: 3px solid #BA7517;
+    padding: 8px 12px; font-size: 12px; color: #555;
+    border-radius: 0 4px 4px 0; margin-bottom: 16px; line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<h1>Optimal Stablecoin Contracts under Limited Commitment</h1>
+<p class="subtitle">Interactive simulation — Wesley Tan, Wesleyan University 2026 · Advisor: Prof. Ryuichiro Izumi</p>
+
+<div class="section-note">
+  <strong>Model summary.</strong>
+  Three parties: issuer, impatient investors (fraction λ~U[0,1]), patient investors.
+  Contract: carry rate σ and illiquid share x. Regime I (σ &lt; σ̄): fire sales when congested.
+  Regime II (σ ≥ σ̄): patient stayers block fire sales by paying transfer T* per deferred unit.
+  Government [G] replicates Regime I. Aggregate welfare W = M·E[Ω] uses market size M, not per-depositor surplus.
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('map1',this)">W_G vs W_P: (β, r) plane</button>
+  <button class="tab" onclick="showTab('map2',this)">W_G vs W_P: (R, β) plane</button>
+  <button class="tab" onclick="showTab('sigma',this)">σ* monotonicity</button>
+</div>
+
+<!-- ── TAB 1 ─────────────────────────────────────────────────────────── -->
+<div id="map1" class="panel active">
+<div class="row">
+<div class="col-map">
+  <h3>Aggregate welfare regions: β vs r</h3>
+  <div style="font-size:11px;color:#888;margin-bottom:6px">
+    x-axis: r (fire-sale price) &nbsp;|&nbsp; y-axis: β (patience discount)
+  </div>
+  <canvas id="canvas1" width="390" height="320"></canvas>
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:#E24B4A"></div>W_G &gt; W_P (gov dominates)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#1D9E75"></div>W_P &gt; W_G (private dominates)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#B5D4F4"></div>W_P = W_G (Regime I, tie)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#D3D1C7"></div>FR violated</div>
+  </div>
+  <div class="note">
+    Dashed line = BW boundary r<sub>BW</sub> = βR/(1−η).
+    <br>Click anywhere on the map to inspect that point.
+  </div>
+</div>
+<div class="col-ctrl">
+  <h3>Fixed parameters</h3>
+  <div class="slider-row"><label>R (return)</label>
+    <input type="range" id="p1R" min="1.01" max="1.5" step="0.005" value="1.025">
+    <span id="v1R">1.025</span></div>
+  <div class="slider-row"><label>η (service)</label>
+    <input type="range" id="p1eta" min="0.001" max="0.15" step="0.001" value="0.01">
+    <span id="v1eta">0.010</span></div>
+  <div class="slider-row"><label>r<sub>b</sub></label>
+    <input type="range" id="p1rb" min="0.80" max="1.00" step="0.005" value="0.99">
+    <span id="v1rb">0.990</span></div>
+  <div class="slider-row"><label>r<sub>g</sub></label>
+    <input type="range" id="p1rg" min="1.00" max="1.10" step="0.005" value="1.01">
+    <span id="v1rg">1.010</span></div>
+  <div class="sep"></div>
+  <h3>Inspect point (click map)</h3>
+  <div class="grid2">
+    <div class="mcard"><div class="ml">β</div><div class="mv" id="i1b">—</div></div>
+    <div class="mcard"><div class="ml">r</div><div class="mv" id="i1r">—</div></div>
+    <div class="mcard"><div class="ml">W_P</div><div class="mv" id="i1wp">—</div></div>
+    <div class="mcard"><div class="ml">W_G</div><div class="mv" id="i1wg">—</div></div>
+    <div class="mcard"><div class="ml">σ̂<sup>B</sup></div><div class="mv" id="i1sb">—</div></div>
+    <div class="mcard"><div class="ml">σ̄</div><div class="mv" id="i1sbar">—</div></div>
+    <div class="mcard"><div class="ml">Config</div><div class="mv" id="i1cfg">—</div></div>
+    <div class="mcard"><div class="ml">BW holds?</div><div class="mv" id="i1bw">—</div></div>
+  </div>
+  <div id="i1text" style="font-size:11px;color:#777;line-height:1.5;margin-top:4px"></div>
+</div>
+</div>
+</div>
+
+<!-- ── TAB 2 ─────────────────────────────────────────────────────────── -->
+<div id="map2" class="panel">
+<div class="row">
+<div class="col-map">
+  <h3>Aggregate welfare regions: β vs R</h3>
+  <div style="font-size:11px;color:#888;margin-bottom:6px">
+    x-axis: R (gross illiquid return) &nbsp;|&nbsp; y-axis: β (patience discount)
+  </div>
+  <canvas id="canvas2" width="390" height="320"></canvas>
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:#E24B4A"></div>W_G &gt; W_P</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#1D9E75"></div>W_P &gt; W_G</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#B5D4F4"></div>Tie (Regime I)</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#D3D1C7"></div>Infeasible</div>
+  </div>
+  <div class="note">
+    Higher R shifts the green region right (blocking becomes self-sustaining).
+    Low β + moderate R = government-dominant zone.
+    <br>Click to inspect.
+  </div>
+</div>
+<div class="col-ctrl">
+  <h3>Fixed parameters</h3>
+  <div class="slider-row"><label>r (fire-sale)</label>
+    <input type="range" id="p2r" min="0.50" max="0.999" step="0.001" value="0.970">
+    <span id="v2r">0.970</span></div>
+  <div class="slider-row"><label>η (service)</label>
+    <input type="range" id="p2eta" min="0.001" max="0.15" step="0.001" value="0.01">
+    <span id="v2eta">0.010</span></div>
+  <div class="slider-row"><label>r<sub>b</sub></label>
+    <input type="range" id="p2rb" min="0.80" max="1.00" step="0.005" value="0.99">
+    <span id="v2rb">0.990</span></div>
+  <div class="slider-row"><label>r<sub>g</sub></label>
+    <input type="range" id="p2rg" min="1.00" max="1.10" step="0.005" value="1.01">
+    <span id="v2rg">1.010</span></div>
+  <div class="sep"></div>
+  <h3>Inspect point (click map)</h3>
+  <div class="grid2">
+    <div class="mcard"><div class="ml">β</div><div class="mv" id="i2b">—</div></div>
+    <div class="mcard"><div class="ml">R</div><div class="mv" id="i2R">—</div></div>
+    <div class="mcard"><div class="ml">W_P</div><div class="mv" id="i2wp">—</div></div>
+    <div class="mcard"><div class="ml">W_G</div><div class="mv" id="i2wg">—</div></div>
+    <div class="mcard"><div class="ml">Config</div><div class="mv" id="i2cfg">—</div></div>
+    <div class="mcard"><div class="ml">BW holds?</div><div class="mv" id="i2bw">—</div></div>
+  </div>
+  <div id="i2text" style="font-size:11px;color:#777;line-height:1.5;margin-top:4px"></div>
+</div>
+</div>
+</div>
+
+<!-- ── TAB 3 ─────────────────────────────────────────────────────────── -->
+<div id="sigma" class="panel">
+  <h3>Comparative statics: optimal carry rates σ*</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Parameter ↑</th>
+        <th style="text-align:center">∂σ<sup>I*</sup>/∂(·)</th>
+        <th style="text-align:center">∂σ<sup>II*</sup>/∂(·)</th>
+        <th style="text-align:center">Monotone?</th>
+        <th>Mechanism</th>
+      </tr>
+    </thead>
+    <tbody id="sigTable"></tbody>
+  </table>
+  <div class="note" style="margin-top:10px">
+    † η is the only non-monotone case for σ<sup>II*</sup>. 
+    Sign of ∂σ<sup>II*</sup>/∂η = sign(1+β+2η−2r<sub>b</sub>). 
+    At USDC calibration (r<sub>b</sub>=0.99, β=0.95, η=0.01): 1+0.95+0.02 = 1.97 &lt; 1.98 = 2r<sub>b</sub>, 
+    so σ<sup>II*</sup> decreases in η there. For low r<sub>b</sub> the sign flips.
+  </div>
+
+  <div style="margin-top:20px">
+  <h3>Live σ* calculator</h3>
+  <div style="font-size:12px;color:#777;margin-bottom:10px">
+    Adjust any parameter to see how σ<sup>I*</sup> and σ<sup>II*</sup> respond in real time.
+  </div>
+  <div class="row">
+  <div style="flex:1;min-width:240px">
+    <div class="slider-row"><label>R</label>
+      <input type="range" id="sR2" min="1.01" max="1.5" step="0.005" value="1.025">
+      <span id="vsR2">1.025</span></div>
+    <div class="slider-row"><label>r</label>
+      <input type="range" id="sr2" min="0.50" max="0.999" step="0.001" value="0.970">
+      <span id="vsr2">0.970</span></div>
+    <div class="slider-row"><label>β</label>
+      <input type="range" id="sbeta2" min="0.05" max="0.99" step="0.01" value="0.95">
+      <span id="vsbeta2">0.95</span></div>
+    <div class="slider-row"><label>η</label>
+      <input type="range" id="seta2" min="0.001" max="0.15" step="0.001" value="0.01">
+      <span id="vseta2">0.010</span></div>
+    <div class="slider-row"><label>r<sub>b</sub></label>
+      <input type="range" id="srb2" min="0.80" max="1.00" step="0.005" value="0.99">
+      <span id="vsrb2">0.990</span></div>
+    <div class="slider-row"><label>r<sub>g</sub></label>
+      <input type="range" id="srg2" min="1.00" max="1.10" step="0.005" value="1.01">
+      <span id="vsrg2">1.010</span></div>
+  </div>
+  <div style="flex:1;min-width:200px">
+    <div class="grid2" id="sigCards"></div>
+    <div id="sigNote"></div>
+  </div>
+  </div>
+  </div>
+</div>
+
+<script>
+/* ── Model functions ─────────────────────────────────────────────────── */
+
+function sigBar(beta,R,r,eta){ return (1-beta-eta)*r / (beta*(R-r)); }
+function Tstar(beta,eta)     { return (1-beta-eta)/beta; }
+function CI(R,r)             { return r*(R-1)**2 / (2*(R-r)); }
+function CII(R,beta,eta)     { return beta*(R-1)**2 / (1-beta-eta); }
+function xIs(R,r)            { return r*(R-1)/(R-r); }
+function xIIs(R,beta,eta)    { return beta*(R-1)/(1-beta-eta); }
+
+function sighatA(R,r,eta,rb){
+  return 0.5 - (1+eta/2-rb)*(R-r) / (r*(R-1)**2);
+}
+function sighatB(R,beta,eta,rb){
+  return 0.75 - (1+eta/2-rb)*(1-beta-eta) / (2*beta*(R-1)**2);
+}
+
+/* Optimal x for Solution B at given sigma (positive root of quadratic) */
+function xBstar(sigma,R,beta,eta,rb){
+  const T = Tstar(beta,eta);
+  const A = 1+eta/2-rb;
+  const disc = 4*sigma**2*(R-1)**2 + 6*A*T;
+  if(disc < 0) return 0;
+  return (2*sigma*(R-1) + Math.sqrt(disc)) / (3*T);
+}
+
+/* Peak profits at interior optima */
+function PiAstar(R,r,eta,rb,rg){
+  const A = 1+eta/2-rb, ci = CI(R,r), sA = Math.max(0, sighatA(R,r,eta,rb));
+  return sA <= 0 ? A*ci/(rg-rb) : (A+ci)**2 / (4*(rg-rb));
+}
+function PiBstar(R,beta,eta,rb,rg){
+  const A = 1+eta/2-rb, cii = CII(R,beta,eta);
+  return (A + cii/2)**2 / (4*(rg-rb));
+}
+
+/* Aggregate welfare W = M * E[Omega] */
+function aggWelfare(sigma,x,R,r,beta,eta,rb,rg,regime){
+  const A = 1+eta/2-rb, Delta = rg-rb;
+  let fk, gk;
+  if(regime === 'I'){
+    fk = x*(R-1) - (R-r)*x**2/(2*r);
+    gk = 0;
+  } else {
+    fk = x*(R-1);
+    gk = (1-beta-eta)*x**2 / (2*beta);
+  }
+  const Omega = 1+eta/2 + fk - gk;
+  const N     = A + sigma*fk - gk;
+  const M     = Math.max(0, N/Delta);
+  return M * Omega;
+}
+
+/* Full equilibrium computation: returns {WP, WG, cfg, sigP, xP, sb, sB, bw} */
+function computeWP(R,r,beta,eta,rb,rg){
+  if((1-beta-eta) <= 0.001) return {WP:0, WG:0, cfg:'FR violated', bw:false};
+
+  const sb   = sigBar(beta,R,r,eta);
+  const sA   = sighatA(R,r,eta,rb);
+  const sB   = sighatB(R,beta,eta,rb);
+  const pA   = PiAstar(R,r,eta,rb,rg);
+  const pB   = PiBstar(R,beta,eta,rb,rg);
+  const xi   = xIs(R,r);
+  const xii  = xIIs(R,beta,eta);
+  const bw   = pB > pA;
+
+  /* Government / Regime I aggregate welfare */
+  const sigA_c = Math.max(0, sA);
+  const WG = aggWelfare(sigA_c, xi, R, r, beta, eta, rb, rg, 'I');
+
+  let WP, cfg, sigP, xP;
+
+  if(!bw){
+    /* Solution A wins: private = Regime I = government */
+    sigP = sigA_c; xP = xi; cfg = 'A';
+    WP = WG;
+  } else if(sB >= sb){
+    /* Solution B interior: blocking self-sustaining */
+    sigP = sB; xP = xii; cfg = 'B-int';
+    WP = aggWelfare(sB, xii, R, r, beta, eta, rb, rg, 'II');
+  } else {
+    /* Solution B constrained: evaluate at sigma = sigBar */
+    const xbs = Math.min(1, xBstar(sb, R, beta, eta, rb));
+    const A   = 1+eta/2-rb;
+    const T   = Tstar(beta,eta);
+    const numer = (A + sb*xbs*(R-1) - T*xbs**2/2);
+    const PBc = Math.max(0, numer*(1-sb)*xbs*(R-1)/(rg-rb));
+    if(PBc > pA){
+      sigP = sb; xP = xbs; cfg = 'B-con';
+      WP = aggWelfare(sb, xbs, R, r, beta, eta, rb, rg, 'II');
+    } else {
+      /* Reverts to Solution A despite BW holding */
+      sigP = sigA_c; xP = xi; cfg = 'A';
+      WP = WG;
+    }
+  }
+
+  return {WP, WG, cfg, sigP, xP, sb, sB, bw};
+}
+
+/* ── Color mapping ───────────────────────────────────────────────────── */
+function regionColor(WP,WG,cfg){
+  if(cfg === 'FR violated') return 'rgba(211,209,199,0.8)';
+  if(WP === WG)             return 'rgba(181,212,244,0.75)';  /* tie */
+  if(WP > WG)               return 'rgba(93,202,165,0.6)';   /* private wins */
+  return 'rgba(226,75,74,0.55)';                              /* gov wins */
+}
+
+/* ── Canvas drawing ──────────────────────────────────────────────────── */
+const PAD = {l:32, r:8, t:8, b:28};
+
+function drawMap(canvasId, axisX, axisY, xMin,xMax, yMin,yMax, getParams, drawExtra){
+  const canvas = document.getElementById(canvasId);
+  const ctx    = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const iW = W-PAD.l-PAD.r, iH = H-PAD.t-PAD.b;
+
+  const toX = v => PAD.l + ((v-xMin)/(xMax-xMin))*iW;
+  const toY = v => PAD.t + (1-(v-yMin)/(yMax-yMin))*iH;
+
+  ctx.clearRect(0,0,W,H);
+
+  /* Grid lines */
+  ctx.strokeStyle = 'rgba(0,0,0,0.07)'; ctx.lineWidth = 0.5;
+  for(let i=1;i<5;i++){
+    const vx = xMin + i*(xMax-xMin)/5;
+    ctx.beginPath(); ctx.moveTo(toX(vx),PAD.t); ctx.lineTo(toX(vx),PAD.t+iH); ctx.stroke();
+    const vy = yMin + i*(yMax-yMin)/5;
+    ctx.beginPath(); ctx.moveTo(PAD.l,toY(vy)); ctx.lineTo(PAD.l+iW,toY(vy)); ctx.stroke();
+  }
+
+  /* Pixel-by-pixel region fill */
+  const step = 3;
+  for(let px = PAD.l; px < PAD.l+iW; px += step){
+    for(let py = PAD.t; py < PAD.t+iH; py += step){
+      const xv = xMin + ((px-PAD.l)/iW)*(xMax-xMin);
+      const yv = yMin + (1-(py-PAD.t)/iH)*(yMax-yMin);
+      const params = getParams(xv, yv);
+      if(!params) continue;
+      const res = computeWP(...params);
+      ctx.fillStyle = regionColor(res.WP, res.WG, res.cfg);
+      ctx.fillRect(px, py, step+1, step+1);
+    }
+  }
+
+  /* Optional overlay curves */
+  if(drawExtra) drawExtra(ctx, toX, toY, xMin,xMax,yMin,yMax);
+
+  /* Axis tick labels */
+  ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.font = '9px sans-serif';
+  for(let i=0; i<=4; i++){
+    const vx = xMin + i*(xMax-xMin)/4;
+    ctx.fillText(vx.toFixed(2), toX(vx)-10, PAD.t+iH+14);
+    const vy = yMin + i*(yMax-yMin)/4;
+    ctx.fillText(vy.toFixed(2), 1, toY(vy)+3);
+  }
+}
+
+/* ── Map 1: (r, beta) plane ──────────────────────────────────────────── */
+function drawMap1(){
+  const R   = +document.getElementById('p1R').value;
+  const eta = +document.getElementById('p1eta').value;
+  const rb  = +document.getElementById('p1rb').value;
+  const rg  = +document.getElementById('p1rg').value;
+
+  drawMap('canvas1',
+    'r', 'β',
+    0.50, 0.999, 0.05, 0.99,
+    (rv, bv) => [R, rv, bv, eta, rb, rg],
+    (ctx, toX, toY) => {
+      /* BW boundary: r_BW = beta*R/(1-eta) */
+      ctx.setLineDash([5,3]);
+      ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); let first = true;
+      for(let bv=0.05; bv<=0.99; bv+=0.003){
+        const rv = bv*R/(1-eta);
+        if(rv < 0.50 || rv > 0.999) continue;
+        const px=toX(rv), py=toY(bv);
+        if(first){ ctx.moveTo(px,py); first=false; } else ctx.lineTo(px,py);
+      }
+      ctx.stroke(); ctx.setLineDash([]);
+      ctx.fillStyle='rgba(0,0,0,0.45)'; ctx.font='9px sans-serif';
+      ctx.fillText('r_BW', toX(Math.min(0.99, 0.5*R/(1-eta)))+3, toY(0.5)-5);
+    }
+  );
+}
+
+/* ── Map 2: (R, beta) plane ──────────────────────────────────────────── */
+function drawMap2(){
+  const r   = +document.getElementById('p2r').value;
+  const eta = +document.getElementById('p2eta').value;
+  const rb  = +document.getElementById('p2rb').value;
+  const rg  = +document.getElementById('p2rg').value;
+
+  drawMap('canvas2',
+    'R', 'β',
+    1.005, 1.5, 0.05, 0.99,
+    (Rv, bv) => {
+      if((1-bv-eta) <= 0.001) return null;
+      return [Rv, r, bv, eta, rb, rg];
+    },
+    null
+  );
+}
+
+/* ── Click handlers ──────────────────────────────────────────────────── */
+function makeClickHandler(canvasId, xMin,xMax, yMin,yMax, getFixed, updateFn){
+  document.getElementById(canvasId).addEventListener('click', function(e){
+    const rect = this.getBoundingClientRect();
+    const sx = this.width/rect.width, sy = this.height/rect.height;
+    const px = (e.clientX-rect.left)*sx, py = (e.clientY-rect.top)*sy;
+    const iW = this.width-PAD.l-PAD.r, iH = this.height-PAD.t-PAD.b;
+    const xv = Math.max(xMin, Math.min(xMax, xMin+((px-PAD.l)/iW)*(xMax-xMin)));
+    const yv = Math.max(yMin, Math.min(yMax, yMin+(1-(py-PAD.t)/iH)*(yMax-yMin)));
+    updateFn(xv, yv);
+  });
+}
+
+makeClickHandler('canvas1', 0.50,0.999, 0.05,0.99, null, (rv,bv) => {
+  const R  = +document.getElementById('p1R').value;
+  const eta= +document.getElementById('p1eta').value;
+  const rb = +document.getElementById('p1rb').value;
+  const rg = +document.getElementById('p1rg').value;
+  const res = computeWP(R,rv,bv,eta,rb,rg);
+  document.getElementById('i1b').textContent    = bv.toFixed(3);
+  document.getElementById('i1r').textContent    = rv.toFixed(3);
+  document.getElementById('i1wp').textContent   = res.WP.toFixed(5);
+  document.getElementById('i1wg').textContent   = res.WG.toFixed(5);
+  document.getElementById('i1sb').textContent   = res.sB.toFixed(3);
+  document.getElementById('i1sbar').textContent = res.sb.toFixed(3);
+  document.getElementById('i1cfg').textContent  = res.cfg;
+  document.getElementById('i1bw').textContent   = res.bw ? 'Yes' : 'No';
+  const txt = {A:'Regime I equilibrium: W_P = W_G (tie). No welfare case for carry mandate.',
+    'B-int':'B-interior: blocking self-sustaining. W_P > W_G — private outcome dominates.',
+    'B-con':'B-constrained: σ* = σ̄. Ambiguous — check W_P vs W_G values above.',
+    'FR violated':'FR assumption violated (β+η ≥ 1).'};
+  document.getElementById('i1text').textContent = txt[res.cfg] || '';
+});
+
+makeClickHandler('canvas2', 1.005,1.5, 0.05,0.99, null, (Rv,bv) => {
+  const r  = +document.getElementById('p2r').value;
+  const eta= +document.getElementById('p2eta').value;
+  const rb = +document.getElementById('p2rb').value;
+  const rg = +document.getElementById('p2rg').value;
+  const res = computeWP(Rv,r,bv,eta,rb,rg);
+  document.getElementById('i2b').textContent  = bv.toFixed(3);
+  document.getElementById('i2R').textContent  = Rv.toFixed(3);
+  document.getElementById('i2wp').textContent = res.WP.toFixed(5);
+  document.getElementById('i2wg').textContent = res.WG.toFixed(5);
+  document.getElementById('i2cfg').textContent= res.cfg;
+  document.getElementById('i2bw').textContent = res.bw ? 'Yes' : 'No';
+  const txt = {A:'Tie — private = Regime I.', 'B-int':'Private dominates (B-interior).',
+    'B-con':'Ambiguous (B-constrained).', 'FR violated':'Infeasible.'};
+  document.getElementById('i2text').textContent = txt[res.cfg] || '';
+});
+
+/* ── σ monotonicity table ────────────────────────────────────────────── */
+const rows = [
+  ['R ↑',  '+', '+',    'Yes (both)',  'Higher return expands carry pools C_I and C_II; issuer shares more'],
+  ['r ↑',  '+', '0',    'I only',     'r enters C_I but not C_II; fire-sale price irrelevant once blocking active'],
+  ['β ↑',  '0', '+',    'II only',    'β lowers T*, expanding C_II; no effect on C_I'],
+  ['η ↑',  '−', '± †',  'I only',     'η raises baseline A, compressing σ^{I*}; σ^{II*} sign depends on r_b (see note)'],
+  ['r_b ↑','+', '+',    'Yes (both)', 'Higher outside option forces more yield-sharing to retain depositors'],
+  ['r_g ↑','0', '0',    '—',          'Scale of market distribution; does not shift the optimal sharing rate'],
+];
+const tb = document.getElementById('sigTable');
+rows.forEach(([p,si,sii,mono,mech]) => {
+  const tr = document.createElement('tr');
+  function sc(s){ return s.startsWith('+')? 'pos' : s.startsWith('-')||s.startsWith('−')? 'neg' : s==='0'? 'zero' : 'amb'; }
+  tr.innerHTML = `
+    <td><strong>${p}</strong></td>
+    <td style="text-align:center" class="${sc(si)}">${si}</td>
+    <td style="text-align:center" class="${sc(sii)}">${sii}</td>
+    <td style="text-align:center;font-size:12px">${mono}</td>
+    <td style="color:#666;font-size:12px">${mech}</td>`;
+  tb.appendChild(tr);
+});
+
+/* ── Live σ calculator ───────────────────────────────────────────────── */
+function updateSig(){
+  const R    = +document.getElementById('sR2').value;
+  const r    = +document.getElementById('sr2').value;
+  const beta = +document.getElementById('sbeta2').value;
+  const eta  = +document.getElementById('seta2').value;
+  const rb   = +document.getElementById('srb2').value;
+  const rg   = +document.getElementById('srg2').value;
+  if((1-beta-eta) <= 0.001){
+    document.getElementById('sigNote').textContent = 'FR violated: β + η ≥ 1.'; return;
+  }
+  const sA  = Math.max(0, sighatA(R,r,eta,rb));
+  const sB  = sighatB(R,beta,eta,rb);
+  const sb  = sigBar(beta,R,r,eta);
+  const sB_c = Math.max(sb, sB);
+  const cards = document.getElementById('sigCards');
+  cards.innerHTML = `
+    <div class="mcard"><div class="ml">σ<sup>I*</sup> = σ<sup>A*</sup></div><div class="mv">${sA.toFixed(4)}</div></div>
+    <div class="mcard"><div class="ml">σ<sup>II*</sup> = σ<sup>B*</sup></div><div class="mv">${sB_c.toFixed(4)}</div></div>
+    <div class="mcard"><div class="ml">σ̄ (blocking floor)</div><div class="mv">${sb.toFixed(4)}</div></div>
+    <div class="mcard"><div class="ml">B-interior?</div><div class="mv">${sB >= sb ? 'Yes' : 'No'}</div></div>
+    <div class="mcard"><div class="ml">x<sup>I*</sup></div><div class="mv">${xIs(R,r).toFixed(4)}</div></div>
+    <div class="mcard"><div class="ml">x<sup>II*</sup></div><div class="mv">${xIIs(R,beta,eta).toFixed(4)}</div></div>`;
+  const etaSign = 1+beta+2*eta-2*rb;
+  document.getElementById('sigNote').textContent =
+    `η ambiguity: ∂σ^{II*}/∂η = sign(1+β+2η−2r_b) = sign(${etaSign.toFixed(4)}) → ` +
+    (etaSign > 0 ? 'σ^{II*} increases in η (r_b low relative to β,η).'
+                 : 'σ^{II*} decreases in η (r_b high — USDC case).');
+}
+
+/* ── Slider binding helpers ──────────────────────────────────────────── */
+function bindSliders(ids, redrawFn){
+  ids.forEach(([id, outId, dec]) => {
+    const el = document.getElementById(id);
+    el.addEventListener('input', function(){
+      document.getElementById(outId).textContent = parseFloat(this.value).toFixed(dec);
+      redrawFn();
+    });
+  });
+}
+
+bindSliders([
+  ['p1R','v1R',3],['p1eta','v1eta',3],['p1rb','v1rb',3],['p1rg','v1rg',3]
+], drawMap1);
+
+bindSliders([
+  ['p2r','v2r',3],['p2eta','v2eta',3],['p2rb','v2rb',3],['p2rg','v2rg',3]
+], drawMap2);
+
+bindSliders([
+  ['sR2','vsR2',3],['sr2','vsr2',3],['sbeta2','vsbeta2',2],
+  ['seta2','vseta2',3],['srb2','vsrb2',3],['srg2','vsrg2',3]
+], updateSig);
+
+function showTab(id, btn){
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  if(id === 'map1') drawMap1();
+  if(id === 'map2') drawMap2();
+}
+
+/* initial render */
+drawMap1(); drawMap2(); updateSig();
+</script>
+</body>
 </html>
