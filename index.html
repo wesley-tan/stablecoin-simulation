@@ -65,15 +65,16 @@
 <p class="subtitle">Interactive simulation — Wesley Tan, Wesleyan University 2026 · Advisor: Prof. Ryuichiro Izumi</p>
 
 <div class="section-note">
-  <strong>Model (§1–6).</strong>
-  Contract = (σ, x). Two regimes: Regime I (σ &lt; σ̄, fire sales); Regime II (σ ≥ σ̄, patient stayers block).
-  σ̄ = (1−β−η)r/[β(R−r)], T* = (1−β−η)/β. M locks in before x is chosen (timing: σ announced → M forms → x optimised).
-  Government forces full accommodation iff r &gt; δ<sup>G</sup> = R/(2−β), replicating Regime I.<br>
-  <strong>Key welfare result (Prop. 4):</strong>
-  At B-interior: W<sub>P</sub>−W<sub>G</sub> = (w<sup>B</sup>−w<sup>G</sup>)(w<sup>B</sup>+w<sup>G</sup>−r<sub>b</sub>)/[2Δ] &gt; 0 whenever (BW) holds
-  — sign equals sign(BW), so private <em>always</em> dominates at B-interior.
-  W<sub>G</sub> &gt; W<sub>P</sub> arises only in <strong>B-constrained</strong> (BW holds, σ̂<sup>B</sup> &lt; σ̄):
-  the forced carry rate σ̄ compresses M<sup>P</sup> via congestion cost g<sup>II</sup> = T*x²/2.
+  <strong>Model (§1–5).</strong>
+  Contract = (σ, x). Regime I (σ &lt; σ̄, fire sales): E[π<sup>I</sup>] = (1−σ)[x(R−1)−(R−r)x²/(2r)].
+  Regime II (σ ≥ σ̄, blocking): E[π<sup>II</sup>] = (1−σ)x(R−1). σ̄ = (1−β−η)r/[β(R−r)].
+  Government replicates Regime I: x<sup>G*</sup>=x̃, σ<sup>G*</sup>=σ̂<sup>I</sup>.
+  <strong>Pinning (§5.2):</strong> at any interior optimum, E[U<sub>i</sub>] = (w+r<sub>b</sub>)/2, E[π] = (w−r<sub>b</sub>)/2, M = (w−r<sub>b</sub>)/[2Δ].<br>
+  <strong>Prop. 1 (§5.4):</strong> At interior optima, W<sub>G</sub>&gt;W<sub>P</sub> is <em>impossible</em>.
+  sign(W<sub>P</sub>−W<sub>G</sub>) = sign(BW) always. W<sub>G</sub>&gt;W<sub>P</sub> only in <strong>B-constrained</strong>.
+  <strong>W<sub>G</sub> is flat in β</strong> (depends on R,r,η,r<sub>b</sub>,r<sub>g</sub> only).
+  The kink at β* = r(1−η)/R marks where private switches to Regime II and W<sub>P</sub> begins rising.
+  BW threshold β* = r(1−η)/R: higher r → higher β* → gov more attractive; higher R → lower β*.
 </div>
 
 <div class="tabs">
@@ -81,6 +82,7 @@
   <button class="tab" onclick="showTab('map2',this)">W<sub>G</sub> vs W<sub>P</sub>: (R, β)</button>
   <button class="tab" onclick="showTab('sigma',this)">σ* &amp; welfare statics</button>
   <button class="tab" onclick="showTab('env',this)">Π(σ) envelope</button>
+  <button class="tab" onclick="showTab('wbeta',this)">W vs β diagram</button>
 </div>
 
 <!-- ── TAB 1 ─────────────────────────────────────────────────────────── -->
@@ -263,6 +265,13 @@
 
     <div id="wDecomp" style="background:#f5f0ff;border-left:3px solid #7c3aed;padding:7px 10px;
         border-radius:0 4px 4px 0;font-size:11px;color:#444;line-height:1.8;margin-top:8px"></div>
+
+    <h4 style="margin-top:12px">Party-by-party at interior optima (§5.3)</h4>
+    <div class="grid2" id="partyCards"></div>
+    <div style="font-size:11px;color:#777;margin-top:4px;line-height:1.6">
+      E[U<sub>i</sub>] = (w+r<sub>b</sub>)/2 &nbsp;|&nbsp; E[π] = (w−r<sub>b</sub>)/2 &nbsp;|&nbsp;
+      β* = r(1−η)/R &nbsp;(BW threshold, kink in W vs β)
+    </div>
     <div id="sigNote" style="font-size:11px;color:#777;line-height:1.5;margin-top:6px"></div>
   </div>
   </div>
@@ -315,9 +324,69 @@
 </div>
 </div>
 
+<!-- ── TAB 5: W vs β diagram ──────────────────────────────────────────── -->
+<div id="wbeta" class="panel">
+<div class="row">
+<div class="col-map">
+  <h3>Aggregate welfare vs patience β &nbsp;
+    <span style="font-weight:400;font-size:12px;color:#888">§5 Fig. 1 — Tan (2026)</span>
+  </h3>
+  <div style="font-size:11px;color:#888;margin-bottom:5px">
+    x-axis: β (patience) &nbsp;|&nbsp;
+    Blue: W<sup>G</sup> (flat) &nbsp;|&nbsp; Red: W<sup>P</sup> (kinked at β*)
+  </div>
+  <canvas id="canvasWB" width="420" height="300"></canvas>
+  <div class="legend" style="margin-top:8px">
+    <div class="leg-item"><div class="leg-dot" style="background:#2563eb"></div>W<sup>G</sup> — flat, independent of β</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#DC3C37"></div>W<sup>P</sup> actual</div>
+    <div class="leg-item"><div class="leg-dot" style="background:rgba(220,60,55,0.4)"></div>W<sup>P</sup> interior formula</div>
+    <div class="leg-item"><div class="leg-dot" style="background:rgba(29,158,117,0.3)"></div>W<sup>P</sup> &gt; W<sup>G</sup></div>
+    <div class="leg-item"><div class="leg-dot" style="background:rgba(220,60,55,0.2)"></div>W<sup>G</sup> &gt; W<sup>P</sup> (B-con)</div>
+  </div>
+  <div class="note">
+    <strong>W<sup>G</sup> is flat</strong>: w<sup>G</sup>=1+η/2+C<sub>I</sub> doesn't depend on β;
+    W<sup>G</sup>=(w<sup>G</sup>−r<sub>b</sub>)w<sup>G</sup>/(2Δ) is constant.<br>
+    <strong>Kink at β*=r(1−η)/R</strong>: below β*, (BW) fails → W<sup>P</sup>=W<sup>G</sup> (tie);
+    above β*, private switches to Regime II → W<sup>P</sup> rises steeply as T*=(1−β−η)/β → 0.<br>
+    <strong>Orange dashed</strong>: boundary between B-constrained and B-interior.<br>
+    <strong>Prop. 1:</strong> At interior optima, W<sup>G</sup>&gt;W<sup>P</sup> impossible. Red fill (W<sup>G</sup>&gt;W<sup>P</sup>)
+    only in B-constrained zone near β*.
+  </div>
+</div>
+<div class="col-ctrl">
+  <h3>Fixed parameters (β swept on x-axis)</h3>
+  <div style="margin-bottom:8px">
+    <button onclick="loadPaperDefaults()" style="padding:4px 10px;font-size:12px;border:1px solid #aaa;
+      border-radius:5px;cursor:pointer;background:#f5f5f0">
+      Load §5 paper defaults (R=2, r=0.5, η=0.1, r<sub>b</sub>=0.1, r<sub>g</sub>=0.9)
+    </button>
+  </div>
+  <div class="slider-row"><label>R</label>
+    <input type="range" id="wbR" min="1.01" max="3.00" step="0.01" value="1.30">
+    <span id="vwbR">1.30</span></div>
+  <div class="slider-row"><label>r</label>
+    <input type="range" id="wbr" min="0.10" max="0.99" step="0.005" value="0.70">
+    <span id="vwbr">0.700</span></div>
+  <div class="slider-row"><label>η</label>
+    <input type="range" id="wbeta_eta" min="0.001" max="0.30" step="0.001" value="0.05">
+    <span id="vwbeta_eta">0.050</span></div>
+  <div class="slider-row"><label>r<sub>b</sub></label>
+    <input type="range" id="wbrb" min="0.05" max="0.98" step="0.01" value="0.70">
+    <span id="vwbrb">0.70</span></div>
+  <div class="slider-row"><label>r<sub>g</sub></label>
+    <input type="range" id="wbrg" min="0.06" max="1.20" step="0.01" value="0.75">
+    <span id="vwbrg">0.75</span></div>
+  <div class="sep"></div>
+  <h3>Key values</h3>
+  <div class="grid2" id="wbCards"></div>
+  <div id="wbNote" style="font-size:11px;color:#777;line-height:1.7;margin-top:8px"></div>
+</div>
+</div>
+</div>
+
 <script>
 /* ════════════════════════════════════════════════════════════════════
-   Model — exact from §1-6, Tan (2026)
+   Model — exact from §1-5, Tan (2026)
    ════════════════════════════════════════════════════════════════════ */
 function Av(eta,rb)          { return 1 + eta/2 - rb; }
 function Dv(rb,rg)           { return rg - rb; }
@@ -745,6 +814,22 @@ function updateSig(){
     x̃=${xi.toFixed(4)} &nbsp;x<sup>II*</sup>=${xii.toFixed(4)} &nbsp;σ<sup>G*</sup>=${sigGv.toFixed(4)}<br>
     η-ambiguity: sign(∂σ<sup>II*</sup>/∂η) = sign(${etaSign.toFixed(3)}) →
     σ<sup>II*</sup> ${etaSign>0?'increases':'decreases'} in η.`;
+
+  // Party-by-party at interior optima (§5.3)
+  const pc = document.getElementById('partyCards');
+  if(pc){
+    const betaStar = r*(1-eta)/R;
+    const EUiG = (wG+rb)/2, EpiG = (wG-rb)/2;
+    const EUiP = (wB+rb)/2, EpiP = (wB-rb)/2;
+    const bwHere = beta > betaStar;
+    pc.innerHTML=`
+      <div class="mcard"><div class="ml">β* = r(1−η)/R</div><div class="mv">${betaStar.toFixed(5)}</div></div>
+      <div class="mcard"><div class="ml">β ${bwHere?'>':'≤'} β* → BW ${bwHere?'holds ✓':'fails'}</div><div class="mv ${bwHere?'good':'zero'}">${bwHere?'Regime II possible':'Tie (Sol. A)'}</div></div>
+      <div class="mcard"><div class="ml">E[U<sub>i</sub><sup>G</sup>] = (w<sup>G</sup>+r<sub>b</sub>)/2</div><div class="mv">${EUiG.toFixed(5)}</div></div>
+      <div class="mcard"><div class="ml">E[π<sup>G</sup>] = (w<sup>G</sup>−r<sub>b</sub>)/2</div><div class="mv">${EpiG.toFixed(5)}</div></div>
+      <div class="mcard"><div class="ml">E[U<sub>i</sub><sup>P</sup>] = (w<sup>B</sup>+r<sub>b</sub>)/2</div><div class="mv">${EUiP.toFixed(5)}</div></div>
+      <div class="mcard"><div class="ml">E[π<sup>P</sup>] = (w<sup>B</sup>−r<sub>b</sub>)/2</div><div class="mv">${EpiP.toFixed(5)}</div></div>`;
+  }
 }
 
 /* ── Profit Envelope (Tab 4) ─────────────────────────────────────────── */
@@ -967,6 +1052,204 @@ function updateEnvCards(R,r,beta,eta,rb,rg,sb,sA,sB,ci,cii,bw,D,A,res){
     where C<sup>A</sup>=C<sub>I</sub>, C<sup>B</sup>=C<sub>II</sub>/2.`;
 }
 
+/* ── W vs β diagram (Tab 5) ──────────────────────────────────────────── */
+function drawWbeta(){
+  const R   =+document.getElementById('wbR').value;
+  const r   =+document.getElementById('wbr').value;
+  const eta =+document.getElementById('wbeta_eta').value;
+  const rb  =+document.getElementById('wbrb').value;
+  const rg  =+document.getElementById('wbrg').value;
+
+  const cvs=document.getElementById('canvasWB');
+  const ctx=cvs.getContext('2d');
+  const CW=cvs.width, CH=cvs.height;
+  const pad={l:54,r:12,t:20,b:40};
+  const iW=CW-pad.l-pad.r, iH=CH-pad.t-pad.b;
+  ctx.clearRect(0,0,CW,CH);
+
+  const D=Dv(rb,rg);
+  if(D<=0||R<=r||r<=0||eta>=1){
+    ctx.fillStyle='#888'; ctx.font='13px sans-serif';
+    ctx.fillText('Infeasible parameters',CW/2-80,CH/2); return;
+  }
+
+  const betaMax=Math.min(0.92,1-eta-0.01);
+  if(betaMax<0.07){ ctx.fillStyle='#888'; ctx.font='13px sans-serif';
+    ctx.fillText('η too large',CW/2-40,CH/2); return; }
+
+  const betaStar=r*(1-eta)/R;  // BW threshold
+  const ci=CI(R,r);
+  const wG=1+eta/2+ci;
+  const WGv=(wG>rb)?(wG-rb)*wG/(2*D):0;  // constant in β
+
+  // Sample points across β
+  const N=300;
+  const pts=[];
+  let yMax=WGv*1.1;
+  for(let i=0;i<=N;i++){
+    const beta=0.05+(i/N)*(betaMax-0.05);
+    const res=computeWP(R,r,beta,eta,rb,rg);
+    const cii=CII(R,beta,eta);
+    const wII=1+eta/2+cii/2;
+    const WP_int=(wII>rb&&D>0)?(wII-rb)*wII/(2*D):0;
+    const WP_act=res.feasible?res.WP:null;
+    pts.push({beta,WP_act,WP_int,cfg:res.cfg});
+    if(WP_act!==null) yMax=Math.max(yMax,WP_act);
+    yMax=Math.max(yMax,WP_int);
+  }
+  yMax*=1.15;
+
+  const toX=b=>pad.l+(b-0.05)/(betaMax-0.05)*iW;
+  const toY=v=>pad.t+(1-Math.max(0,v)/yMax)*iH;
+
+  // Grid
+  ctx.strokeStyle='rgba(0,0,0,0.06)'; ctx.lineWidth=0.5;
+  for(let i=1;i<=4;i++){
+    const yv=i*yMax/5;
+    ctx.beginPath();ctx.moveTo(pad.l,toY(yv));ctx.lineTo(pad.l+iW,toY(yv));ctx.stroke();
+    const bv=0.05+i*(betaMax-0.05)/5;
+    ctx.beginPath();ctx.moveTo(toX(bv),pad.t);ctx.lineTo(toX(bv),pad.t+iH);ctx.stroke();
+  }
+  // Axes
+  ctx.strokeStyle='rgba(0,0,0,0.25)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(pad.l,pad.t);ctx.lineTo(pad.l,pad.t+iH);ctx.lineTo(pad.l+iW,pad.t+iH);ctx.stroke();
+
+  // Shade between W^P actual and W^G
+  for(let i=0;i<pts.length-1;i++){
+    const p=pts[i],q=pts[i+1];
+    if(p.WP_act===null||q.WP_act===null) continue;
+    const mid=(p.WP_act+q.WP_act)/2;
+    const col=mid>WGv+1e-9?'rgba(29,158,117,0.12)':mid<WGv-1e-9?'rgba(220,60,55,0.15)':null;
+    if(!col) continue;
+    ctx.fillStyle=col;
+    ctx.beginPath();
+    ctx.moveTo(toX(p.beta),toY(WGv));ctx.lineTo(toX(q.beta),toY(WGv));
+    ctx.lineTo(toX(q.beta),toY(q.WP_act));ctx.lineTo(toX(p.beta),toY(p.WP_act));
+    ctx.closePath();ctx.fill();
+  }
+
+  // β* vertical dashed
+  if(betaStar>=0.05&&betaStar<=betaMax){
+    ctx.save();ctx.setLineDash([6,3]);
+    ctx.strokeStyle='rgba(0,0,0,0.40)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(toX(betaStar),pad.t);ctx.lineTo(toX(betaStar),pad.t+iH);ctx.stroke();
+    ctx.restore();
+    ctx.fillStyle='rgba(0,0,0,0.55)';ctx.font='9px sans-serif';
+    ctx.fillText(`β*=${betaStar.toFixed(3)}`,toX(betaStar)+3,pad.t+11);
+  }
+
+  // B-int/B-con boundary (orange dashed)
+  let betaBound=null;
+  for(let i=1;i<pts.length;i++){
+    if(pts[i-1].cfg!=='B-int'&&pts[i].cfg==='B-int'&&pts[i].beta>betaStar+0.01){
+      betaBound=pts[i].beta; break;
+    }
+  }
+  if(betaBound!==null){
+    ctx.save();ctx.setLineDash([4,3]);
+    ctx.strokeStyle='rgba(200,100,0,0.55)';ctx.lineWidth=1.2;
+    ctx.beginPath();ctx.moveTo(toX(betaBound),pad.t);ctx.lineTo(toX(betaBound),pad.t+iH);ctx.stroke();
+    ctx.restore();
+    ctx.fillStyle='rgba(180,80,0,0.70)';ctx.font='9px sans-serif';
+    ctx.fillText('B-int',toX(betaBound)+2,pad.t+23);
+  }
+
+  // W^P interior formula (red dashed)
+  ctx.save();ctx.strokeStyle='rgba(220,60,55,0.45)';ctx.lineWidth=1.5;ctx.setLineDash([5,3]);
+  ctx.beginPath();let first=true;
+  pts.forEach(p=>{
+    const x=toX(p.beta),y=toY(p.WP_int);
+    if(first){ctx.moveTo(x,y);first=false;}else ctx.lineTo(x,y);
+  });
+  ctx.stroke();ctx.restore();
+
+  // W^P actual (red solid)
+  ctx.strokeStyle='#DC3C37';ctx.lineWidth=2.5;ctx.setLineDash([]);
+  ctx.beginPath();first=true;
+  pts.forEach(p=>{
+    if(p.WP_act===null) return;
+    const x=toX(p.beta),y=toY(p.WP_act);
+    if(first){ctx.moveTo(x,y);first=false;}else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // W^G flat (blue)
+  ctx.strokeStyle='#2563eb';ctx.lineWidth=2.5;
+  ctx.beginPath();ctx.moveTo(toX(0.05),toY(WGv));ctx.lineTo(toX(betaMax),toY(WGv));ctx.stroke();
+
+  // W^G label
+  ctx.fillStyle='#2563eb';ctx.font='9px sans-serif';
+  ctx.fillText(`W^G = ${WGv.toFixed(4)}`,pad.l+3,toY(WGv)-4);
+
+  // Kink at β*
+  if(betaStar>=0.05&&betaStar<=betaMax){
+    ctx.beginPath();ctx.arc(toX(betaStar),toY(WGv),4.5,0,2*Math.PI);
+    ctx.fillStyle='#DC3C37';ctx.fill();
+    ctx.fillStyle='#DC3C37';ctx.font='9px sans-serif';
+    ctx.fillText('kink',toX(betaStar)+6,toY(WGv)+13);
+  }
+
+  // Region annotation
+  ctx.fillStyle='rgba(29,158,117,0.60)';ctx.font='10px sans-serif';
+  const bMid=betaStar>=0.05&&betaStar<=betaMax&&betaBound ? (betaStar+betaBound)/2 : betaMax*0.75;
+  if(bMid>=0.05&&bMid<=betaMax) ctx.fillText('W^P > W^G',toX(bMid)-20,toY(WGv*(1+(WGv>0?.3:0)))-10);
+  if(betaStar>0.10){
+    ctx.fillStyle='rgba(0,0,0,0.35)';
+    ctx.fillText('W^P = W^G',toX(0.05+betaStar*0.4),toY(WGv*1.05)-4);
+  }
+
+  // Axis labels
+  ctx.fillStyle='rgba(0,0,0,0.45)';ctx.font='9px sans-serif';
+  for(let i=0;i<=5;i++){
+    const bv=0.05+i*(betaMax-0.05)/5;
+    ctx.fillText(bv.toFixed(2),toX(bv)-8,pad.t+iH+16);
+    const yv=i*yMax/5;
+    ctx.fillText(yv.toFixed(2),2,toY(yv)+3);
+  }
+  ctx.fillText('β →',pad.l+iW-20,pad.t+iH+30);
+  ctx.save();ctx.translate(14,pad.t+iH/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText('Aggregate welfare W',-45,0);ctx.restore();
+
+  // Legend
+  ctx.font='10px sans-serif';
+  ctx.fillStyle='#2563eb';ctx.fillText('— W^G (flat, constant in β)',pad.l+5,pad.t+14);
+  ctx.fillStyle='#DC3C37';ctx.fillText('— W^P actual',pad.l+5,pad.t+25);
+  ctx.fillStyle='rgba(220,60,55,0.6)';ctx.fillText('- - W^P interior formula: (w^II−r_b)w^II/(2Δ)',pad.l+5,pad.t+36);
+
+  updateWbCards(R,r,eta,rb,rg,betaStar,WGv,wG,ci,D);
+}
+
+function updateWbCards(R,r,eta,rb,rg,betaStar,WGv,wG,ci,D){
+  const EUiG=(wG+rb)/2, EpiG=(wG-rb)/2;
+  const MG=(wG>rb)?(wG-rb)/(2*D):0;
+  document.getElementById('wbCards').innerHTML=`
+    <div class="mcard"><div class="ml">β* = r(1−η)/R</div><div class="mv">${betaStar.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">W<sup>G</sup> = (w<sup>G</sup>−r<sub>b</sub>)w<sup>G</sup>/(2Δ)</div><div class="mv">${WGv.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">w<sup>G</sup> = 1+η/2+C<sub>I</sub></div><div class="mv">${wG.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">M<sup>G</sup> = (w<sup>G</sup>−r<sub>b</sub>)/(2Δ)</div><div class="mv">${MG.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">E[U<sub>i</sub><sup>G</sup>] = (w<sup>G</sup>+r<sub>b</sub>)/2</div><div class="mv">${EUiG.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">E[π<sup>G</sup>] = (w<sup>G</sup>−r<sub>b</sub>)/2</div><div class="mv">${EpiG.toFixed(5)}</div></div>`;
+  document.getElementById('wbNote').innerHTML=
+    `<strong>W<sup>G</sup> is flat in β</strong>: w<sup>G</sup>=1+η/2+C<sub>I</sub> = ${wG.toFixed(4)} (depends on R,r,η,r<sub>b</sub> only).<br>
+    Kink at β*=${betaStar.toFixed(4)}: below → (BW) fails → W<sup>P</sup>=W<sup>G</sup>;
+    above → Regime II → W<sup>P</sup> rises steeply as T*→0.<br>
+    Higher R ↓ β* (Regime II easier). Higher r ↑ β* (fire-sale recovery raises w<sup>G</sup>).
+    Higher η ↓ β* (service flow reduces blocking cost).<br>
+    <strong>Prop. 1:</strong> W<sup>G</sup>&gt;W<sup>P</sup> impossible at interior optima —
+    only in B-constrained (red fill, near β*).`;
+}
+
+function loadPaperDefaults(){
+  // §5 Fig 1 parameters: R=2, r=0.5, η=0.1, r_b=0.1, r_g=0.9
+  const vals=[['wbR','vwbR','2.00',2],['wbr','vwbr','0.500',3],
+              ['wbeta_eta','vwbeta_eta','0.100',3],['wbrb','vwbrb','0.10',2],['wbrg','vwbrg','0.90',2]];
+  vals.forEach(([id,vid,val,dec])=>{
+    document.getElementById(id).value=parseFloat(val);
+    document.getElementById(vid).textContent=parseFloat(val).toFixed(dec);
+  });
+  drawWbeta();
+}
+
 /* ── Slider binding ─────────────────────────────────────────────────── */
 function bindSliders(ids, fn){
   ids.forEach(([id,outId,dec]) => {
@@ -982,20 +1265,23 @@ bindSliders([['sR2','vsR2',2],['sr2','vsr2',3],['sbeta2','vsbeta2',2],
              ['seta2','vseta2',3],['srb2','vsrb2',2],['srg2','vsrg2',2]], updateSig);
 bindSliders([['eR','veR',2],['er','ver',3],['ebeta','vebeta',2],
              ['eeta','veeta',3],['erb','verb',2],['erg','verg',2]], drawEnvelope);
+bindSliders([['wbR','vwbR',2],['wbr','vwbr',3],
+             ['wbeta_eta','vwbeta_eta',3],['wbrb','vwbrb',2],['wbrg','vwbrg',2]], drawWbeta);
 
 function showTab(id, btn){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   btn.classList.add('active');
-  if(id==='map1') drawMap1();
-  if(id==='map2') drawMap2();
-  if(id==='sigma') updateSig();
-  if(id==='env')  drawEnvelope();
+  if(id==='map1')   drawMap1();
+  if(id==='map2')   drawMap2();
+  if(id==='sigma')  updateSig();
+  if(id==='env')    drawEnvelope();
+  if(id==='wbeta')  drawWbeta();
 }
 
 /* Initial render */
-drawMap1(); drawMap2(); updateSig(); drawEnvelope();
+drawMap1(); drawMap2(); updateSig(); drawEnvelope(); drawWbeta();
 </script>
 </body>
 </html>
