@@ -40,8 +40,10 @@
   input[type=range] { width: 100%; height: 4px; accent-color: #378ADD; display: block; }
 
   /* Legend */
-  .wm-legend-item { display: flex; align-items: center; gap: 9px; margin-bottom: 7px; font-size: 12px; color: #555; }
-  .wm-legend-swatch { width: 13px; height: 13px; border-radius: 3px; flex-shrink: 0; }
+  .wm-legend-item { display: flex; align-items: center; gap: 9px; margin-bottom: 6px; font-size: 12px; color: #444; white-space: nowrap; }
+  .wm-legend-label { display: flex; align-items: baseline; gap: 0; }
+  .wm-legend-label .sub { font-size: 11px; color: #888; margin-left: 6px; }
+  .wm-legend-swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
 
   /* Canvas & readout */
   canvas { border: 1px solid #e0e0de; border-radius: 6px; width: 100%; max-width: 480px; display: block; }
@@ -95,10 +97,25 @@
 
     <div class="sep">
       <div class="wm-section-title">Legend</div>
-      <div class="wm-legend-item"><div class="wm-legend-swatch" style="background:#378ADD"></div>W<sup>P</sup> &gt; W<sup>G</sup> &nbsp;<span style="color:#aaa;font-size:11px">(B-interior)</span></div>
-      <div class="wm-legend-item"><div class="wm-legend-swatch" style="background:#EF9F27"></div>W<sup>G</sup> &gt; W<sup>P</sup> &nbsp;<span style="color:#aaa;font-size:11px">(B-constrained)</span></div>
-      <div class="wm-legend-item"><div class="wm-legend-swatch" style="background:#888780"></div>W<sup>P</sup> = W<sup>G</sup> &nbsp;<span style="color:#aaa;font-size:11px">(chose A)</span></div>
-      <div class="wm-legend-item"><div class="wm-legend-swatch" style="background:#D3D1C7"></div>Infeasible</div>
+      <div class="wm-legend-item">
+        <div class="wm-legend-swatch" style="background:#378ADD"></div>
+        <span>𝒲<sup>P</sup> &gt; 𝒲<sup>G</sup></span>
+        <span style="color:#bbb;font-size:11px">B-interior</span>
+      </div>
+      <div class="wm-legend-item">
+        <div class="wm-legend-swatch" style="background:#EF9F27"></div>
+        <span>𝒲<sup>G</sup> &gt; 𝒲<sup>P</sup></span>
+        <span style="color:#bbb;font-size:11px">B-constrained</span>
+      </div>
+      <div class="wm-legend-item">
+        <div class="wm-legend-swatch" style="background:#888780"></div>
+        <span>𝒲<sup>P</sup> = 𝒲<sup>G</sup></span>
+        <span style="color:#bbb;font-size:11px">chose A</span>
+      </div>
+      <div class="wm-legend-item">
+        <div class="wm-legend-swatch" style="background:#D3D1C7"></div>
+        <span>Infeasible</span>
+      </div>
     </div>
 
   </div>
