@@ -604,18 +604,23 @@ function computeWP(R,r,beta,eta,rb,rg){
   const pA  = PiAstar(R,r,eta,rb,rg);
   const pB  = PiBstar(R,beta,eta,rb,rg);
   const xi  = xTilde(R,r);
-  const bw  = pB > pA;
   const xII = 1;
 
-  const sigG = Math.max(0, Math.min(sb > 0 ? sb - 1e-10 : 0, sA));
-  const WG   = aggW(sigG, xi, R, r, beta, eta, rb, rg, 'I');
+  /* When sb ≥ 1 the blocking threshold exceeds max σ=1, so Regime II
+     is never triggered regardless of BW — private always stays in Regime I. */
+  const bw = (pB > pA) && (sb < 1);
+
+  /* Government: optimal σ^G in [0, min(sb,1)). */
+  const sigGub = sb > 0 && sb < 1 ? sb - 1e-10 : 1 - 1e-10;
+  const sigG   = Math.max(0, Math.min(sigGub, sA > 0 ? sA : 0));
+  const WG     = aggW(sigG, xi, R, r, beta, eta, rb, rg, 'I');
 
   let WP, cfg, sigmaP, xP;
 
   if(!bw){
     WP = WG;
     cfg = sA <= 0 ? 'A-corner' : 'A-int';
-    sigmaP = sigmaAstarConstrained(sA, sb);
+    sigmaP = sigmaAstarConstrained(sA, sb < 1 ? sb : 1);
     xP = xi;
   } else if(sB >= sb){
     WP = aggW(sB, xII, R, r, beta, eta, rb, rg, 'II');
@@ -624,17 +629,18 @@ function computeWP(R,r,beta,eta,rb,rg){
     xP = xII;
   } else {
     const R1 = R - 1;
-    const Ncon = A + sb*R1 - T/2;
-    const PBc  = Math.max(0, Ncon*(1-sb)*R1/D);
+    const sbClamped = Math.min(sb, 1);
+    const Ncon = A + sbClamped*R1 - T/2;
+    const PBc  = Math.max(0, Ncon*(1-sbClamped)*R1/D);
     if(PBc > pA){
-      WP = aggW(sb, xII, R, r, beta, eta, rb, rg, 'II');
+      WP = aggW(sbClamped, xII, R, r, beta, eta, rb, rg, 'II');
       cfg = 'B-con';
-      sigmaP = Math.min(1, Math.max(0, sb));
+      sigmaP = sbClamped;
       xP = xII;
     } else {
       WP = WG;
       cfg = sA <= 0 ? 'A-corner' : 'A-int';
-      sigmaP = sigmaAstarConstrained(sA, sb);
+      sigmaP = sigmaAstarConstrained(sA, sbClamped);
       xP = xi;
     }
   }
