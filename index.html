@@ -1271,7 +1271,10 @@ function drawWbeta(){
   const Kbw=(R-1)-ci;
   const betaStar=Kbw>0?betaBWthreshold(R,r,eta):Infinity;
   const wG=1+eta/2+ci;
-  const WGv=(wG>rb)?(wG-rb)*wG/(2*D):0;  // constant in β
+  const A_val=Av(eta,rb);
+  const sA_ref=sighatA(R,r,eta,rb);
+  /* WG reference line: at A-corner (σ̂^I≤0) WG=A·wG/Δ; at A-interior WG=(wG−rb)wG/(2Δ) */
+  const WGv = sA_ref>0 ? Math.max(0,(wG-rb)*wG/(2*D)) : Math.max(0,A_val*wG/D);
 
   // Sample points across β
   const N=300;
@@ -1383,7 +1386,7 @@ function drawWbeta(){
   // Region annotation
   ctx.fillStyle='rgba(29,158,117,0.60)';ctx.font='10px sans-serif';
   const bMid=isFinite(betaStar)&&betaStar>=0.05&&betaStar<=betaMax&&betaBound ? (betaStar+betaBound)/2 : betaMax*0.75;
-  if(bMid>=0.05&&bMid<=betaMax) ctx.fillText('W^P > W^G',toX(bMid)-20,toY(WGv*(1+(WGv>0?.3:0)))-10);
+  if(bMid>=0.05&&bMid<=betaMax) ctx.fillText('W^P > W^G',toX(bMid)-20,Math.max(pad.t+12,toY(WGv)-10));
   if(isFinite(betaStar)&&betaStar>0.10){
     ctx.fillStyle='rgba(0,0,0,0.35)';
     ctx.fillText('W^P = W^G',toX(0.05+betaStar*0.4),toY(WGv*1.05)-4);
@@ -1407,25 +1410,32 @@ function drawWbeta(){
   ctx.fillStyle='#DC3C37';ctx.fillText('— W^P actual',pad.l+5,pad.t+25);
   ctx.fillStyle='rgba(220,60,55,0.6)';ctx.fillText('- - W^P interior formula: (w^II−r_b)w^II/(2Δ)',pad.l+5,pad.t+36);
 
-  updateWbCards(R,r,eta,rb,rg,betaStar,WGv,wG,ci,D,Kbw);
+  updateWbCards(R,r,eta,rb,rg,betaStar,WGv,wG,ci,D,Kbw,sA_ref);
 }
 
-function updateWbCards(R,r,eta,rb,rg,betaStar,WGv,wG,ci,D,Kbw){
-  const EUiG=(wG+rb)/2, EpiG=(wG-rb)/2;
-  const MG=(wG>rb)?(wG-rb)/(2*D):0;
+function updateWbCards(R,r,eta,rb,rg,betaStar,WGv,wG,ci,D,Kbw,sA_ref){
+  const A_val=Av(eta,rb);
+  /* At A-corner (σ̂^I≤0): M^G=A/Δ, E[U_i]=1+η/2, E[π]=C_I.
+     At A-interior: M^G=(wG−rb)/(2Δ); midpoint pinning gives E[U_i]=(wG+rb)/2, E[π]=(wG−rb)/2. */
+  const interior = sA_ref > 0;
+  const MG    = interior ? Math.max(0,(wG-rb)/(2*D)) : Math.max(0,A_val/D);
+  const EUiG  = interior ? (wG+rb)/2 : 1+eta/2;
+  const EpiG  = interior ? (wG-rb)/2 : ci;
+  const WGlbl = interior ? '(w<sup>G</sup>−r<sub>b</sub>)w<sup>G</sup>/(2Δ)' : 'A·w<sup>G</sup>/Δ (corner σ<sup>G</sup>=0)';
   const bStr=!isFinite(betaStar)?'—':betaStar.toFixed(5);
   document.getElementById('wbCards').innerHTML=`
     <div class="mcard"><div class="ml">β* = (1−η)/[2K+1], K=(R−1)−C<sub>I</sub></div><div class="mv">${bStr}</div></div>
-    <div class="mcard"><div class="ml">W<sup>G</sup> = (w<sup>G</sup>−r<sub>b</sub>)w<sup>G</sup>/(2Δ)</div><div class="mv">${WGv.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">W<sup>G</sup> = ${WGlbl}</div><div class="mv">${WGv.toFixed(5)}</div></div>
     <div class="mcard"><div class="ml">w<sup>G</sup> = 1+η/2+C<sub>I</sub></div><div class="mv">${wG.toFixed(5)}</div></div>
-    <div class="mcard"><div class="ml">M<sup>G</sup> = (w<sup>G</sup>−r<sub>b</sub>)/(2Δ)</div><div class="mv">${MG.toFixed(5)}</div></div>
-    <div class="mcard"><div class="ml">E[U<sub>i</sub><sup>G</sup>] = (w<sup>G</sup>+r<sub>b</sub>)/2</div><div class="mv">${EUiG.toFixed(5)}</div></div>
-    <div class="mcard"><div class="ml">E[π<sup>G</sup>] = (w<sup>G</sup>−r<sub>b</sub>)/2</div><div class="mv">${EpiG.toFixed(5)}</div></div>`;
+    <div class="mcard"><div class="ml">M<sup>G</sup></div><div class="mv">${MG.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">E[U<sub>i</sub><sup>G</sup>]</div><div class="mv">${EUiG.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">E[π<sup>G</sup>]</div><div class="mv">${EpiG.toFixed(5)}</div></div>`;
   document.getElementById('wbNote').innerHTML=
-    `<strong>W<sup>G</sup> is flat in β</strong>: w<sup>G</sup>=1+η/2+C<sub>I</sub> = ${wG.toFixed(4)} (depends on R,r,η,r<sub>b</sub> only).<br>
+    `<strong>W<sup>G</sup> is flat in β</strong>: w<sup>G</sup>=1+η/2+C<sub>I</sub> = ${wG.toFixed(4)} (depends on R,r,η,r<sub>b</sub> only).
+    ${interior?'Interior optimum (σ̂<sup>I</sup>&gt;0): W<sup>G</sup>=(w<sup>G</sup>−r<sub>b</sub>)w<sup>G</sup>/(2Δ).':'Corner (σ̂<sup>I</sup>≤0): σ<sup>G</sup>=0, W<sup>G</sup>=A·w<sup>G</sup>/Δ — larger than interior formula.'}<br>
     ${Kbw>0?`Kink at β*≈${isFinite(betaStar)?betaStar.toFixed(4):'—'}: below → (BW) fails → tie; above → Regime II at x=1, w<sup>II</sup> rises as T* falls.`
     :'(R−1)≤C<sub>I</sub>: (BW) never holds — private stays in Regime I.'}<br>
-    <strong>Note:</strong> W<sup>G</sup>&gt;W<sup>P</sup> can occur under B-constrained (σ=σ̄, x=1), not at interior optima.`;
+    <strong>W<sup>G</sup>&gt;W<sup>P</sup></strong> can occur only under B-constrained (σ=σ̄, x=1), and only when large T* compresses M<sup>P</sup>·w<sup>II</sup> below M<sup>G</sup>·w<sup>G</sup>.`;
 }
 
 function loadPaperDefaults(){
