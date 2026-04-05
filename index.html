@@ -44,12 +44,6 @@
   .wm-legend-label { display: flex; align-items: baseline; gap: 0; }
   .wm-legend-label .sub { font-size: 11px; color: #888; margin-left: 6px; }
   .wm-legend-swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
-  .wm-legend-bw {
-    width: 20px; flex-shrink: 0;
-    background: repeating-linear-gradient(90deg,#555 0px,#555 4px,transparent 4px,transparent 7px);
-    height: 2px; margin: 2px 0;
-  }
-
   /* Canvas & readout */
   canvas { border: 1px solid #e0e0de; border-radius: 6px; width: 100%; max-width: 480px; display: block; }
   #rdout {
@@ -120,10 +114,6 @@
       <div class="wm-legend-item">
         <div class="wm-legend-swatch" style="background:#D3D1C7"></div>
         <span>Infeasible</span>
-      </div>
-      <div class="wm-legend-item" style="margin-top:4px">
-        <div class="wm-legend-bw"></div>
-        <span>(BW) boundary</span>
       </div>
     </div>
 
@@ -197,16 +187,6 @@ function wm_solve(beta, R, r, eta, rb, rg) {
   return { reg, WP, WG, sigmaA, sigmaB, PiA, PiB, CA, aA, aB, sbar };
 }
 
-function wmGetConfig(s, R) {
-  const shatA = 0.5 - s.aA / (2 * s.CA);
-  if (s.PiB <= s.PiA) {
-    if (shatA <= 0)       return 'A1: corner σ*=0';
-    if (shatA < s.sbar)   return 'A2: interior';
-    return 'A3: corner σ*=σ̄⁻';
-  }
-  const shatB = 0.5 - s.aB / (2 * (R - 1));
-  return shatB < s.sbar ? 'B1: constrained σ*=σ̄' : 'B2: interior';
-}
 
 function wmAxes() {
   return { xk: document.getElementById('xax').value, yk: document.getElementById('yax').value };
@@ -273,52 +253,6 @@ function drawWelfareMap() {
   ctx.strokeStyle = 'rgba(0,0,0,0.15)'; ctx.lineWidth = 0.5;
   ctx.strokeRect(ml, mt, pw, ph);
 
-  /* BW boundary: w^B = w^G  ↔  (R−1) − (1−β−η)/(2β) = C_A */
-  {
-    const bwPts = [];
-    for (let i = 0; i < pw; i++) {
-      const xv = px.min + (i / (pw - 1)) * (px.max - px.min);
-      let prev = null, crossJ = null;
-      for (let j = 0; j < ph; j++) {
-        const yv = py.max - (j / (ph - 1)) * (py.max - py.min);
-        const a = { ...WM_F, [xk]: xv, [yk]: yv };
-        if (a.beta <= 0 || a.beta >= 1 || a.R <= 1 || a.r >= 1 ||
-            a.R <= a.r || 1 - a.beta - a.eta <= 0) { prev = null; continue; }
-        const CAb = a.r * (a.R - 1) * (a.R - 1) / (2 * (a.R - a.r));
-        const diff = (a.R - 1) - (1 - a.beta - a.eta) / (2 * a.beta) - CAb;
-        if (prev !== null && prev * diff < 0) {
-          crossJ = j - diff / (diff - prev); break;
-        }
-        prev = diff;
-      }
-      bwPts.push(crossJ !== null ? { x: ml + i, y: mt + crossJ } : null);
-    }
-    ctx.save();
-    ctx.setLineDash([5, 4]); ctx.lineCap = 'round';
-    const drawBW = (style, lw) => {
-      ctx.strokeStyle = style; ctx.lineWidth = lw;
-      ctx.beginPath(); let on = false;
-      bwPts.forEach(p => {
-        if (!p) { on = false; return; }
-        on ? ctx.lineTo(p.x, p.y) : (ctx.moveTo(p.x, p.y), (on = true));
-      });
-      ctx.stroke();
-    };
-    drawBW('rgba(0,0,0,0.35)', 3);
-    drawBW('rgba(255,255,255,0.95)', 1.5);
-    /* "(BW)" label near the 65% mark */
-    const labelIdx = Math.floor(pw * 0.65);
-    const lp = bwPts[labelIdx] || bwPts.find(p => p);
-    if (lp) {
-      ctx.setLineDash([]);
-      ctx.font = '600 10px sans-serif';
-      ctx.fillStyle = 'rgba(255,255,255,0.95)';
-      ctx.textAlign = 'left';
-      ctx.fillText('BW', lp.x + 4, lp.y - 4);
-    }
-    ctx.restore();
-  }
-
   /* Axis tick labels */
   ctx.fillStyle = 'rgba(55,55,55,0.9)'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
   for (let i = 0; i <= 5; i++) {
@@ -338,21 +272,13 @@ function drawWelfareMap() {
   const s0 = wm_solve(WM_F.beta, WM_F.R, WM_F.r, WM_F.eta, WM_F.rb, WM_F.rg);
   const rdout = document.getElementById('rdout');
   if (s0) {
-    const cfg  = wmGetConfig(s0, WM_F.R);
-    const rl   = s0.reg===1 ? 'Wᴾ > Wᴳ' : s0.reg===-1 ? 'Wᴳ > Wᴾ' : 'Wᴾ = Wᴳ';
+    const rl   = s0.reg===1 ? '𝒲ᴾ > 𝒲ᴳ' : s0.reg===-1 ? '𝒲ᴳ > 𝒲ᴾ' : '𝒲ᴾ = 𝒲ᴳ';
     const rcol = s0.reg===1 ? '#185FA5' : s0.reg===-1 ? '#854F0B' : '#666';
-    const wBf  = 1 + WM_F.eta/2 + (WM_F.R - 1) - (1 - WM_F.beta - WM_F.eta) / (2 * WM_F.beta);
-    const wGf  = 1 + WM_F.eta/2 + s0.CA;
-    const bwGap = wBf - wGf;
-    const bwStr = (bwGap >= 0 ? '+' : '') + bwGap.toFixed(3);
-    const bwCol = bwGap > 0 ? '#185FA5' : '#888';
     rdout.innerHTML =
       `β=${WM_F.beta.toFixed(2)}  R=${WM_F.R.toFixed(2)}  r=${WM_F.r.toFixed(2)}  ` +
       `η=${WM_F.eta.toFixed(2)}  rᵦ=${WM_F.rb.toFixed(2)}  rᵍ=${WM_F.rg.toFixed(2)}<br>` +
-      `Config: <strong>${cfg}</strong> · σ̄=${s0.sbar.toFixed(3)} · Wᴾ=${s0.WP.toFixed(3)}  Wᴳ=${s0.WG.toFixed(3)}<br>` +
-      `Outcome: <strong style="color:${rcol}">${rl}</strong>` +
-      ` · wᴮ−wᴳ: <strong style="color:${bwCol}">${bwStr}</strong>` +
-      ` <span style="color:#aaa;font-size:10px">(BW ${bwGap > 1e-9 ? 'holds' : 'fails'})</span>`;
+      `σ̄=${s0.sbar.toFixed(3)} · 𝒲ᴾ=${s0.WP.toFixed(3)} · 𝒲ᴳ=${s0.WG.toFixed(3)}<br>` +
+      `<strong style="color:${rcol}">${rl}</strong>`;
   } else {
     rdout.textContent = 'Infeasible at current fixed parameter values.';
   }
