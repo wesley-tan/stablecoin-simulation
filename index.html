@@ -57,6 +57,34 @@
   .warn { color: #993C1D; font-weight: 500; }
   .good { color: #185FA5; font-weight: 500; }
   .env-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top:10px; }
+
+  /* ── Welfare Map tab ─────────────────────────────────────────────────── */
+  #map1 .wm-layout { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
+  #map1 .wm-controls { flex: 0 0 200px; }
+  #map1 .wm-field { margin-bottom: 10px; }
+  #map1 .wm-field label { display: block; font-size: 11px; color: #666; margin-bottom: 3px;
+    text-transform: uppercase; letter-spacing: 0.04em; }
+  #map1 select { font-size: 12px; padding: 4px 7px; border: 1px solid #ccc;
+    border-radius: 6px; background: #fff; color: #222; width: 100%; cursor: pointer; }
+  #map1 .wm-slider-row { margin-bottom: 9px; }
+  #map1 .wm-slider-row .wm-lbl { display: flex; justify-content: space-between;
+    font-size: 12px; margin-bottom: 2px; color: #444; }
+  #map1 input[type=range] { width: 100%; height: 4px; accent-color: #378ADD; }
+  #map1 button.preset { font-size: 11px; padding: 4px 8px; margin-bottom: 4px; width: 100%;
+    border: 1px solid #ddd; border-radius: 6px; background: #f5f5f3; color: #555;
+    cursor: pointer; text-align: left; }
+  #map1 button.preset:hover { background: #eaeae8; }
+  #map1 .wm-section-title { font-size: 11px; font-weight: 500; color: #777;
+    margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.04em; }
+  #map1 .wm-legend-item { display: flex; align-items: center; gap: 8px;
+    margin-bottom: 6px; font-size: 12px; color: #555; }
+  #map1 .wm-legend-swatch { width: 13px; height: 13px; border-radius: 3px; flex-shrink: 0; }
+  #map1 .wm-canvas-wrap { flex: 1; min-width: 270px; }
+  #map1 canvas { border: 1px solid #e0e0de; border-radius: 6px; width: 100%;
+    max-width: 480px; display: block; }
+  #rdout { margin-top: 8px; padding: 7px 10px; background: #f0efeb; border-radius: 6px;
+    font-size: 11px; color: #555; font-family: ui-monospace, monospace; line-height: 1.7;
+    max-width: 480px; }
 </style>
 </head>
 <body>
@@ -74,123 +102,73 @@
 </div>
 
 <div class="tabs">
-  <button class="tab active" onclick="showTab('map1',this)">W<sub>G</sub> vs W<sub>P</sub>: (r, β)</button>
-  <button class="tab" onclick="showTab('map2',this)">W<sub>G</sub> vs W<sub>P</sub>: (R, β)</button>
+  <button class="tab active" onclick="showTab('map1',this)">Welfare Map</button>
   <button class="tab" onclick="showTab('sigma',this)">σ* &amp; welfare statics</button>
   <button class="tab" onclick="showTab('env',this)">Π(σ) envelope</button>
   <button class="tab" onclick="showTab('wbeta',this)">W vs β diagram</button>
   <button class="tab" onclick="showTab('primitives',this)">Primitives &amp; §2–§6</button>
 </div>
 
-<!-- ── TAB 1 ─────────────────────────────────────────────────────────── -->
+<!-- ── TAB 1: Flexible Welfare Map ────────────────────────────────────── -->
 <div id="map1" class="panel active">
-<div class="row">
-<div class="col-map">
-  <h3>Aggregate welfare: β vs r &nbsp;<span style="font-weight:400;font-size:12px;color:#888">(swept)</span></h3>
-  <div style="font-size:11px;color:#888;margin-bottom:5px">x: r (fire-sale price) &nbsp;|&nbsp; y: β (patience)</div>
-  <canvas id="canvas1" width="410" height="330"></canvas>
-  <div class="legend" style="margin-top:8px">
-    <div class="leg-item"><div class="leg-dot" style="background:#DC3C37"></div>W<sub>G</sub> &gt; W<sub>P</sub> (B-constrained)</div>
-    <div class="leg-item"><div class="leg-dot" style="background:#1D9E75"></div>W<sub>P</sub> &gt; W<sub>G</sub> (B-interior)</div>
-    <div class="leg-item"><div class="leg-dot" style="background:#7BB8E8"></div>Tie (BW fails or Regime I)</div>
-    <div class="leg-item"><div class="leg-dot" style="background:#D3D1C7"></div>Infeasible</div>
-  </div>
-  <div class="note">
-    <strong>Black dashed</strong>: (BW) boundary — (R−1)−T*/2 = C<sub>I</sub>(r) (implicit in r for each β).<br>
-    <strong>Orange dashed</strong>: δ<sup>G</sup> = R/(2−β) — government doesn't accommodate below this r (Prop. 1).<br>
-    At B-interior: W<sub>P</sub> &gt; W<sub>G</sub> always (sign = sign BW). Red only in B-constrained.<br>
-    Click to inspect.
-  </div>
-</div>
-<div class="col-ctrl">
-  <h3>Fixed parameters</h3>
-  <div class="slider-row"><label>R (return)</label>
-    <input type="range" id="p1R" min="1.01" max="2.00" step="0.01" value="1.30">
-    <span id="v1R">1.30</span></div>
-  <div class="slider-row"><label>η (service)</label>
-    <input type="range" id="p1eta" min="0.001" max="0.20" step="0.001" value="0.05">
-    <span id="v1eta">0.050</span></div>
-  <div class="slider-row"><label>r<sub>b</sub></label>
-    <input type="range" id="p1rb" min="0.40" max="0.98" step="0.01" value="0.70">
-    <span id="v1rb">0.70</span></div>
-  <div class="slider-row"><label>r<sub>g</sub></label>
-    <input type="range" id="p1rg" min="0.41" max="1.10" step="0.01" value="0.75">
-    <span id="v1rg">0.75</span></div>
-  <div style="font-size:11px;color:#888;margin-bottom:6px">
-    A = 1+η/2−r<sub>b</sub> = <span id="v1A">—</span> &nbsp;|&nbsp; Δ = <span id="v1D">—</span>
-  </div>
-  <div class="sep"></div>
-  <h3>Inspect <span style="font-weight:400;font-size:11px;color:#888">(click map)</span></h3>
-  <div class="grid2">
-    <div class="mcard"><div class="ml">β</div><div class="mv" id="i1b">—</div></div>
-    <div class="mcard"><div class="ml">r</div><div class="mv" id="i1r">—</div></div>
-    <div class="mcard"><div class="ml">W<sub>P</sub></div><div class="mv" id="i1wp">—</div></div>
-    <div class="mcard"><div class="ml">W<sub>G</sub></div><div class="mv" id="i1wg">—</div></div>
-    <div class="mcard"><div class="ml">w<sup>G</sup> = 1+η/2+C<sub>I</sub></div><div class="mv" id="i1wgper">—</div></div>
-    <div class="mcard"><div class="ml">w<sup>II</sup> at x=1</div><div class="mv" id="i1wbper">—</div></div>
-    <div class="mcard"><div class="ml">σ̄</div><div class="mv" id="i1sbar">—</div></div>
-    <div class="mcard"><div class="ml">σ̂<sup>B</sup></div><div class="mv" id="i1sb">—</div></div>
-    <div class="mcard"><div class="ml">Config</div><div class="mv" id="i1cfg">—</div></div>
-    <div class="mcard"><div class="ml">δ<sup>G</sup></div><div class="mv" id="i1dg">—</div></div>
-  </div>
-  <div id="i1text" style="font-size:11px;color:#777;line-height:1.6;margin-top:4px"></div>
-</div>
-</div>
-</div>
+  <h3 style="margin-bottom:14px">Welfare comparison: W<sup>P</sup> vs W<sup>G</sup></h3>
+  <div class="wm-layout">
 
-<!-- ── TAB 2 ─────────────────────────────────────────────────────────── -->
-<div id="map2" class="panel">
-<div class="row">
-<div class="col-map">
-  <h3>Aggregate welfare: β vs R &nbsp;<span style="font-weight:400;font-size:12px;color:#888">(swept)</span></h3>
-  <div style="font-size:11px;color:#888;margin-bottom:5px">x: R (illiquid return) &nbsp;|&nbsp; y: β (patience)</div>
-  <canvas id="canvas2" width="410" height="330"></canvas>
-  <div class="legend" style="margin-top:8px">
-    <div class="leg-item"><div class="leg-dot" style="background:#DC3C37"></div>W<sub>G</sub> &gt; W<sub>P</sub></div>
-    <div class="leg-item"><div class="leg-dot" style="background:#1D9E75"></div>W<sub>P</sub> &gt; W<sub>G</sub></div>
-    <div class="leg-item"><div class="leg-dot" style="background:#7BB8E8"></div>Tie</div>
-    <div class="leg-item"><div class="leg-dot" style="background:#D3D1C7"></div>Infeasible</div>
+    <div class="wm-controls">
+      <div class="wm-field">
+        <label>x-axis</label>
+        <select id="xax">
+          <option value="R" selected>R (risky return)</option>
+          <option value="beta">β (patience share)</option>
+          <option value="r">r (fire-sale price)</option>
+          <option value="eta">η (liquidity value)</option>
+        </select>
+      </div>
+      <div class="wm-field">
+        <label>y-axis</label>
+        <select id="yax">
+          <option value="beta" selected>β (patience share)</option>
+          <option value="R">R (risky return)</option>
+          <option value="r">r (fire-sale price)</option>
+          <option value="eta">η (liquidity value)</option>
+        </select>
+      </div>
+
+      <div class="sep">
+        <div class="wm-section-title">Fixed parameters</div>
+        <div id="sldrs"></div>
+        <div class="wm-slider-row">
+          <div class="wm-lbl"><span>r<sub>b</sub> (outside option)</span><span id="lb_rb">0.60</span></div>
+          <input type="range" id="sl_rb" min="0.1" max="1.2" step="0.02" value="0.60">
+        </div>
+        <div class="wm-slider-row">
+          <div class="wm-lbl"><span>r<sub>g</sub> (upper bound)</span><span id="lb_rg">1.00</span></div>
+          <input type="range" id="sl_rg" min="0.5" max="2.0" step="0.02" value="1.00">
+        </div>
+      </div>
+
+      <div class="sep">
+        <div class="wm-section-title">Presets</div>
+        <button class="preset" id="wmp1">standard: mostly blue</button>
+        <button class="preset" id="wmp2">low r: mixed all 4 regions</button>
+        <button class="preset" id="wmp3">highlight amber region</button>
+      </div>
+
+      <div class="sep">
+        <div class="wm-section-title">Legend</div>
+        <div class="wm-legend-item"><div class="wm-legend-swatch" style="background:#378ADD"></div>W<sup>P</sup> &gt; W<sup>G</sup> (B-interior)</div>
+        <div class="wm-legend-item"><div class="wm-legend-swatch" style="background:#EF9F27"></div>W<sup>G</sup> &gt; W<sup>P</sup> (B-constrained)</div>
+        <div class="wm-legend-item"><div class="wm-legend-swatch" style="background:#888780"></div>W<sup>P</sup> = W<sup>G</sup> (chose A)</div>
+        <div class="wm-legend-item"><div class="wm-legend-swatch" style="background:#D3D1C7"></div>Infeasible</div>
+      </div>
+    </div>
+
+    <div class="wm-canvas-wrap">
+      <canvas id="ph" width="480" height="380"></canvas>
+      <div id="rdout">Loading…</div>
+    </div>
+
   </div>
-  <div class="note">
-    <strong>Black dashed</strong>: (BW) boundary β = (1−η)/[2((R−1)−C<sub>I</sub>(R))+1] for fixed r.<br>
-    <strong>Orange dashed</strong>: δ<sup>G</sup>=r line (R such that δ<sup>G</sup>=R/(2−β)=r).<br>
-    Higher R → B-interior → W<sub>P</sub>&gt;W<sub>G</sub>. Moderate R + low β → B-constrained → red.
-  </div>
-</div>
-<div class="col-ctrl">
-  <h3>Fixed parameters</h3>
-  <div class="slider-row"><label>r (fire-sale)</label>
-    <input type="range" id="p2r" min="0.40" max="0.99" step="0.005" value="0.70">
-    <span id="v2r">0.700</span></div>
-  <div class="slider-row"><label>η (service)</label>
-    <input type="range" id="p2eta" min="0.001" max="0.20" step="0.001" value="0.05">
-    <span id="v2eta">0.050</span></div>
-  <div class="slider-row"><label>r<sub>b</sub></label>
-    <input type="range" id="p2rb" min="0.40" max="0.98" step="0.01" value="0.70">
-    <span id="v2rb">0.70</span></div>
-  <div class="slider-row"><label>r<sub>g</sub></label>
-    <input type="range" id="p2rg" min="0.41" max="1.10" step="0.01" value="0.75">
-    <span id="v2rg">0.75</span></div>
-  <div style="font-size:11px;color:#888;margin-bottom:6px">
-    A = <span id="v2A">—</span> &nbsp;|&nbsp; Δ = <span id="v2D">—</span>
-  </div>
-  <div class="sep"></div>
-  <h3>Inspect <span style="font-weight:400;font-size:11px;color:#888">(click map)</span></h3>
-  <div class="grid2">
-    <div class="mcard"><div class="ml">β</div><div class="mv" id="i2b">—</div></div>
-    <div class="mcard"><div class="ml">R</div><div class="mv" id="i2R">—</div></div>
-    <div class="mcard"><div class="ml">W<sub>P</sub></div><div class="mv" id="i2wp">—</div></div>
-    <div class="mcard"><div class="ml">W<sub>G</sub></div><div class="mv" id="i2wg">—</div></div>
-    <div class="mcard"><div class="ml">w<sup>G</sup></div><div class="mv" id="i2wgper">—</div></div>
-    <div class="mcard"><div class="ml">w<sup>II</sup></div><div class="mv" id="i2wbper">—</div></div>
-    <div class="mcard"><div class="ml">σ̄</div><div class="mv" id="i2sbar">—</div></div>
-    <div class="mcard"><div class="ml">σ̂<sup>B</sup></div><div class="mv" id="i2sb">—</div></div>
-    <div class="mcard"><div class="ml">Config</div><div class="mv" id="i2cfg">—</div></div>
-    <div class="mcard"><div class="ml">BW?</div><div class="mv" id="i2bw">—</div></div>
-  </div>
-  <div id="i2text" style="font-size:11px;color:#777;line-height:1.6;margin-top:4px"></div>
-</div>
-</div>
 </div>
 
 <!-- ── TAB 3: σ* and welfare statics ──────────────────────────────────── -->
@@ -656,7 +634,221 @@ function regionColor(WP, WG, cfg){
   return 'rgba(123,184,232,0.75)';
 }
 
-/* ── Map drawing engine ─────────────────────────────────────────────── */
+/* ── Welfare Map (Tab 1) ─────────────────────────────────────────────── */
+const WM_PAX = {
+  beta: { label: 'β', min: 0.03, max: 0.97, step: 0.01, def: 0.40 },
+  R:    { label: 'R', min: 1.05, max: 5.00, step: 0.05, def: 2.50 },
+  r:    { label: 'r', min: 0.01, max: 0.99, step: 0.01, def: 0.20 },
+  eta:  { label: 'η', min: 0.00, max: 0.90, step: 0.01, def: 0.10 }
+};
+const WM_F = { beta: 0.40, R: 2.50, r: 0.20, eta: 0.10, rb: 0.60, rg: 1.00 };
+
+function wm_solve(beta, R, r, eta, rb, rg) {
+  if (r >= 1 || R <= 1 || beta <= 0 || beta >= 1 || rb >= rg) return null;
+  const aA = 1 + eta / 2 - rb;
+  if (aA <= 0) return null;
+  const CA = r * (R - 1) * (R - 1) / (2 * (R - r));
+  if (CA <= 0) return null;
+  const aB = 1 + eta / 2 - (1 - beta - eta) / (2 * beta) - rb;
+  const sbar_raw = (1 - beta - eta) * r / (beta * (R - r));
+  const sbar = Math.min(Math.max(sbar_raw, 0), 0.99999);
+
+  /* Solution A branches */
+  const shatA = 0.5 - aA / (2 * CA);
+  let sigmaA, PiA;
+  if (shatA <= 0) {
+    sigmaA = 0; PiA = aA * CA / (rg - rb);
+  } else if (shatA < sbar) {
+    sigmaA = shatA; PiA = (CA + aA) * (CA + aA) / (4 * (rg - rb));
+  } else {
+    sigmaA = sbar; PiA = (aA + CA * sbar) * (1 - sbar) * CA / (rg - rb);
+  }
+  PiA = Math.max(0, PiA);
+  const euA = aA + sigmaA * CA;
+  if (euA <= 0) return null;
+  const WG = (euA / (rg - rb)) * (1 + eta / 2 + CA);
+
+  /* Solution B branches — only reachable when sbar_raw < 1 */
+  const wBrb = aB + (R - 1);
+  let sigmaB, PiB;
+  if (sbar_raw > 1 || wBrb <= 0) {
+    sigmaB = null; PiB = 0;
+  } else {
+    const shatB = 0.5 - aB / (2 * (R - 1));
+    if (shatB < sbar) {
+      sigmaB = sbar;
+      PiB = Math.max(0, (aB + (R - 1) * sbar) * (1 - sbar) * (R - 1) / (rg - rb));
+    } else if (shatB <= 1) {
+      sigmaB = shatB; PiB = wBrb * wBrb / (4 * (rg - rb));
+    } else {
+      sigmaB = 1; PiB = 0;
+    }
+  }
+
+  /* Global choice */
+  if (PiB <= PiA) return { reg: 0, WP: WG, WG, sigmaA, sigmaB, PiA, PiB, CA, aA, aB, sbar };
+  const euB = aB + sigmaB * (R - 1);
+  if (euB <= 0) return { reg: 0, WP: WG, WG, sigmaA, sigmaB, PiA, PiB, CA, aA, aB, sbar };
+  const wB = 1 + eta / 2 + (R - 1) - (1 - beta - eta) / (2 * beta);
+  const WP = (euB / (rg - rb)) * wB;
+  const reg = WP > WG + 1e-9 ? 1 : (WP < WG - 1e-9 ? -1 : 0);
+  return { reg, WP, WG, sigmaA, sigmaB, PiA, PiB, CA, aA, aB, sbar };
+}
+
+function wmGetConfig(s, R) {
+  const shatA = 0.5 - s.aA / (2 * s.CA);
+  if (s.PiB <= s.PiA) {
+    if (shatA <= 0)             return 'A1: corner σ*=0';
+    if (shatA < s.sbar)         return 'A2: interior';
+    return 'A3: corner σ*=σ̄⁻';
+  } else {
+    const shatB = 0.5 - s.aB / (2 * (R - 1));
+    return shatB < s.sbar ? 'B1: constrained σ*=σ̄' : 'B2: interior';
+  }
+}
+
+function wmAxes() {
+  return { xk: document.getElementById('xax').value, yk: document.getElementById('yax').value };
+}
+
+function buildSlidersWM() {
+  const { xk, yk } = wmAxes();
+  const d = document.getElementById('sldrs');
+  d.innerHTML = '';
+  ['beta', 'R', 'r', 'eta'].forEach(k => {
+    if (k === xk || k === yk) return;
+    const p = WM_PAX[k];
+    const row = document.createElement('div');
+    row.className = 'wm-slider-row';
+    row.innerHTML = `<div class="wm-lbl"><span>${p.label}</span><span id="lb_${k}">${WM_F[k].toFixed(2)}</span></div>` +
+      `<input type="range" id="sl_${k}" min="${p.min}" max="${p.max}" step="${p.step}" value="${WM_F[k]}">`;
+    d.appendChild(row);
+    row.querySelector('input').addEventListener('input', e => {
+      WM_F[k] = parseFloat(e.target.value);
+      document.getElementById('lb_' + k).textContent = WM_F[k].toFixed(2);
+      drawWelfareMap();
+    });
+  });
+}
+
+function drawWelfareMap() {
+  const { xk, yk } = wmAxes();
+  const cv = document.getElementById('ph');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  const CW = cv.width, CH = cv.height;
+  const ml = 48, mb = 42, mt = 22, mr = 22;
+  const pw = CW - ml - mr, ph = CH - mt - mb;
+  const px = WM_PAX[xk], py = WM_PAX[yk];
+
+  ctx.clearRect(0, 0, CW, CH);
+
+  /* pixel-by-pixel ImageData render */
+  const img = ctx.createImageData(pw, ph);
+  /* reg:  1=blue(WP>WG)  -1=amber(WG>WP)  0=grey(tie/A)  null=infeasible */
+  const COLS = { null:[200,198,190,160], '-1':[239,159,39,215], '0':[136,135,128,185], '1':[55,138,221,215] };
+  for (let j = 0; j < ph; j++) {
+    for (let i = 0; i < pw; i++) {
+      const xv = px.min + (i / (pw - 1)) * (px.max - px.min);
+      const yv = py.max - (j / (ph - 1)) * (py.max - py.min);
+      const a = { ...WM_F, [xk]: xv, [yk]: yv };
+      const s = wm_solve(a.beta, a.R, a.r, a.eta, a.rb, a.rg);
+      const c = s === null ? COLS['null'] : COLS[String(s.reg)];
+      const idx = (j * pw + i) * 4;
+      img.data[idx]=c[0]; img.data[idx+1]=c[1]; img.data[idx+2]=c[2]; img.data[idx+3]=c[3];
+    }
+  }
+  const tmp = document.createElement('canvas');
+  tmp.width = pw; tmp.height = ph;
+  tmp.getContext('2d').putImageData(img, 0, 0);
+  ctx.drawImage(tmp, ml, mt);
+
+  /* grid lines */
+  ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 0.5;
+  [1,2,3,4].forEach(i => {
+    ctx.beginPath(); ctx.moveTo(ml+i/4*pw, mt); ctx.lineTo(ml+i/4*pw, mt+ph); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ml, mt+i/4*ph); ctx.lineTo(ml+pw, mt+i/4*ph); ctx.stroke();
+  });
+  ctx.strokeStyle = 'rgba(0,0,0,0.15)'; ctx.lineWidth = 0.5;
+  ctx.strokeRect(ml, mt, pw, ph);
+
+  /* axis tick labels */
+  ctx.fillStyle = 'rgba(55,55,55,0.9)'; ctx.font = '11px sans-serif';
+  ctx.textAlign = 'center';
+  for (let i = 0; i <= 5; i++) {
+    const xv = px.min + i/5 * (px.max - px.min);
+    ctx.fillText(xv.toFixed(xv < 2 ? 2 : 1), ml + i/5 * pw, mt+ph+17);
+  }
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= 5; i++) {
+    const yv = py.min + i/5 * (py.max - py.min);
+    ctx.fillText(yv.toFixed(yv < 2 ? 2 : 1), ml-5, mt+ph - i/5*ph + 4);
+  }
+  ctx.fillStyle = 'rgba(35,35,35,0.9)'; ctx.font = '500 13px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText(px.label, ml+pw/2, CH-6);
+  ctx.save(); ctx.translate(12, mt+ph/2); ctx.rotate(-Math.PI/2); ctx.fillText(py.label, 0, 0); ctx.restore();
+
+  /* readout at current WM_F values */
+  const s0 = wm_solve(WM_F.beta, WM_F.R, WM_F.r, WM_F.eta, WM_F.rb, WM_F.rg);
+  const rdout = document.getElementById('rdout');
+  if (s0) {
+    const cfg = wmGetConfig(s0, WM_F.R);
+    const rl  = s0.reg===1 ? 'Wᴾ > Wᴳ' : s0.reg===-1 ? 'Wᴳ > Wᴾ' : 'Wᴾ = Wᴳ';
+    const rcol= s0.reg===1 ? '#185FA5' : s0.reg===-1 ? '#854F0B' : '#666';
+    rdout.innerHTML =
+      `β=${WM_F.beta.toFixed(2)}  R=${WM_F.R.toFixed(2)}  r=${WM_F.r.toFixed(2)}  ` +
+      `η=${WM_F.eta.toFixed(2)}  rᵦ=${WM_F.rb.toFixed(2)}  rᵍ=${WM_F.rg.toFixed(2)}<br>` +
+      `Config: <strong>${cfg}</strong> · σ̄=${s0.sbar.toFixed(3)} · ` +
+      `Wᴾ=${s0.WP.toFixed(3)} Wᴳ=${s0.WG.toFixed(3)}<br>` +
+      `Outcome: <strong style="color:${rcol}">${rl}</strong>`;
+  } else {
+    rdout.textContent = 'Infeasible at current fixed parameter values.';
+  }
+}
+
+function onAxisChangeWM() {
+  const { xk, yk } = wmAxes();
+  if (xk === yk) {
+    const other = ['beta','R','r','eta'].find(v => v !== xk);
+    document.getElementById(xk === 'R' ? 'yax' : 'xax').value = other;
+  }
+  buildSlidersWM(); drawWelfareMap();
+}
+document.getElementById('xax').addEventListener('change', onAxisChangeWM);
+document.getElementById('yax').addEventListener('change', onAxisChangeWM);
+
+['rb','rg'].forEach(k => {
+  document.getElementById('sl_' + k).addEventListener('input', e => {
+    WM_F[k] = parseFloat(e.target.value);
+    document.getElementById('lb_' + k).textContent = WM_F[k].toFixed(2);
+    drawWelfareMap();
+  });
+});
+
+function syncSlidersWM() {
+  ['rb','rg','beta','R','r','eta'].forEach(k => {
+    const sl = document.getElementById('sl_' + k);
+    if (sl) { sl.value = WM_F[k]; document.getElementById('lb_' + k).textContent = WM_F[k].toFixed(2); }
+  });
+}
+
+document.getElementById('wmp1').onclick = () => {
+  Object.assign(WM_F, { r:0.60, eta:0.10, rb:0.90, rg:1.40, beta:0.50, R:2.50 });
+  document.getElementById('xax').value='R'; document.getElementById('yax').value='beta';
+  syncSlidersWM(); buildSlidersWM(); drawWelfareMap();
+};
+document.getElementById('wmp2').onclick = () => {
+  Object.assign(WM_F, { r:0.20, eta:0.10, rb:0.60, rg:1.00, beta:0.40, R:2.50 });
+  document.getElementById('xax').value='R'; document.getElementById('yax').value='beta';
+  syncSlidersWM(); buildSlidersWM(); drawWelfareMap();
+};
+document.getElementById('wmp3').onclick = () => {
+  Object.assign(WM_F, { r:0.20, eta:0.10, rb:0.60, rg:1.00, beta:0.29, R:2.00 });
+  document.getElementById('xax').value='R'; document.getElementById('yax').value='beta';
+  syncSlidersWM(); buildSlidersWM(); drawWelfareMap();
+};
+
+/* ── Map drawing engine (kept for σ* tab click handlers if any) ─────── */
 const PAD = {l:34, r:8, t:8, b:30};
 
 function drawMap(canvasId, xMin,xMax, yMin,yMax, getParams, drawExtra){
@@ -828,41 +1020,6 @@ function inspectResult(res, R, r, beta, eta, rb){
   return {wG, wB, msg: msgs[res.cfg] || res.cfg};
 }
 
-makeClick('canvas1', 0.40,0.95, 0.30,0.95, (rv,bv) => {
-  const R=+document.getElementById('p1R').value, eta=+document.getElementById('p1eta').value;
-  const rb=+document.getElementById('p1rb').value, rg=+document.getElementById('p1rg').value;
-  const res=computeWP(R,rv,bv,eta,rb,rg);
-  const {wG,wB,msg}=inspectResult(res,R,rv,bv,eta,rb);
-  document.getElementById('i1b').textContent    = bv.toFixed(3);
-  document.getElementById('i1r').textContent    = rv.toFixed(3);
-  document.getElementById('i1wp').textContent   = res.feasible?res.WP.toFixed(5):'—';
-  document.getElementById('i1wg').textContent   = res.feasible?res.WG.toFixed(5):'—';
-  document.getElementById('i1wgper').textContent= wG.toFixed(5);
-  document.getElementById('i1wbper').textContent= wB.toFixed(5);
-  document.getElementById('i1sbar').textContent = res.feasible?res.sb.toFixed(4):'—';
-  document.getElementById('i1sb').textContent   = res.feasible?res.sB.toFixed(4):'—';
-  document.getElementById('i1cfg').textContent  = res.cfg;
-  document.getElementById('i1dg').textContent   = deltaG(R,bv).toFixed(4);
-  document.getElementById('i1text').textContent = msg;
-});
-
-makeClick('canvas2', 1.05,1.60, 0.30,0.95, (Rv,bv) => {
-  const r=+document.getElementById('p2r').value, eta=+document.getElementById('p2eta').value;
-  const rb=+document.getElementById('p2rb').value, rg=+document.getElementById('p2rg').value;
-  const res=computeWP(Rv,r,bv,eta,rb,rg);
-  const {wG,wB,msg}=inspectResult(res,Rv,r,bv,eta,rb);
-  document.getElementById('i2b').textContent    = bv.toFixed(3);
-  document.getElementById('i2R').textContent    = Rv.toFixed(3);
-  document.getElementById('i2wp').textContent   = res.feasible?res.WP.toFixed(5):'—';
-  document.getElementById('i2wg').textContent   = res.feasible?res.WG.toFixed(5):'—';
-  document.getElementById('i2wgper').textContent= wG.toFixed(5);
-  document.getElementById('i2wbper').textContent= wB.toFixed(5);
-  document.getElementById('i2sbar').textContent = res.feasible?res.sb.toFixed(4):'—';
-  document.getElementById('i2sb').textContent   = res.feasible?res.sB.toFixed(4):'—';
-  document.getElementById('i2cfg').textContent  = res.cfg;
-  document.getElementById('i2bw').textContent   = res.bw?'Yes':'No';
-  document.getElementById('i2text').textContent = msg;
-});
 
 /* ── Comparative statics summary — §7 (welfare ordering) ───────────── */
 const rows = [
@@ -1625,8 +1782,6 @@ function bindSliders(ids, fn){
     });
   });
 }
-bindSliders([['p1R','v1R',2],['p1eta','v1eta',3],['p1rb','v1rb',2],['p1rg','v1rg',2]], drawMap1);
-bindSliders([['p2r','v2r',3],['p2eta','v2eta',3],['p2rb','v2rb',2],['p2rg','v2rg',2]], drawMap2);
 bindSliders([['sR2','vsR2',2],['sr2','vsr2',3],['sbeta2','vsbeta2',2],
              ['seta2','vseta2',3],['srb2','vsrb2',2],['srg2','vsrg2',2]], updateSig);
 bindSliders([['eR','veR',2],['er','ver',3],['ebeta','vebeta',2],
@@ -1644,16 +1799,15 @@ function showTab(id, btn){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   btn.classList.add('active');
-  if(id==='map1')   drawMap1();
-  if(id==='map2')   drawMap2();
-  if(id==='sigma')  updateSig();
-  if(id==='env')    drawEnvelope();
-  if(id==='wbeta')  drawWbeta();
+  if(id==='map1')       drawWelfareMap();
+  if(id==='sigma')      updateSig();
+  if(id==='env')        drawEnvelope();
+  if(id==='wbeta')      drawWbeta();
   if(id==='primitives') updatePrimTab();
 }
 
 /* Initial render */
-drawMap1(); drawMap2(); updateSig(); drawEnvelope(); drawWbeta(); updatePrimTab();
+buildSlidersWM(); drawWelfareMap(); updateSig(); drawEnvelope(); drawWbeta(); updatePrimTab();
 </script>
 </body>
 </html>
