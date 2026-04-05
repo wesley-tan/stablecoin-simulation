@@ -11,8 +11,7 @@
     font-size: 14px; background: #f9f9f7; color: #1a1a18;
     padding: 24px; max-width: 960px; margin: 0 auto;
   }
-  h1 { font-size: 18px; font-weight: 500; margin-bottom: 3px; }
-  .subtitle { font-size: 12px; color: #888; margin-bottom: 20px; }
+  h1 { font-size: 18px; font-weight: 500; margin-bottom: 20px; }
   h3 { font-size: 14px; font-weight: 500; margin-bottom: 14px; }
 
   /* Layout */
@@ -40,14 +39,6 @@
   .wm-lbl { display: flex; justify-content: space-between; font-size: 12px; color: #555; margin-bottom: 3px; }
   input[type=range] { width: 100%; height: 4px; accent-color: #378ADD; display: block; }
 
-  /* Presets */
-  button.preset {
-    font-size: 11px; padding: 5px 9px; margin-bottom: 5px; width: 100%;
-    border: 1px solid #ddd; border-radius: 6px;
-    background: #f3f3f0; color: #555; cursor: pointer; text-align: left;
-  }
-  button.preset:hover { background: #e8e8e5; }
-
   /* Legend */
   .wm-legend-item { display: flex; align-items: center; gap: 9px; margin-bottom: 7px; font-size: 12px; color: #555; }
   .wm-legend-swatch { width: 13px; height: 13px; border-radius: 3px; flex-shrink: 0; }
@@ -63,10 +54,7 @@
 </head>
 <body>
 
-<h1>Private and Government</h1>
-<p class="subtitle">Interactive simulation — Wesley Tan, Wesleyan University 2026 · Advisor: Prof. Ryuichiro Izumi</p>
-
-<h3>Welfare comparison: W<sup>P</sup> vs W<sup>G</sup></h3>
+<h1>Welfare comparison: W<sup>P</sup> vs W<sup>G</sup></h1>
 
 <div class="wm-layout">
 
@@ -103,13 +91,6 @@
         <div class="wm-lbl"><span>r<sub>g</sub> (upper bound)</span><span id="lb_rg">1.00</span></div>
         <input type="range" id="sl_rg" min="0.5" max="2.0" step="0.02" value="1.00">
       </div>
-    </div>
-
-    <div class="sep">
-      <div class="wm-section-title">Presets</div>
-      <button class="preset" id="wmp1">Standard — mostly blue</button>
-      <button class="preset" id="wmp2">Low r — all four regions</button>
-      <button class="preset" id="wmp3">Highlight amber region</button>
     </div>
 
     <div class="sep">
@@ -316,29 +297,6 @@ document.getElementById('yax').addEventListener('change', onAxisChangeWM);
     drawWelfareMap();
   });
 });
-
-function syncSlidersWM() {
-  ['rb','rg','beta','R','r','eta'].forEach(k => {
-    const sl = document.getElementById('sl_' + k);
-    if (sl) { sl.value = WM_F[k]; document.getElementById('lb_' + k).textContent = WM_F[k].toFixed(2); }
-  });
-}
-
-document.getElementById('wmp1').onclick = () => {
-  Object.assign(WM_F, { r:0.60, eta:0.10, rb:0.90, rg:1.40, beta:0.50, R:2.50 });
-  document.getElementById('xax').value='R'; document.getElementById('yax').value='beta';
-  syncSlidersWM(); buildSlidersWM(); drawWelfareMap();
-};
-document.getElementById('wmp2').onclick = () => {
-  Object.assign(WM_F, { r:0.20, eta:0.10, rb:0.60, rg:1.00, beta:0.40, R:2.50 });
-  document.getElementById('xax').value='R'; document.getElementById('yax').value='beta';
-  syncSlidersWM(); buildSlidersWM(); drawWelfareMap();
-};
-document.getElementById('wmp3').onclick = () => {
-  Object.assign(WM_F, { r:0.20, eta:0.10, rb:0.60, rg:1.00, beta:0.29, R:2.00 });
-  document.getElementById('xax').value='R'; document.getElementById('yax').value='beta';
-  syncSlidersWM(); buildSlidersWM(); drawWelfareMap();
-};
 
 buildSlidersWM();
 drawWelfareMap();
