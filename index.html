@@ -65,16 +65,15 @@
 <p class="subtitle">Interactive simulation — Wesley Tan, Wesleyan University 2026 · Advisor: Prof. Ryuichiro Izumi</p>
 
 <div class="section-note">
-  <strong>Model (§1–5).</strong>
-  Contract = (σ, x). Regime I (σ &lt; σ̄, fire sales): E[π<sup>I</sup>] = (1−σ)[x(R−1)−(R−r)x²/(2r)].
-  Regime II (σ ≥ σ̄, blocking): E[π<sup>II</sup>] = (1−σ)x(R−1). σ̄ = (1−β−η)r/[β(R−r)].
-  Government replicates Regime I: x<sup>G*</sup>=x̃, σ<sup>G*</sup>=σ̂<sup>I</sup>.
-  <strong>Pinning (§5.2):</strong> at any interior optimum, E[U<sub>i</sub>] = (w+r<sub>b</sub>)/2, E[π] = (w−r<sub>b</sub>)/2, M = (w−r<sub>b</sub>)/[2Δ].<br>
-  <strong>Prop. 1 (§5.4):</strong> At interior optima, W<sub>G</sub>&gt;W<sub>P</sub> is <em>impossible</em>.
-  sign(W<sub>P</sub>−W<sub>G</sub>) = sign(BW) always. W<sub>G</sub>&gt;W<sub>P</sub> only in <strong>B-constrained</strong>.
-  <strong>W<sub>G</sub> is flat in β</strong> (depends on R,r,η,r<sub>b</sub>,r<sub>g</sub> only).
-  The kink at β* = r(1−η)/R marks where private switches to Regime II and W<sub>P</sub> begins rising.
-  BW threshold β* = r(1−η)/R: higher r → higher β* → gov more attractive; higher R → lower β*.
+  <strong>Issuer and government optimisation (primitive variables, April 2026).</strong>
+  <strong>Timing:</strong> (t=0a) issuer announces σ; (t=0b) investors form x<sup>e</sup>, deposit iff E[U<sub>i</sub>]≥v<sub>i</sub>,
+  M = (E[U<sub>i</sub>]−r<sub>b</sub>)/(r<sub>g</sub>−r<sub>b</sub>) locks in; (t=0c) issuer maximises M·E[π] in x given M; (t=1) λ~U[0,1].
+  <strong>σ̄:</strong> (1−β−η)r/[β(R−r)]; <strong>T*:</strong> (1−β−η)/β. <strong>Solution A</strong> (σ&lt;σ̄): fire sales,
+  E[π<sup>A</sup>]=(1−σ)[x(R−1)−(R−r)x²/(2r)]; <strong>Solution B</strong> (σ≥σ̄): blocking, E[π<sup>B</sup>]=(1−σ)x(R−1).
+  <strong>[G] ≡ A:</strong> full accommodation (r&gt;δ<sup>G</sup>=R/(2−β)) replicates A — x<sup>G*</sup>=x̃=r(R−1)/(R−r), σ̂<sup>G</sup>=σ̂<sup>A</sup>.<br>
+  <strong>Midpoint pinning (Prop.):</strong> at interior σ*, E[U<sub>i</sub>]−r<sub>b</sub>=(w−r<sub>b</sub>)/2, M=(w−r<sub>b</sub>)/[2(r<sub>g</sub>−r<sub>b</sub>)].
+  <strong>Welfare ordering:</strong> at interior optima sign(W<sub>P</sub>−W<sub>G</sub>)=sign(BW) with BW ⇔ β(R−r)&gt;r(1−β−η); W<sub>G</sub>&gt;W<sub>P</sub> only possible under <strong>B-constrained</strong>.
+  Four configs: A-interior / A-corner / B-interior / B-constrained (revert to A if Π<sup>B</sup>(σ̄)&lt;Π<sup>A*</sup>).
 </div>
 
 <div class="tabs">
@@ -83,6 +82,7 @@
   <button class="tab" onclick="showTab('sigma',this)">σ* &amp; welfare statics</button>
   <button class="tab" onclick="showTab('env',this)">Π(σ) envelope</button>
   <button class="tab" onclick="showTab('wbeta',this)">W vs β diagram</button>
+  <button class="tab" onclick="showTab('primitives',this)">Primitives &amp; §2–§6</button>
 </div>
 
 <!-- ── TAB 1 ─────────────────────────────────────────────────────────── -->
@@ -209,11 +209,10 @@
     <table>
       <thead>
         <tr>
-          <th>↑ param</th>
-          <th style="text-align:center">∂σ<sup>I*</sup></th>
-          <th style="text-align:center">∂σ<sup>II*</sup></th>
-          <th style="text-align:center">∂(w<sup>B</sup>−w<sup>G</sup>)</th>
-          <th>Key mechanism</th>
+          <th>Parameter</th>
+          <th style="text-align:center">Direction for W<sub>P</sub>&gt;W<sub>G</sub></th>
+          <th>Channel</th>
+          <th style="text-align:center">Monotone?</th>
         </tr>
       </thead>
       <tbody id="sigTable"></tbody>
@@ -262,6 +261,9 @@
 
     <h4 style="margin-top:12px">Market sizes &amp; aggregate welfare</h4>
     <div class="grid2" id="mCards"></div>
+
+    <h4 style="margin-top:12px">Equilibrium (σ*, x*) — §2 closed forms</h4>
+    <div class="grid2" id="eqExCards"></div>
 
     <div id="wDecomp" style="background:#f5f0ff;border-left:3px solid #7c3aed;padding:7px 10px;
         border-radius:0 4px 4px 0;font-size:11px;color:#444;line-height:1.8;margin-top:8px"></div>
@@ -384,9 +386,72 @@
 </div>
 </div>
 
+<!-- ── TAB 6: Primitives, expectations, government ───────────────────── -->
+<div id="primitives" class="panel">
+<div class="row">
+<div style="flex:1;min-width:320px">
+  <h3>Per-λ primitives <span style="font-weight:400;font-size:12px;color:#888">§1</span></h3>
+  <p style="font-size:12px;color:#777;margin-bottom:8px;line-height:1.6">
+    n(λ)=λ−(1−x) for λ&gt;1−x. Piecewise π(λ;x,σ) and U<sub>i</sub>(λ;x,σ) from the note;
+    λ~U[0,1] ⇒ ∫<sub>1−x</sub><sup>1</sup>n(λ)dλ=x²/2.
+  </p>
+  <div class="slider-row"><label>λ</label>
+    <input type="range" id="primLam" min="0" max="1" step="0.002" value="0.35">
+    <span id="vprimLam">0.350</span></div>
+  <div class="slider-row"><label>x</label>
+    <input type="range" id="primX" min="0.02" max="1" step="0.01" value="0.50">
+    <span id="vprimX">0.50</span></div>
+  <div class="slider-row"><label>σ</label>
+    <input type="range" id="primSig" min="0" max="0.99" step="0.01" value="0.25">
+    <span id="vprimSig">0.25</span></div>
+  <div class="slider-row"><label>R</label>
+    <input type="range" id="primR" min="1.01" max="2.00" step="0.01" value="1.30">
+    <span id="vprimR">1.30</span></div>
+  <div class="slider-row"><label>r</label>
+    <input type="range" id="primr" min="0.40" max="0.99" step="0.005" value="0.70">
+    <span id="vprimr">0.700</span></div>
+  <div class="slider-row"><label>β</label>
+    <input type="range" id="primbeta" min="0.05" max="0.94" step="0.01" value="0.60">
+    <span id="vprimbeta">0.60</span></div>
+  <div class="slider-row"><label>η</label>
+    <input type="range" id="primeta" min="0.001" max="0.20" step="0.001" value="0.05">
+    <span id="vprimeta">0.050</span></div>
+  <div class="grid2" id="primCards" style="margin-top:10px"></div>
+  <canvas id="canvasPrim" width="400" height="220" style="margin-top:10px;max-width:100%"></canvas>
+  <p style="font-size:11px;color:#888;margin-top:6px;line-height:1.5">
+    <strong>Curves:</strong> π(λ) (blue) vs λ; U<sub>i</sub>(λ) (green). Vertical dashed: λ=1−x.
+  </p>
+</div>
+<div style="flex:1;min-width:300px">
+  <h3>Closed-form expectations &amp; government <span style="font-weight:400;font-size:12px;color:#888">§2, §6</span></h3>
+  <p style="font-size:12px;color:#777;margin-bottom:8px;line-height:1.6">
+    At fixed (x,σ): E[π<sup>A</sup>], E[U<sup>A</sup>] use congestion term (R−r)x²/(2r);
+    E[π<sup>B</sup>]=(1−σ)x(R−1); E[U<sup>B</sup>] adds blocking cost (1−β−η)x²/(2β).
+    Government full accommodation: E[π<sup>G</sup>]=E[π<sup>A</sup>], E[Ω<sup>G</sup>]=1+η/2+(R−1)x−(R−r)x²/(2r) (σ cancels in Ω).
+  </p>
+  <div class="slider-row"><label>x (eval)</label>
+    <input type="range" id="evX" min="0.05" max="1" step="0.01" value="0.50">
+    <span id="vEvX">0.50</span></div>
+  <div class="slider-row"><label>σ (eval)</label>
+    <input type="range" id="evSig" min="0" max="0.99" step="0.01" value="0.30">
+    <span id="vEvSig">0.30</span></div>
+  <div class="grid2" id="expectGovCards" style="margin-top:8px"></div>
+  <div id="expectGovNote" style="font-size:11px;color:#666;line-height:1.7;margin-top:10px;
+    background:#f7f7f4;border-radius:6px;padding:8px 10px"></div>
+  <div style="margin-top:14px">
+    <button type="button" onclick="loadUSDCRemark()" style="padding:6px 12px;font-size:12px;border:1px solid #aaa;
+      border-radius:6px;cursor:pointer;background:#fff">
+      Load remark calibration (r=0.97, R=1.025, β=0.95, η=0.01)
+    </button>
+    <span id="usdcWdiff" style="font-size:11px;color:#555;margin-left:8px"></span>
+  </div>
+</div>
+</div>
+</div>
+
 <script>
 /* ════════════════════════════════════════════════════════════════════
-   Model — exact from §1-5, Tan (2026)
+   Model — Issuer & government optimisation, primitive variables (2026)
    ════════════════════════════════════════════════════════════════════ */
 function Av(eta,rb)          { return 1 + eta/2 - rb; }
 function Dv(rb,rg)           { return rg - rb; }
@@ -397,6 +462,76 @@ function CII(R,beta,eta)     { return beta*(R-1)**2/(1-beta-eta); }
 function xTilde(R,r)         { return r*(R-1)/(R-r); }
 function xIIstar(R,beta,eta) { return Math.min(1, beta*(R-1)/(1-beta-eta)); }
 function deltaG(R,beta)      { return R/(2-beta); }
+function assumptionFR(beta,R,eta){ return beta*R + eta < 1; }
+function dOmega(R,r,beta)    { return (2 - beta) - R/r; }
+
+/** n(λ) = λ-(1-x) when λ > 1-x, else 0 */
+function nDeferred(lambda, x){
+  if(lambda <= 1 - x) return 0;
+  return lambda - (1 - x);
+}
+
+/** §1 per-depositor issuer profit π(λ;x,σ) */
+function piPerDepositor(lambda, x, sigma, R, r, beta, eta){
+  const sb = sigBar(beta, R, r, eta);
+  const base = (1 - sigma) * x * (R - 1);
+  if(lambda <= 1 - x) return base;
+  const n = nDeferred(lambda, x);
+  if(sigma < sb)
+    return (1 - sigma) * (x * (R - 1) - ((R - r) / r) * n);
+  return base;
+}
+
+/** §1 per-depositor investor utility U_i(λ;x,σ) */
+function UiPerDepositor(lambda, x, sigma, R, r, beta, eta){
+  const sb = sigBar(beta, R, r, eta);
+  const T = Tstar(beta, eta);
+  const baseEta = 1 + eta * (1 - lambda) + sigma * x * (R - 1);
+  if(lambda <= 1 - x) return baseEta;
+  const n = nDeferred(lambda, x);
+  if(sigma < sb)
+    return 1 + eta * (1 - lambda) + sigma * (x * (R - 1) - ((R - r) / r) * n);
+  return 1 + eta * (1 - lambda) + sigma * x * (R - 1) - T * n;
+}
+
+/** §1 government per-depositor welfare Ω(π_g;λ,x); use π_g=n(λ) for full accommodation */
+function OmegaGov(lambda, x, R, r, beta, eta, piG){
+  const base = 1 + eta * (1 - lambda) + (R - 1) * x;
+  if(lambda <= 1 - x) return base;
+  const n = nDeferred(lambda, x);
+  const d = dOmega(R, r, beta);
+  return base - n * (1 - beta) + piG * d;
+}
+
+/** E[π^A], E[U^A] at (x,σ) under λ~U[0,1] — eq. (EpiA), (EUA) */
+function EpiA(sigma, x, R, r){
+  const cong = ((R - r) / (2 * r)) * x * x;
+  return (1 - sigma) * (x * (R - 1) - cong);
+}
+function EUiA(sigma, x, R, r, eta){
+  const cong = ((R - r) / (2 * r)) * x * x;
+  return 1 + eta / 2 + sigma * (x * (R - 1) - cong);
+}
+
+/** E[π^B], E[U^B] — eq. (EpiB), (EUB) */
+function EpiB(sigma, x, R){
+  return (1 - sigma) * x * (R - 1);
+}
+function EUiB(sigma, x, R, r, beta, eta){
+  const block = ((1 - beta - eta) / (2 * beta)) * x * x;
+  return 1 + eta / 2 + sigma * x * (R - 1) - block;
+}
+
+/** §6: E[Ω^G] under full accommodation — eq. (EOmG) */
+function EOomegaG(x, R, r, eta){
+  return 1 + eta / 2 + (R - 1) * x - ((R - r) / (2 * r)) * x * x;
+}
+
+function sigmaAstarConstrained(sA, sb){
+  if(sA <= 0) return 0;
+  const cap = sb > 1e-9 ? Math.min(sA, sb - 1e-10) : sA;
+  return Math.max(0, cap);
+}
 
 function sighatA(R,r,eta,rb){
   const ci = CI(R,r);
@@ -450,10 +585,10 @@ function aggW(sigma,x,R,r,beta,eta,rb,rg,regime){
 /* Core computation */
 function computeWP(R,r,beta,eta,rb,rg){
   const A = Av(eta,rb), D = Dv(rb,rg);
-  if(1-beta-eta <= 0.001) return {WP:0,WG:0,cfg:'β+η≥1',bw:false,feasible:false};
-  if(A <= 0)              return {WP:0,WG:0,cfg:'A≤0',bw:false,feasible:false};
-  if(D <= 0)              return {WP:0,WG:0,cfg:'Δ≤0',bw:false,feasible:false};
-  if(R <= r || r <= 0)    return {WP:0,WG:0,cfg:'R≤r',bw:false,feasible:false};
+  if(1-beta-eta <= 0.001) return {WP:0,WG:0,cfg:'β+η≥1',bw:false,feasible:false,sigmaP:NaN,xP:NaN,xi:NaN,xii:NaN};
+  if(A <= 0)              return {WP:0,WG:0,cfg:'A≤0',bw:false,feasible:false,sigmaP:NaN,xP:NaN,xi:NaN,xii:NaN};
+  if(D <= 0)              return {WP:0,WG:0,cfg:'Δ≤0',bw:false,feasible:false,sigmaP:NaN,xP:NaN,xi:NaN,xii:NaN};
+  if(R <= r || r <= 0)    return {WP:0,WG:0,cfg:'R≤r',bw:false,feasible:false,sigmaP:NaN,xP:NaN,xi:NaN,xii:NaN};
 
   const T   = Tstar(beta,eta);
   const sb  = sigBar(beta,R,r,eta);
@@ -467,13 +602,19 @@ function computeWP(R,r,beta,eta,rb,rg){
   const sigG = Math.max(0, Math.min(sb > 0 ? sb - 1e-10 : 0, sA));
   const WG   = aggW(sigG, xi, R, r, beta, eta, rb, rg, 'I');
 
-  let WP, cfg;
+  const xii = xIIstar(R, beta, eta);
+  let WP, cfg, sigmaP, xP;
+
   if(!bw){
-    WP = WG; cfg = sA <= 0 ? 'A-corner' : 'A-int';
+    WP = WG;
+    cfg = sA <= 0 ? 'A-corner' : 'A-int';
+    sigmaP = sigmaAstarConstrained(sA, sb);
+    xP = xi;
   } else if(sB >= sb){
-    const xii = xIIstar(R,beta,eta);
     WP = aggW(sB, xii, R, r, beta, eta, rb, rg, 'II');
     cfg = 'B-int';
+    sigmaP = Math.min(1, Math.max(0, sB));
+    xP = xii;
   } else {
     const xbs  = Math.min(1, xBstar(sb, R, beta, eta, rb));
     const fbs  = xbs*(R-1), gbs = T*xbs**2/2;
@@ -482,11 +623,16 @@ function computeWP(R,r,beta,eta,rb,rg){
     if(PBc > pA){
       WP = aggW(sb, xbs, R, r, beta, eta, rb, rg, 'II');
       cfg = 'B-con';
+      sigmaP = Math.min(1, Math.max(0, sb));
+      xP = xbs;
     } else {
-      WP = WG; cfg = sA <= 0 ? 'A-corner' : 'A-int';
+      WP = WG;
+      cfg = sA <= 0 ? 'A-corner' : 'A-int';
+      sigmaP = sigmaAstarConstrained(sA, sb);
+      xP = xi;
     }
   }
-  return {WP, WG, cfg, bw, sb, sB, feasible:true};
+  return {WP, WG, cfg, bw, sb, sB, feasible:true, sigmaP, xP, xi, xii};
 }
 
 function regionColor(WP, WG, cfg){
@@ -694,24 +840,27 @@ makeClick('canvas2', 1.05,1.60, 0.30,0.95, (Rv,bv) => {
   document.getElementById('i2text').textContent = msg;
 });
 
-/* ── σ* + Welfare statics table ─────────────────────────────────────── */
+/* ── Comparative statics summary — §7 (welfare ordering) ───────────── */
 const rows = [
-  ['R ↑', '+', '+',   '+',   'Higher return raises C_I, C_II; both regimes share more, w^B gains faster'],
-  ['r ↑', '+', '0',   '−',   'r raises C_I → w^G rises, leaves w^B unchanged → gap shrinks. High r → government looks better'],
-  ['β ↑', '0', '+',   '+',   'β lowers T*, expands C_II → w^B rises, w^G unchanged. Private advantage grows'],
-  ['η ↑', '−', '± †', '+',   '∂(C_II/2)/∂η > 0: T* falls → w^B rises. Net: w^B−w^G rises'],
-  ['r_b↑','+', '+',   '0',   'Raises A, compresses optimal σ* to share yield. Gap independent of r_b'],
-  ['r_g↑','0', '0',   '0',   'Scales Δ only; does not shift σ* or per-dep welfare'],
+  ['β↑', 'Favours [P]', 'T*↓, σ̄↓, w<sup>B</sup>↑ — channels reinforce', 'Yes'],
+  ['R↑', 'Favours [P]', 'Blocking carry pool rises faster; σ̄↓', 'Yes'],
+  ['r', 'Non-monotone', 'Low r: [G] can win (B-con); USDC-like r: [P] strong; r→r*: BW fails → tie', 'No'],
+  ['η↑', 'Favours [P] at interior', 'T*↓, σ̄↓; B-constrained ambiguous', 'No'],
+  ['r<sub>b</sub>↑', 'Shrinks W<sub>P</sub>−W<sub>G</sub> (interior)', '∂(W<sub>P</sub>−W<sub>G</sub>)/∂r<sub>b</sub>&lt;0 under BW; B-con evidence mixed', 'No'],
 ];
 const tb = document.getElementById('sigTable');
-rows.forEach(([p,si,sii,sw,mech]) => {
+rows.forEach(([p, dir, ch, mono]) => {
   const tr=document.createElement('tr');
-  function sc(s){ return s.startsWith('+')? 'pos': s.startsWith('-')||s.startsWith('−')? 'neg': s==='0'? 'zero': 'amb'; }
+  function clsDir(s){
+    if(/Favours|Shrinks/.test(s)) return 'pos';
+    if(/Non-monotone/.test(s)) return 'amb';
+    return 'zero';
+  }
+  function clsMono(s){ return s==='Yes' ? 'pos' : 'zero'; }
   tr.innerHTML=`<td><strong>${p}</strong></td>
-    <td style="text-align:center" class="${sc(si)}">${si}</td>
-    <td style="text-align:center" class="${sc(sii)}">${sii}</td>
-    <td style="text-align:center" class="${sc(sw)}">${sw}</td>
-    <td style="color:#666;font-size:12px">${mech}</td>`;
+    <td style="text-align:center" class="${clsDir(dir)}">${dir}</td>
+    <td style="color:#666;font-size:12px;line-height:1.45">${ch}</td>
+    <td style="text-align:center" class="${clsMono(mono)}">${mono}</td>`;
   tb.appendChild(tr);
 });
 
@@ -730,12 +879,15 @@ function updateSig(){
   const wd = document.getElementById('wDecomp');
   const sn = document.getElementById('sigNote');
 
+  const eqEx = document.getElementById('eqExCards');
   if(1-beta-eta<=0.001){
     sc.innerHTML=wc.innerHTML=mc.innerHTML='';
+    if(eqEx) eqEx.innerHTML='';
     wd.innerHTML=sn.innerHTML='Infeasible: β+η≥1.'; return;
   }
   const A=Av(eta,rb), D=Dv(rb,rg);
   if(A<=0||D<=0||R<=r){
+    if(eqEx) eqEx.innerHTML='';
     wd.innerHTML=sn.innerHTML='Check parameters: A>0, Δ>0, R>r required.'; return;
   }
 
@@ -772,6 +924,25 @@ function updateSig(){
   const wComp  = !res.feasible ? '—' :
     Math.abs(res.WP-res.WG)<1e-8 ? 'W_P = W_G' :
     res.WP>res.WG ? 'W_P > W_G' : 'W_G > W_P';
+
+  if(eqEx){
+    if(!res.feasible) eqEx.innerHTML = '';
+    else {
+      const useB = res.cfg === 'B-int' || res.cfg === 'B-con';
+      const ep = useB ? EpiB(res.sigmaP, res.xP, R) : EpiA(res.sigmaP, res.xP, R, r);
+      const eu = useB ? EUiB(res.sigmaP, res.xP, R, r, beta, eta)
+                      : EUiA(res.sigmaP, res.xP, R, r, eta);
+      const epiG = EpiA(sigGv, xi, R, r);
+      const eomG = EOomegaG(xi, R, r, eta);
+      eqEx.innerHTML = `
+    <div class="mcard"><div class="ml">σ* (private)</div><div class="mv">${res.sigmaP.toFixed(4)}</div></div>
+    <div class="mcard"><div class="ml">x* (private)</div><div class="mv">${res.xP.toFixed(4)}</div></div>
+    <div class="mcard"><div class="ml">E[π] at (σ*,x*) — ${useB?'Sol. B':'Sol. A'}</div><div class="mv">${ep.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">E[U<sub>i</sub>] at (σ*,x*)</div><div class="mv">${eu.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">E[π<sup>G</sup>]=E[π<sup>A</sup>] at (σ<sup>G</sup>,x̃)</div><div class="mv">${epiG.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">E[Ω<sup>G</sup>] at x̃ — (EOmG)</div><div class="mv">${eomG.toFixed(5)}</div></div>`;
+    }
+  }
 
   sc.innerHTML=`
     <div class="mcard"><div class="ml">σ<sup>I*</sup> = max(0,σ̂<sup>A</sup>)</div><div class="mv">${Math.max(0,sA).toFixed(4)}</div></div>
@@ -1250,6 +1421,170 @@ function loadPaperDefaults(){
   drawWbeta();
 }
 
+/* ── Primitives tab: §1 curves + §2/§6 expectations ───────────────── */
+function readPrimCore(){
+  return {
+    lam: +document.getElementById('primLam').value,
+    x:   +document.getElementById('primX').value,
+    sig: +document.getElementById('primSig').value,
+    R:   +document.getElementById('primR').value,
+    r:   +document.getElementById('primr').value,
+    beta:+document.getElementById('primbeta').value,
+    eta: +document.getElementById('primeta').value,
+  };
+}
+
+function drawPrimCanvas(p){
+  const cvs = document.getElementById('canvasPrim');
+  if(!cvs) return;
+  const ctx = cvs.getContext('2d');
+  const W = cvs.width, H = cvs.height;
+  const pad = {l:44, r:12, t:14, b:28};
+  const iW = W - pad.l - pad.r, iH = H - pad.t - pad.b;
+  ctx.clearRect(0, 0, W, H);
+  const {x, sig, R, r, beta, eta} = p;
+  const sb = sigBar(beta, R, r, eta);
+  const lamCut = Math.max(0, Math.min(1, 1 - x));
+
+  let vmin = Infinity, vmax = -Infinity;
+  const N = 200;
+  const piPts = [], uPts = [];
+  for(let i = 0; i <= N; i++){
+    const lam = i / N;
+    const pv = piPerDepositor(lam, x, sig, R, r, beta, eta);
+    const uv = UiPerDepositor(lam, x, sig, R, r, beta, eta);
+    piPts.push(pv); uPts.push(uv);
+    vmin = Math.min(vmin, pv, uv);
+    vmax = Math.max(vmax, pv, uv);
+  }
+  if(!isFinite(vmin) || !isFinite(vmax) || vmax - vmin < 1e-9){ vmin -= 0.05; vmax += 0.05; }
+  else { const padv = (vmax - vmin) * 0.08; vmin -= padv; vmax += padv; }
+
+  const toX = l => pad.l + l * iW;
+  const toY = v => pad.t + (1 - (v - vmin) / (vmax - vmin)) * iH;
+
+  ctx.strokeStyle = 'rgba(0,0,0,0.06)'; ctx.lineWidth = 0.5;
+  for(let g = 1; g < 5; g++){
+    const ly = g / 5;
+    ctx.beginPath(); ctx.moveTo(toX(ly), pad.t); ctx.lineTo(toX(ly), pad.t + iH); ctx.stroke();
+    const vv = vmin + (g / 5) * (vmax - vmin);
+    ctx.beginPath(); ctx.moveTo(pad.l, toY(vv)); ctx.lineTo(pad.l + iW, toY(vv)); ctx.stroke();
+  }
+
+  ctx.strokeStyle = 'rgba(0,0,0,0.25)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(pad.l, pad.t); ctx.lineTo(pad.l, pad.t + iH);
+  ctx.lineTo(pad.l + iW, pad.t + iH); ctx.stroke();
+
+  if(lamCut > 0 && lamCut < 1){
+    ctx.save(); ctx.setLineDash([4, 3]); ctx.strokeStyle = 'rgba(0,0,0,0.35)'; ctx.lineWidth = 1.2;
+    const cx = toX(lamCut);
+    ctx.beginPath(); ctx.moveTo(cx, pad.t); ctx.lineTo(cx, pad.t + iH); ctx.stroke(); ctx.restore();
+  }
+
+  function strokeSeries(pts, col){
+    ctx.strokeStyle = col; ctx.lineWidth = 2; ctx.beginPath();
+    let first = true;
+    for(let i = 0; i <= N; i++){
+      const xx = toX(i / N), yy = toY(pts[i]);
+      if(first){ ctx.moveTo(xx, yy); first = false; }
+      else ctx.lineTo(xx, yy);
+    }
+    ctx.stroke();
+  }
+  strokeSeries(piPts, '#2563eb');
+  strokeSeries(uPts, '#15803d');
+
+  ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.font = '9px sans-serif';
+  for(let i = 0; i <= 5; i++){
+    const l = i / 5;
+    ctx.fillText(l.toFixed(1), toX(l) - 6, pad.t + iH + 14);
+  }
+  ctx.fillText('λ →', pad.l + iW - 22, pad.t + iH + 26);
+  ctx.save(); ctx.translate(12, pad.t + iH / 2); ctx.rotate(-Math.PI / 2);
+  ctx.fillText('π, U_i', -18, 0); ctx.restore();
+  ctx.font = '10px sans-serif';
+  ctx.fillStyle = '#2563eb'; ctx.fillText('π(λ)', pad.l + iW - 70, pad.t + 12);
+  ctx.fillStyle = '#15803d'; ctx.fillText('U_i(λ)', pad.l + iW - 38, pad.t + 12);
+}
+
+function updatePrimTab(){
+  const p = readPrimCore();
+  const sb = sigBar(p.beta, p.R, p.r, p.eta);
+  const n = nDeferred(p.lam, p.x);
+  const piv = piPerDepositor(p.lam, p.x, p.sig, p.R, p.r, p.beta, p.eta);
+  const uiv = UiPerDepositor(p.lam, p.x, p.sig, p.R, p.r, p.beta, p.eta);
+  const ogFull = OmegaGov(p.lam, p.x, p.R, p.r, p.beta, p.eta, n);
+  const d = dOmega(p.R, p.r, p.beta);
+
+  document.getElementById('primCards').innerHTML = `
+    <div class="mcard"><div class="ml">σ̄</div><div class="mv">${sb.toFixed(4)}</div></div>
+    <div class="mcard"><div class="ml">σ &lt; σ̄?</div><div class="mv">${p.sig < sb ? 'Yes (Sol. A)' : 'No (Sol. B)'}</div></div>
+    <div class="mcard"><div class="ml">n(λ)</div><div class="mv">${n.toFixed(4)}</div></div>
+    <div class="mcard"><div class="ml">π(λ;x,σ)</div><div class="mv">${piv.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">U_i(λ;x,σ)</div><div class="mv">${uiv.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">d = (2−β)−R/r</div><div class="mv">${d.toFixed(4)}</div></div>
+    <div class="mcard"><div class="ml">Ω(π_g=n) full acc.</div><div class="mv">${ogFull.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">T* = (1−β−η)/β</div><div class="mv">${Tstar(p.beta, p.eta).toFixed(4)}</div></div>`;
+
+  drawPrimCanvas(p);
+  updateExpectGovBlock();
+}
+
+function updateExpectGovBlock(){
+  const p = readPrimCore();
+  const x = +document.getElementById('evX').value;
+  const sigma = +document.getElementById('evSig').value;
+  const {R, r, beta, eta} = p;
+  const dg = deltaG(R, beta);
+  const rOk = r > dg + 1e-12;
+  const fr = assumptionFR(beta, R, eta);
+  const xiiRaw = beta * (R - 1) / (1 - beta - eta);
+
+  const epA = EpiA(sigma, x, R, r);
+  const euA = EUiA(sigma, x, R, r, eta);
+  const epB = EpiB(sigma, x, R);
+  const euB = EUiB(sigma, x, R, r, beta, eta);
+  const epiG = epA;
+  const eOmG = EOomegaG(x, R, r, eta);
+  document.getElementById('expectGovCards').innerHTML = `
+    <div class="mcard"><div class="ml">E[π<sup>A</sup>] — (EpiA)</div><div class="mv">${epA.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">E[U<sup>A</sup>] — (EUA)</div><div class="mv">${euA.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">E[π<sup>B</sup>] — (EpiB)</div><div class="mv">${epB.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">E[U<sup>B</sup>] — (EUB)</div><div class="mv">${euB.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">E[π<sup>G</sup>] = E[π<sup>A</sup>]</div><div class="mv">${epiG.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">E[Ω<sup>G</sup>] — (EOmG)</div><div class="mv">${eOmG.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">δ<sup>G</sup> = R/(2−β)</div><div class="mv">${dg.toFixed(4)}</div></div>
+    <div class="mcard"><div class="ml">r &gt; δ<sup>G</sup> (full acc.)</div><div class="mv ${rOk ? 'good' : 'warn'}">${rOk ? 'Yes' : 'No'}</div></div>
+    <div class="mcard"><div class="ml">x<sup>II*</sup> raw / FR (βR+η&lt;1)</div><div class="mv">${xiiRaw.toFixed(4)} / ${fr ? 'interior' : 'corner x=1'}</div></div>
+    <div class="mcard"><div class="ml">M, Π = M·E[π]</div><div class="mv">σ* tab</div></div>`;
+
+  document.getElementById('expectGovNote').innerHTML =
+    `Piecewise total profit Π(x;σ) from §2 switches at σ̄=${sigBar(beta,R,r,eta).toFixed(4)}.
+    Government corner π_g*=n(λ) iff r&gt;δ<sup>G</sup> (independent of σ, x, η, F).
+    Equivalence [G]≡A: E[π<sup>G</sup>]=E[π<sup>A</sup>] and E[U<sup>G</sup>]=E[U<sup>A</sup>] at the same (x,σ) structure.`;
+}
+
+function loadUSDCRemark(){
+  const R = 1.025, r = 0.97, beta = 0.95, eta = 0.01;
+  [['primR','vprimR',R,3],['primr','vprimr',r,3],['primbeta','vprimbeta',beta,2],
+   ['primeta','vprimeta',eta,3],['sR2','vsR2',R,3],['sr2','vsr2',r,3],
+   ['sbeta2','vsbeta2',beta,2],['seta2','vseta2',eta,3]]
+    .forEach(([id, vid, v, dec]) => {
+      const el = document.getElementById(id);
+      if(el){ el.value = v; document.getElementById(vid).textContent = v.toFixed(dec); }
+    });
+  const rb = +document.getElementById('srb2').value;
+  const rg = +document.getElementById('srg2').value;
+  const res = computeWP(R, r, beta, eta, rb, rg);
+  const diff = res.feasible ? (res.WP - res.WG) : NaN;
+  document.getElementById('usdcWdiff').innerHTML =
+    res.feasible
+      ? `With your r<sub>b</sub>, r<sub>g</sub> on the σ* tab: W<sub>P</sub>−W<sub>G</sub> ≈ ${diff.toFixed(3)} (${res.cfg}). The text’s ~0.26 uses the same (r,R,β,η) but a different outside-option calibration (typically much higher r<sub>b</sub>, which expands M and can move the economy to B-interior).`
+      : '—';
+  updatePrimTab();
+  updateSig();
+}
+
 /* ── Slider binding ─────────────────────────────────────────────────── */
 function bindSliders(ids, fn){
   ids.forEach(([id,outId,dec]) => {
@@ -1267,6 +1602,11 @@ bindSliders([['eR','veR',2],['er','ver',3],['ebeta','vebeta',2],
              ['eeta','veeta',3],['erb','verb',2],['erg','verg',2]], drawEnvelope);
 bindSliders([['wbR','vwbR',2],['wbr','vwbr',3],
              ['wbeta_eta','vwbeta_eta',3],['wbrb','vwbrb',2],['wbrg','vwbrg',2]], drawWbeta);
+bindSliders([
+  ['primLam','vprimLam',3],['primX','vprimX',2],['primSig','vprimSig',2],
+  ['primR','vprimR',2],['primr','vprimr',3],['primbeta','vprimbeta',2],['primeta','vprimeta',3],
+  ['evX','vEvX',2],['evSig','vEvSig',2]
+], updatePrimTab);
 
 function showTab(id, btn){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
@@ -1278,10 +1618,11 @@ function showTab(id, btn){
   if(id==='sigma')  updateSig();
   if(id==='env')    drawEnvelope();
   if(id==='wbeta')  drawWbeta();
+  if(id==='primitives') updatePrimTab();
 }
 
 /* Initial render */
-drawMap1(); drawMap2(); updateSig(); drawEnvelope(); drawWbeta();
+drawMap1(); drawMap2(); updateSig(); drawEnvelope(); drawWbeta(); updatePrimTab();
 </script>
 </body>
 </html>
