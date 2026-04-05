@@ -450,7 +450,7 @@ function Dv(rb,rg)           { return rg - rb; }
 function Tstar(beta,eta)     { return (1-beta-eta)/beta; }
 function sigBar(beta,R,r,eta){ return (1-beta-eta)*r/(beta*(R-r)); }
 function CI(R,r)             { return r*(R-1)**2/(2*(R-r)); }
-/** Net carry at x=1 vs blocking: (R−1) − T*/2 — enters w^II and BW */
+/** Net carry at x=1 vs blocking: (R−1) − T_star/2 — enters w^II and BW */
 function netCarryB(beta,eta,R){
   const T = Tstar(beta,eta);
   return (R - 1) - T / 2;
@@ -568,7 +568,7 @@ function PiBstar(R,beta,eta,rb,rg){
 
 /* Profit envelope:
    Π^I(σ) at x = x̃:  (A+σ·CI)(1-σ)·CI/Δ
-   Π^II(σ) at x = 1: (A+σ(R−1)−T*/2)(1−σ)(R−1)/Δ  */
+   Π^II(σ) at x = 1: (A+σ(R−1)−T_star/2)(1−σ)(R−1)/Δ  */
 function piA_env(sigma, ci, A, D){
   return Math.max(0, (A + sigma*ci)*(1-sigma)*ci/D);
 }
