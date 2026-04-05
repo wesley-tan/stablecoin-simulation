@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stablecoin Welfare Simulation — Tan (2026)</title>
+<title>Private and Government — Tan (2026)</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -61,19 +61,16 @@
 </head>
 <body>
 
-<h1>Optimal Stablecoin Contracts under Limited Commitment</h1>
+<h1>Private and Government</h1>
 <p class="subtitle">Interactive simulation — Wesley Tan, Wesleyan University 2026 · Advisor: Prof. Ryuichiro Izumi</p>
 
 <div class="section-note">
-  <strong>Issuer and government optimisation (primitive variables, April 2026).</strong>
-  <strong>Timing:</strong> (t=0a) issuer announces σ; (t=0b) investors form x<sup>e</sup>, deposit iff E[U<sub>i</sub>]≥v<sub>i</sub>,
-  M = (E[U<sub>i</sub>]−r<sub>b</sub>)/(r<sub>g</sub>−r<sub>b</sub>) locks in; (t=0c) issuer maximises M·E[π] in x given M; (t=1) λ~U[0,1].
-  <strong>σ̄:</strong> (1−β−η)r/[β(R−r)]; <strong>T*:</strong> (1−β−η)/β. <strong>Solution A</strong> (σ&lt;σ̄): fire sales,
-  E[π<sup>A</sup>]=(1−σ)[x(R−1)−(R−r)x²/(2r)]; <strong>Solution B</strong> (σ≥σ̄): blocking, E[π<sup>B</sup>]=(1−σ)x(R−1).
-  <strong>[G] ≡ A:</strong> full accommodation (r&gt;δ<sup>G</sup>=R/(2−β)) replicates A — x<sup>G*</sup>=x̃=r(R−1)/(R−r), σ̂<sup>G</sup>=σ̂<sup>A</sup>.<br>
-  <strong>Midpoint pinning (Prop.):</strong> at interior σ*, E[U<sub>i</sub>]−r<sub>b</sub>=(w−r<sub>b</sub>)/2, M=(w−r<sub>b</sub>)/[2(r<sub>g</sub>−r<sub>b</sub>)].
-  <strong>Welfare ordering:</strong> at interior optima sign(W<sub>P</sub>−W<sub>G</sub>)=sign(BW) with BW ⇔ β(R−r)&gt;r(1−β−η); W<sub>G</sub>&gt;W<sub>P</sub> only possible under <strong>B-constrained</strong>.
-  Four configs: A-interior / A-corner / B-interior / B-constrained (revert to A if Π<sup>B</sup>(σ̄)&lt;Π<sup>A*</sup>).
+  <strong>Timing (April 2026 note).</strong> (t=0a) Issuer announces σ; (t=0b) investors form x<sup>e</sup>, deposit iff E[U<sub>i</sub>]≥v<sub>i</sub>;
+  <strong>M locks in</strong> and is fixed at (t=0c): M=(E[U<sub>i</sub>]−r<sub>b</sub>)/(r<sub>g</sub>−r<sub>b</sub>). The issuer then chooses x to maximise M·E[π] with M constant, so ∂M/∂x does not enter the x-FOC.
+  <strong>σ̄</strong>=(1−β−η)r/[β(R−r)], <strong>T*</strong>=(1−β−η)/β. <strong>Regime I</strong> (σ&lt;σ̄): x<sup>I*</sup>=x̃=r(R−1)/(R−r).
+  <strong>Regime II</strong> (σ≥σ̄): E[π<sup>II</sup>]=(1−σ)x(R−1) is linear in x ⇒ <strong>x<sup>II*</sup>=1</strong> (corner, not joint-commitment interior).
+  <strong>(BW)</strong> Solution B dominates iff (R−1)−T*/2 &gt; r(R−1)²/[2(R−r)] (net carry at x=1 vs fire-sale carry at x̃).
+  <strong>[G] ≡ I:</strong> government replication matches Regime I; x<sup>G*</sup>=x̃, σ<sup>G*</sup>=σ̂<sup>I</sup>. At interior optima, sign(W<sub>P</sub>−W<sub>G</sub>)=sign(w<sup>II</sup>−w<sup>G</sup>)=sign(BW); W<sub>G</sub>&gt;W<sub>P</sub> possible only under <strong>B-constrained</strong> (σ<sup>P</sup>=σ̄, x<sup>P</sup>=1).
 </div>
 
 <div class="tabs">
@@ -99,7 +96,7 @@
     <div class="leg-item"><div class="leg-dot" style="background:#D3D1C7"></div>Infeasible</div>
   </div>
   <div class="note">
-    <strong>Black dashed</strong>: (BW) boundary r<sub>BW</sub> = βR/(1−η) — above → BW fails → tie.<br>
+    <strong>Black dashed</strong>: (BW) boundary — (R−1)−T*/2 = C<sub>I</sub>(r) (implicit in r for each β).<br>
     <strong>Orange dashed</strong>: δ<sup>G</sup> = R/(2−β) — government doesn't accommodate below this r (Prop. 1).<br>
     At B-interior: W<sub>P</sub> &gt; W<sub>G</sub> always (sign = sign BW). Red only in B-constrained.<br>
     Click to inspect.
@@ -130,7 +127,7 @@
     <div class="mcard"><div class="ml">W<sub>P</sub></div><div class="mv" id="i1wp">—</div></div>
     <div class="mcard"><div class="ml">W<sub>G</sub></div><div class="mv" id="i1wg">—</div></div>
     <div class="mcard"><div class="ml">w<sup>G</sup> = 1+η/2+C<sub>I</sub></div><div class="mv" id="i1wgper">—</div></div>
-    <div class="mcard"><div class="ml">w<sup>B</sup> = 1+η/2+C<sub>II</sub>/2</div><div class="mv" id="i1wbper">—</div></div>
+    <div class="mcard"><div class="ml">w<sup>II</sup> at x=1</div><div class="mv" id="i1wbper">—</div></div>
     <div class="mcard"><div class="ml">σ̄</div><div class="mv" id="i1sbar">—</div></div>
     <div class="mcard"><div class="ml">σ̂<sup>B</sup></div><div class="mv" id="i1sb">—</div></div>
     <div class="mcard"><div class="ml">Config</div><div class="mv" id="i1cfg">—</div></div>
@@ -155,7 +152,7 @@
     <div class="leg-item"><div class="leg-dot" style="background:#D3D1C7"></div>Infeasible</div>
   </div>
   <div class="note">
-    <strong>Black dashed</strong>: (BW) boundary R<sub>BW</sub> = r(1−η)/β.<br>
+    <strong>Black dashed</strong>: (BW) boundary β = (1−η)/[2((R−1)−C<sub>I</sub>(R))+1] for fixed r.<br>
     <strong>Orange dashed</strong>: δ<sup>G</sup>=r line (R such that δ<sup>G</sup>=R/(2−β)=r).<br>
     Higher R → B-interior → W<sub>P</sub>&gt;W<sub>G</sub>. Moderate R + low β → B-constrained → red.
   </div>
@@ -185,7 +182,7 @@
     <div class="mcard"><div class="ml">W<sub>P</sub></div><div class="mv" id="i2wp">—</div></div>
     <div class="mcard"><div class="ml">W<sub>G</sub></div><div class="mv" id="i2wg">—</div></div>
     <div class="mcard"><div class="ml">w<sup>G</sup></div><div class="mv" id="i2wgper">—</div></div>
-    <div class="mcard"><div class="ml">w<sup>B</sup></div><div class="mv" id="i2wbper">—</div></div>
+    <div class="mcard"><div class="ml">w<sup>II</sup></div><div class="mv" id="i2wbper">—</div></div>
     <div class="mcard"><div class="ml">σ̄</div><div class="mv" id="i2sbar">—</div></div>
     <div class="mcard"><div class="ml">σ̂<sup>B</sup></div><div class="mv" id="i2sb">—</div></div>
     <div class="mcard"><div class="ml">Config</div><div class="mv" id="i2cfg">—</div></div>
@@ -200,11 +197,11 @@
 <div id="sigma" class="panel">
   <div class="row" style="align-items:flex-start">
   <div style="flex:1;min-width:300px">
-    <h3>Comparative statics: σ* (carry rates) &amp; w<sup>B</sup>−w<sup>G</sup> (welfare gap)</h3>
+    <h3>Comparative statics: σ* &amp; w<sup>II</sup>−w<sup>G</sup></h3>
     <p style="font-size:12px;color:#777;margin-bottom:10px">
-      σ<sup>I*</sup> = ½ − A/(2C<sub>I</sub>) &nbsp;|&nbsp;
-      σ<sup>II*</sup> = max(σ̄, σ̂<sup>B</sup>) &nbsp;|&nbsp;
-      w<sup>G</sup> = 1+η/2+C<sub>I</sub> &nbsp;|&nbsp; w<sup>B</sup> = 1+η/2+C<sub>II</sub>/2
+      σ̂<sup>I</sup> = ½ − A/(2C<sub>I</sub>) &nbsp;|&nbsp;
+      σ<sup>II*</sup> = max(σ̄, σ̂<sup>II</sup>) &nbsp;|&nbsp;
+      w<sup>G</sup> = 1+η/2+C<sub>I</sub> &nbsp;|&nbsp; w<sup>II</sup> = 1+η/2+(R−1)−T*/2 at x<sup>II*</sup>=1
     </p>
     <table>
       <thead>
@@ -219,13 +216,10 @@
     </table>
 
     <div class="note" style="margin-top:10px">
-      <strong>Sign of w<sup>B</sup>−w<sup>G</sup> = C<sub>II</sub>/2 − C<sub>I</sub>:</strong>
-      positive iff (BW) holds. At B-interior:
-      W<sub>P</sub>−W<sub>G</sub> = (w<sup>B</sup>−w<sup>G</sup>)(w<sup>B</sup>+w<sup>G</sup>−r<sub>b</sub>)/[2Δ],
-      so sign(W<sub>P</sub>−W<sub>G</sub>) = sign(BW) always.<br>
-      <strong>Counterintuitive:</strong> ∂(w<sup>B</sup>−w<sup>G</sup>)/∂r &lt; 0 — higher fire-sale recovery
-      raises w<sup>G</sup> while leaving w<sup>B</sup> unchanged, <em>shrinking</em> private advantage.
-      The B-interior green region is larger at <em>lower</em> r (but low r may force B-constrained → red).
+      <strong>(BW):</strong> (R−1)−T*/2 &gt; C<sub>I</sub>. At B-interior:
+      W<sub>P</sub>−W<sub>G</sub> = (w<sup>II</sup>−w<sup>G</sup>)(w<sup>II</sup>+w<sup>G</sup>−r<sub>b</sub>)/[2Δ],
+      so sign(W<sub>P</sub>−W<sub>G</sub>) = sign(w<sup>II</sup>−w<sup>G</sup>) = sign(BW).<br>
+      Higher r raises C<sub>I</sub> and can overturn (BW); w<sup>II</sup> is independent of r (at x=1).
     </div>
   </div>
 
@@ -272,7 +266,7 @@
     <div class="grid2" id="partyCards"></div>
     <div style="font-size:11px;color:#777;margin-top:4px;line-height:1.6">
       E[U<sub>i</sub>] = (w+r<sub>b</sub>)/2 &nbsp;|&nbsp; E[π] = (w−r<sub>b</sub>)/2 &nbsp;|&nbsp;
-      β* = r(1−η)/R &nbsp;(BW threshold, kink in W vs β)
+      β* = (1−η)/[2((R−1)−C<sub>I</sub>)+1] &nbsp;(when (R−1)&gt;C<sub>I</sub>)
     </div>
     <div id="sigNote" style="font-size:11px;color:#777;line-height:1.5;margin-top:6px"></div>
   </div>
@@ -287,15 +281,15 @@
     <span style="font-weight:400;font-size:12px;color:#888">§4.2 Tan (2026)</span>
   </h3>
   <div style="font-size:11px;color:#888;margin-bottom:5px">
-    Π<sup>A</sup>(σ) at x = x̃ (blue) &nbsp;|&nbsp;
-    Π<sup>B</sup>(σ) at x = x<sup>II*</sup> (red)
+    Π<sup>I</sup>(σ) at x = x̃ (blue) &nbsp;|&nbsp;
+    Π<sup>II</sup>(σ) at x = 1 (red)
   </div>
   <canvas id="canvasEnv" width="420" height="300"></canvas>
   <div class="note">
-    <strong>Blue:</strong> Π<sup>A</sup>(σ) = (A+σC<sub>I</sub>)(1−σ)C<sub>I</sub>/Δ — Solution A, x fixed at x̃.<br>
-    <strong>Red solid:</strong> Π<sup>B</sup>(σ) = (A+σC<sub>II</sub>−C<sub>II</sub>/2)(1−σ)C<sub>II</sub>/Δ — Solution B at x=x<sup>II*</sup>.<br>
+    <strong>Blue:</strong> Π<sup>I</sup>(σ) = (A+σC<sub>I</sub>)(1−σ)C<sub>I</sub>/Δ — Regime I, x=x̃.<br>
+    <strong>Red:</strong> Π<sup>II</sup>(σ) = (A+σ(R−1)−T*/2)(1−σ)(R−1)/Δ — Regime II, x<sup>II*</sup>=1.<br>
     Jump at σ̄: upward (orange ▲) when (BW) holds, downward (gray ▼) when not.<br>
-    σ* = global optimum (star ★). Dotted verticals at σ̂<sup>A</sup>, σ̂<sup>B</sup>.
+    σ* = global optimum (★). Dotted verticals at σ̂<sup>I</sup>, σ̂<sup>II</sup>.
   </div>
 </div>
 <div class="col-ctrl">
@@ -348,11 +342,10 @@
   <div class="note">
     <strong>W<sup>G</sup> is flat</strong>: w<sup>G</sup>=1+η/2+C<sub>I</sub> doesn't depend on β;
     W<sup>G</sup>=(w<sup>G</sup>−r<sub>b</sub>)w<sup>G</sup>/(2Δ) is constant.<br>
-    <strong>Kink at β*=r(1−η)/R</strong>: below β*, (BW) fails → W<sup>P</sup>=W<sup>G</sup> (tie);
-    above β*, private switches to Regime II → W<sup>P</sup> rises steeply as T*=(1−β−η)/β → 0.<br>
-    <strong>Orange dashed</strong>: boundary between B-constrained and B-interior.<br>
-    <strong>Prop. 1:</strong> At interior optima, W<sup>G</sup>&gt;W<sup>P</sup> impossible. Red fill (W<sup>G</sup>&gt;W<sup>P</sup>)
-    only in B-constrained zone near β*.
+    <strong>Kink at β*</strong> where (R−1)−T*/2 = C<sub>I</sub>: β*=(1−η)/[2((R−1)−C<sub>I</sub>)+1] (when (R−1)&gt;C<sub>I</sub>).
+    Below β*, (BW) fails → tie; above, Regime II at x=1; w<sup>II</sup> rises as T* falls.<br>
+    <strong>Orange dashed</strong>: B-constrained vs B-interior.<br>
+    <strong>W<sup>G</sup>&gt;W<sup>P</sup></strong> possible only under B-constrained (not at interior optima).
   </div>
 </div>
 <div class="col-ctrl">
@@ -392,8 +385,7 @@
 <div style="flex:1;min-width:320px">
   <h3>Per-λ primitives <span style="font-weight:400;font-size:12px;color:#888">§1</span></h3>
   <p style="font-size:12px;color:#777;margin-bottom:8px;line-height:1.6">
-    n(λ)=λ−(1−x) for λ&gt;1−x. Piecewise π(λ;x,σ) and U<sub>i</sub>(λ;x,σ) from the note;
-    λ~U[0,1] ⇒ ∫<sub>1−x</sub><sup>1</sup>n(λ)dλ=x²/2.
+    n(λ)=max{λ−(1−x),0}. For σ≥σ̄ and λ&gt;1−x, U<sub>i</sub> includes −T*·n(λ)/(1−λ) (per-depositor formula in the note); the plot samples λ∈(0,1) away from 1. Integrated E[U<sup>II</sup>] still uses x²/2 so closed forms match §3.
   </p>
   <div class="slider-row"><label>λ</label>
     <input type="range" id="primLam" min="0" max="1" step="0.002" value="0.35">
@@ -458,12 +450,27 @@ function Dv(rb,rg)           { return rg - rb; }
 function Tstar(beta,eta)     { return (1-beta-eta)/beta; }
 function sigBar(beta,R,r,eta){ return (1-beta-eta)*r/(beta*(R-r)); }
 function CI(R,r)             { return r*(R-1)**2/(2*(R-r)); }
-function CII(R,beta,eta)     { return beta*(R-1)**2/(1-beta-eta); }
+/** Net carry at x=1 vs blocking: (R−1) − T*/2 — enters w^II and BW */
+function netCarryB(beta,eta,R){
+  const T = Tstar(beta,eta);
+  return (R - 1) - T / 2;
+}
+function wII(R,beta,eta)     { return 1 + eta/2 + netCarryB(beta,eta,R); }
 function xTilde(R,r)         { return r*(R-1)/(R-r); }
-function xIIstar(R,beta,eta) { return Math.min(1, beta*(R-1)/(1-beta-eta)); }
+/** Regime II optimum x under timing (t=0c with M fixed): always corner x=1 */
+function xIIstar(){ return 1; }
 function deltaG(R,beta)      { return R/(2-beta); }
-function assumptionFR(beta,R,eta){ return beta*R + eta < 1; }
 function dOmega(R,r,beta)    { return (2 - beta) - R/r; }
+/** (BW): net carry at x=1 exceeds fire-sale carry C_I at x̃ */
+function BW_holds(R,r,beta,eta){
+  return netCarryB(beta,eta,R) > CI(R,r) + 1e-15;
+}
+/** β at which L(β)=C_I for fixed R,r,η: β=(1−η)/(2((R−1)−C_I)+1) */
+function betaBWthreshold(R,r,eta){
+  const K = (R - 1) - CI(R,r);
+  if(K <= 0) return Infinity;
+  return (1 - eta) / (2 * K + 1);
+}
 
 /** n(λ) = λ-(1-x) when λ > 1-x, else 0 */
 function nDeferred(lambda, x){
@@ -491,7 +498,9 @@ function UiPerDepositor(lambda, x, sigma, R, r, beta, eta){
   const n = nDeferred(lambda, x);
   if(sigma < sb)
     return 1 + eta * (1 - lambda) + sigma * (x * (R - 1) - ((R - r) / r) * n);
-  return 1 + eta * (1 - lambda) + sigma * x * (R - 1) - T * n;
+  const lamSafe = Math.min(lambda, 1 - 1e-9);
+  const denom = Math.max(1e-12, 1 - lamSafe);
+  return 1 + eta * (1 - lambda) + sigma * x * (R - 1) - T * (n / denom);
 }
 
 /** §1 government per-depositor welfare Ω(π_g;λ,x); use π_g=n(λ) for full accommodation */
@@ -540,13 +549,8 @@ function sighatA(R,r,eta,rb){
 }
 function sighatB(R,beta,eta,rb){
   if((R-1) === 0) return -Infinity;
-  return 0.75 - Av(eta,rb)*Tstar(beta,eta)/(2*(R-1)**2);
-}
-function xBstar(sigma,R,beta,eta,rb){
-  const T = Tstar(beta,eta), A = Av(eta,rb);
-  const disc = 4*sigma**2*(R-1)**2 + 6*A*T;
-  if(disc < 0) return 0;
-  return (2*sigma*(R-1) + Math.sqrt(disc))/(3*T);
+  const A = Av(eta,rb), T = Tstar(beta,eta);
+  return 0.5 - (A - T/2) / (2*(R-1));
 }
 
 /* Interior profit values */
@@ -557,18 +561,21 @@ function PiAstar(R,r,eta,rb,rg){
   return (A+ci)**2/(4*D);
 }
 function PiBstar(R,beta,eta,rb,rg){
-  const A = Av(eta,rb), cii = CII(R,beta,eta), D = Dv(rb,rg);
-  return (A + cii/2)**2/(4*D);
+  const A = Av(eta,rb), D = Dv(rb,rg), T = Tstar(beta,eta);
+  const peak = A + (R-1) - T/2;
+  return peak*peak/(4*D);
 }
 
-/* Profit envelope functions (§4.2):
-   Π^A(σ) at x = x̃:  (A+σ·CI)(1-σ)·CI/Δ
-   Π^B(σ) at x = x^II*: (A+σ·CII−CII/2)(1-σ)·CII/Δ  */
+/* Profit envelope:
+   Π^I(σ) at x = x̃:  (A+σ·CI)(1-σ)·CI/Δ
+   Π^II(σ) at x = 1: (A+σ(R−1)−T*/2)(1−σ)(R−1)/Δ  */
 function piA_env(sigma, ci, A, D){
   return Math.max(0, (A + sigma*ci)*(1-sigma)*ci/D);
 }
-function piB_env(sigma, cii, A, D){
-  return Math.max(0, (A + sigma*cii - cii/2)*(1-sigma)*cii/D);
+function piB_env(sigma, R, A, D, beta, eta){
+  const T = Tstar(beta,eta), R1 = R-1;
+  const N = A + sigma*R1 - T/2;
+  return Math.max(0, N*(1-sigma)*R1/D);
 }
 
 /* Aggregate welfare W = M · E[Ω] */
@@ -598,11 +605,11 @@ function computeWP(R,r,beta,eta,rb,rg){
   const pB  = PiBstar(R,beta,eta,rb,rg);
   const xi  = xTilde(R,r);
   const bw  = pB > pA;
+  const xII = 1;
 
   const sigG = Math.max(0, Math.min(sb > 0 ? sb - 1e-10 : 0, sA));
   const WG   = aggW(sigG, xi, R, r, beta, eta, rb, rg, 'I');
 
-  const xii = xIIstar(R, beta, eta);
   let WP, cfg, sigmaP, xP;
 
   if(!bw){
@@ -611,20 +618,19 @@ function computeWP(R,r,beta,eta,rb,rg){
     sigmaP = sigmaAstarConstrained(sA, sb);
     xP = xi;
   } else if(sB >= sb){
-    WP = aggW(sB, xii, R, r, beta, eta, rb, rg, 'II');
+    WP = aggW(sB, xII, R, r, beta, eta, rb, rg, 'II');
     cfg = 'B-int';
     sigmaP = Math.min(1, Math.max(0, sB));
-    xP = xii;
+    xP = xII;
   } else {
-    const xbs  = Math.min(1, xBstar(sb, R, beta, eta, rb));
-    const fbs  = xbs*(R-1), gbs = T*xbs**2/2;
-    const Ncon = A + sb*fbs - gbs;
-    const PBc  = Math.max(0, Ncon*(1-sb)*fbs/D);
+    const R1 = R - 1;
+    const Ncon = A + sb*R1 - T/2;
+    const PBc  = Math.max(0, Ncon*(1-sb)*R1/D);
     if(PBc > pA){
-      WP = aggW(sb, xbs, R, r, beta, eta, rb, rg, 'II');
+      WP = aggW(sb, xII, R, r, beta, eta, rb, rg, 'II');
       cfg = 'B-con';
       sigmaP = Math.min(1, Math.max(0, sb));
-      xP = xbs;
+      xP = xII;
     } else {
       WP = WG;
       cfg = sA <= 0 ? 'A-corner' : 'A-int';
@@ -632,7 +638,7 @@ function computeWP(R,r,beta,eta,rb,rg){
       xP = xi;
     }
   }
-  return {WP, WG, cfg, bw, sb, sB, feasible:true, sigmaP, xP, xi, xii};
+  return {WP, WG, cfg, bw, sb, sB, feasible:true, sigmaP, xP, xi, xii: xII};
 }
 
 function regionColor(WP, WG, cfg){
@@ -701,20 +707,27 @@ function drawMap1(){
     (rv,bv) => (1-bv-eta<=0.001||R<=rv) ? null : [R,rv,bv,eta,rb,rg],
     (ctx,toX,toY) => {
       ctx.save(); ctx.setLineDash([5,3]);
-      // BW boundary: r = βR/(1-η)
+      // BW boundary: (R−1)−T*/2 = C_I(r)  ⟺  r = 2LR/((R−1)²+2L), L=(R−1)−T*/2
       ctx.strokeStyle='rgba(0,0,0,0.65)'; ctx.lineWidth=1.5;
       ctx.beginPath(); let first=true;
       for(let bv=0.30; bv<=0.95; bv+=0.002){
-        const rv=bv*R/(1-eta);
-        if(rv<0.40||rv>0.95) continue;
+        if(1-bv-eta<=0.001) continue;
+        const Tloc=(1-bv-eta)/bv;
+        const L=(R-1)-Tloc/2;
+        if(L<=0) continue;
+        const den=(R-1)**2+2*L;
+        if(den<=0) continue;
+        const rv=2*L*R/den;
+        if(rv>=R||rv<0.40||rv>0.95) continue;
         const px=toX(rv),py=toY(bv);
         if(first){ctx.moveTo(px,py);first=false;}else ctx.lineTo(px,py);
       }
       ctx.stroke();
       ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.font='9px sans-serif';
-      const rwL=Math.min(0.92,0.55*R/(1-eta)), bwL=0.55*(1-eta)/R;
-      if(rwL>=0.40&&rwL<=0.94&&bwL>=0.31&&bwL<=0.94)
-        ctx.fillText('(BW)',toX(rwL)+3,toY(bwL)-4);
+      const bLab=0.55, Tl=(1-bLab-eta)/bLab, Ll=(R-1)-Tl/2;
+      const rLab=Ll>0&&((R-1)**2+2*Ll)>0?2*Ll*R/((R-1)**2+2*Ll):NaN;
+      if(!isNaN(rLab)&&rLab>=0.40&&rLab<=0.94&&bLab>=0.31&&bLab<=0.94)
+        ctx.fillText('(BW)',toX(rLab)+3,toY(bLab)-4);
       // δ^G: r = R/(2-β)
       ctx.strokeStyle='rgba(200,100,0,0.75)'; ctx.lineWidth=1.5;
       ctx.setLineDash([4,3]);
@@ -746,18 +759,23 @@ function drawMap2(){
     (Rv,bv) => (1-bv-eta<=0.001||Rv<=r) ? null : [Rv,r,bv,eta,rb,rg],
     (ctx,toX,toY) => {
       ctx.save(); ctx.setLineDash([5,3]);
-      // BW boundary: R = r(1-η)/β
+      // BW boundary: β = (1−η)/(2((R−1)−C_I(R))+1)
       ctx.strokeStyle='rgba(0,0,0,0.65)'; ctx.lineWidth=1.5;
       ctx.beginPath(); let first=true;
-      for(let bv=0.30; bv<=0.95; bv+=0.002){
-        const Rv=r*(1-eta)/bv;
-        if(Rv<1.05||Rv>1.60) continue;
+      for(let Rv=1.05; Rv<=1.60; Rv+=0.002){
+        if(Rv<=r) continue;
+        const K=(Rv-1)-CI(Rv,r);
+        if(K<=0) continue;
+        const bv=(1-eta)/(2*K+1);
+        if(bv<0.30||bv>0.95) continue;
         const px=toX(Rv),py=toY(bv);
         if(first){ctx.moveTo(px,py);first=false;}else ctx.lineTo(px,py);
       }
       ctx.stroke();
       ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.font='9px sans-serif';
-      ctx.fillText('(BW)',toX(1.08),toY(0.60)-4);
+      const Rlab=1.15, Klab=(Rlab-1)-CI(Rlab,r);
+      if(Klab>0){ const blab=(1-eta)/(2*Klab+1);
+        if(blab>=0.31&&blab<=0.94) ctx.fillText('(BW)',toX(Rlab)+3,toY(blab)-4); }
       // δ^G = r line: R = r(2-β)
       ctx.strokeStyle='rgba(200,100,0,0.75)'; ctx.lineWidth=1.5;
       ctx.setLineDash([4,3]);
@@ -791,14 +809,14 @@ function makeClick(canvasId, xMin,xMax, yMin,yMax, cb){
 }
 
 function inspectResult(res, R, r, beta, eta, rb){
-  const ci=CI(R,r), cii=CII(R,beta,eta);
-  const wG=1+eta/2+ci, wB=1+eta/2+cii/2;
+  const ci=CI(R,r);
+  const wG=1+eta/2+ci, wB=wII(R,beta,eta);
   const msgs={
     'A-corner': 'Tie: Solution A at corner σ*=0. W_P = W_G. (BW fails or Π^B ≤ Π^A)',
     'A-int':    'Tie: Solution A interior. W_P = W_G.',
-    'B-int':    'B-interior: W_P > W_G. Formula: (w^B−w^G)(w^B+w^G−r_b)/(2Δ) > 0.',
+    'B-int':    'B-interior: W_P > W_G. (w^II−w^G)(w^II+w^G−r_b)/(2Δ) > 0.',
     'B-con':    res.WG > res.WP+1e-9
-                  ? 'B-constrained. Forced σ=σ̄ compresses M^P via T*x²/2 → W_G > W_P.'
+                  ? 'B-constrained (σ=σ̄, x=1). Large T*/2 can make M^P·w^II < M^G·w^G.'
                   : 'B-constrained, but W_P ≥ W_G here.',
   };
   return {wG, wB, msg: msgs[res.cfg] || res.cfg};
@@ -842,8 +860,8 @@ makeClick('canvas2', 1.05,1.60, 0.30,0.95, (Rv,bv) => {
 
 /* ── Comparative statics summary — §7 (welfare ordering) ───────────── */
 const rows = [
-  ['β↑', 'Favours [P]', 'T*↓, σ̄↓, w<sup>B</sup>↑ — channels reinforce', 'Yes'],
-  ['R↑', 'Favours [P]', 'Blocking carry pool rises faster; σ̄↓', 'Yes'],
+  ['β↑', 'Favours [P]', 'T*↓, σ̄↓, (R−1)−T*/2↑ → w<sup>II</sup>↑', 'Yes'],
+  ['R↑', 'Often [P]', 'Raises (R−1) and C<sub>I</sub>; (BW) and w<sup>II</sup>−w<sup>G</sup> need case-by-case', 'No'],
   ['r', 'Non-monotone', 'Low r: [G] can win (B-con); USDC-like r: [P] strong; r→r*: BW fails → tie', 'No'],
   ['η↑', 'Favours [P] at interior', 'T*↓, σ̄↓; B-constrained ambiguous', 'No'],
   ['r<sub>b</sub>↑', 'Shrinks W<sub>P</sub>−W<sub>G</sub> (interior)', '∂(W<sub>P</sub>−W<sub>G</sub>)/∂r<sub>b</sub>&lt;0 under BW; B-con evidence mixed', 'No'],
@@ -852,7 +870,7 @@ const tb = document.getElementById('sigTable');
 rows.forEach(([p, dir, ch, mono]) => {
   const tr=document.createElement('tr');
   function clsDir(s){
-    if(/Favours|Shrinks/.test(s)) return 'pos';
+    if(/Favours|Often|Shrinks/.test(s)) return 'pos';
     if(/Non-monotone/.test(s)) return 'amb';
     return 'zero';
   }
@@ -896,15 +914,15 @@ function updateSig(){
   const sA  = sighatA(R,r,eta,rb);
   const sB  = sighatB(R,beta,eta,rb);
   const sBc = Math.max(sb, sB);
-  const ci  = CI(R,r), cii = CII(R,beta,eta);
-  const xi  = xTilde(R,r), xii = xIIstar(R,beta,eta);
+  const ci  = CI(R,r);
+  const xi  = xTilde(R,r), xii = 1;
   const res = computeWP(R,r,beta,eta,rb,rg);
   const dg  = deltaG(R,beta);
   const sigGv = Math.max(0, Math.min(sb>0?sb-1e-10:0, sA));
 
   // Per-depositor welfare (at optimal x)
   const wG = 1 + eta/2 + ci;        // at x = x̃
-  const wB = 1 + eta/2 + cii/2;     // at x = x^II*
+  const wB = wII(R,beta,eta);       // w^{II} at x^{II*}=1
   const wdiff = wB - wG;
 
   // Market sizes at interior optima
@@ -948,14 +966,14 @@ function updateSig(){
     <div class="mcard"><div class="ml">σ<sup>I*</sup> = max(0,σ̂<sup>A</sup>)</div><div class="mv">${Math.max(0,sA).toFixed(4)}</div></div>
     <div class="mcard"><div class="ml">σ<sup>II*</sup> = max(σ̄,σ̂<sup>B</sup>)</div><div class="mv">${sBc.toFixed(4)}</div></div>
     <div class="mcard"><div class="ml">σ̄ (blocking floor)</div><div class="mv">${sb.toFixed(4)}</div></div>
-    <div class="mcard"><div class="ml">σ̂<sup>B</sup> (unconstrained)</div><div class="mv">${sB.toFixed(4)}</div></div>
-    <div class="mcard"><div class="ml">B-interior? σ̂<sup>B</sup>≥σ̄</div><div class="mv">${sB>=sb?'Yes ✓':'No — constrained'}</div></div>
+    <div class="mcard"><div class="ml">σ̂<sup>II</sup> (unconstrained)</div><div class="mv">${sB.toFixed(4)}</div></div>
+    <div class="mcard"><div class="ml">B-interior? σ̂<sup>II</sup>≥σ̄</div><div class="mv">${sB>=sb?'Yes ✓':'No — constrained'}</div></div>
     <div class="mcard"><div class="ml">Config</div><div class="mv">${res.cfg}</div></div>`;
 
   wc.innerHTML=`
-    <div class="mcard"><div class="ml">w<sup>G</sup> = 1+η/2+C<sub>I</sub></div><div class="mv">${wG.toFixed(5)}</div></div>
-    <div class="mcard"><div class="ml">w<sup>B</sup> = 1+η/2+C<sub>II</sub>/2</div><div class="mv">${wB.toFixed(5)}</div></div>
-    <div class="mcard"><div class="ml">w<sup>B</sup>−w<sup>G</sup> = C<sub>II</sub>/2−C<sub>I</sub></div><div class="mv ${wdiff>1e-9?'pos':wdiff<-1e-9?'neg':'zero'}">${wdiff.toFixed(5)}</div></div>`;
+    <div class="mcard"><div class="ml">w<sup>G</sup> = w<sup>I</sup> = 1+η/2+C<sub>I</sub></div><div class="mv">${wG.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">w<sup>II</sup> = 1+η/2+(R−1)−T*/2</div><div class="mv">${wB.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">w<sup>II</sup>−w<sup>G</sup></div><div class="mv ${wdiff>1e-9?'pos':wdiff<-1e-9?'neg':'zero'}">${wdiff.toFixed(5)}</div></div>`;
 
   mc.innerHTML=`
     <div class="mcard"><div class="ml">M<sup>G</sup> (at ${sA>0?'interior':'corner'})</div><div class="mv">${MG.toFixed(5)}</div></div>
@@ -965,13 +983,14 @@ function updateSig(){
     <div class="mcard"><div class="ml">Verdict</div><div class="mv ${wClass}">${wComp}</div></div>
     <div class="mcard"><div class="ml">δ<sup>G</sup> = R/(2−β)</div><div class="mv">${dg.toFixed(4)}</div></div>`;
 
-  const bwLHS=(beta*(R-r)).toFixed(4), bwRHS=(r*(1-beta-eta)).toFixed(4);
-  const bwHolds = +bwLHS > +bwRHS;
+  const ncB = netCarryB(beta,eta,R);
+  const bwLHS = ncB.toFixed(4), bwRHS = ci.toFixed(4);
+  const bwHolds = BW_holds(R,r,beta,eta);
   wd.innerHTML=`<strong>Welfare decomposition (B-interior closed form):</strong><br>
-    W<sub>P</sub>−W<sub>G</sub> = (w<sup>B</sup>−w<sup>G</sup>)(w<sup>B</sup>+w<sup>G</sup>−r<sub>b</sub>)/[2Δ]
+    W<sub>P</sub>−W<sub>G</sub> = (w<sup>II</sup>−w<sup>G</sup>)(w<sup>II</sup>+w<sup>G</sup>−r<sub>b</sub>)/[2Δ]
     = <strong>${Wdiff_closed.toFixed(5)}</strong>
-    &nbsp;|&nbsp; sign = sign(w<sup>B</sup>−w<sup>G</sup>) = sign(BW)<br>
-    (BW): β(R−r) > r(1−β−η) → ${bwLHS} ${bwHolds?'>':'≤'} ${bwRHS}
+    &nbsp;|&nbsp; sign = sign(w<sup>II</sup>−w<sup>G</sup>) = sign(BW)<br>
+    (BW): (R−1)−T*/2 > C<sub>I</sub> → ${bwLHS} ${bwHolds?'>':'≤'} ${bwRHS}
     → BW ${bwHolds?'<span class="good">holds</span>':'<span style="color:#888">fails</span>'}
     &nbsp;|&nbsp; Actual config: ${res.cfg}<br>
     ${res.cfg==='B-int'
@@ -980,26 +999,26 @@ function updateSig(){
       ? `At B-constrained: formula above is for interior reference. Actual W<sub>P</sub>−W<sub>G</sub> = ${res.feasible?(res.WP-res.WG).toFixed(5):'—'}.`
       : 'Solution A: W_P = W_G (tie).'}`;
 
-  const etaSign = 1+beta+2*eta-2*rb;
-  sn.innerHTML=`A=${A.toFixed(4)} &nbsp;T*=${T.toFixed(4)} &nbsp;C<sub>I</sub>=${ci.toFixed(4)} &nbsp;C<sub>II</sub>=${cii.toFixed(4)}<br>
-    x̃=${xi.toFixed(4)} &nbsp;x<sup>II*</sup>=${xii.toFixed(4)} &nbsp;σ<sup>G*</sup>=${sigGv.toFixed(4)}<br>
-    η-ambiguity: sign(∂σ<sup>II*</sup>/∂η) = sign(${etaSign.toFixed(3)}) →
-    σ<sup>II*</sup> ${etaSign>0?'increases':'decreases'} in η.`;
+  const Kbw = (R-1) - ci;
+  sn.innerHTML=`A=${A.toFixed(4)} &nbsp;T*=${T.toFixed(4)} &nbsp;C<sub>I</sub>=${ci.toFixed(4)} &nbsp;(R−1)−T*/2=${ncB.toFixed(4)}<br>
+    x̃=${xi.toFixed(4)} &nbsp;x<sup>II*</sup>=1 &nbsp;σ<sup>G*</sup>=${sigGv.toFixed(4)}<br>
+    BW threshold in β: ${Kbw>0 ? 'β*=(1−η)/[2((R−1)−C<sub>I</sub>)+1]='+(betaBWthreshold(R,r,eta)).toFixed(4) : 'never (R−1≤C<sub>I</sub>)'}.`;
 
-  // Party-by-party at interior optima (§5.3)
+  // Party-by-party at interior optima
   const pc = document.getElementById('partyCards');
   if(pc){
-    const betaStar = r*(1-eta)/R;
+    const betaStar = betaBWthreshold(R,r,eta);
     const EUiG = (wG+rb)/2, EpiG = (wG-rb)/2;
     const EUiP = (wB+rb)/2, EpiP = (wB-rb)/2;
-    const bwHere = beta > betaStar;
+    const bwHere = Kbw <= 0 ? false : beta > betaStar;
+    const betaStarStr = !isFinite(betaStar) ? '—' : betaStar.toFixed(5);
     pc.innerHTML=`
-      <div class="mcard"><div class="ml">β* = r(1−η)/R</div><div class="mv">${betaStar.toFixed(5)}</div></div>
-      <div class="mcard"><div class="ml">β ${bwHere?'>':'≤'} β* → BW ${bwHere?'holds ✓':'fails'}</div><div class="mv ${bwHere?'good':'zero'}">${bwHere?'Regime II possible':'Tie (Sol. A)'}</div></div>
+      <div class="mcard"><div class="ml">β* (BW): (1−η)/[2K+1], K=(R−1)−C<sub>I</sub></div><div class="mv">${betaStarStr}</div></div>
+      <div class="mcard"><div class="ml">β vs β* → BW</div><div class="mv ${bwHere?'good':'zero'}">${Kbw<=0?'never':(bwHere?'holds ✓':'fails')}</div></div>
       <div class="mcard"><div class="ml">E[U<sub>i</sub><sup>G</sup>] = (w<sup>G</sup>+r<sub>b</sub>)/2</div><div class="mv">${EUiG.toFixed(5)}</div></div>
       <div class="mcard"><div class="ml">E[π<sup>G</sup>] = (w<sup>G</sup>−r<sub>b</sub>)/2</div><div class="mv">${EpiG.toFixed(5)}</div></div>
-      <div class="mcard"><div class="ml">E[U<sub>i</sub><sup>P</sup>] = (w<sup>B</sup>+r<sub>b</sub>)/2</div><div class="mv">${EUiP.toFixed(5)}</div></div>
-      <div class="mcard"><div class="ml">E[π<sup>P</sup>] = (w<sup>B</sup>−r<sub>b</sub>)/2</div><div class="mv">${EpiP.toFixed(5)}</div></div>`;
+      <div class="mcard"><div class="ml">E[U<sub>i</sub><sup>P</sup>] = (w<sup>II</sup>+r<sub>b</sub>)/2</div><div class="mv">${EUiP.toFixed(5)}</div></div>
+      <div class="mcard"><div class="ml">E[π<sup>P</sup>] = (w<sup>II</sup>−r<sub>b</sub>)/2</div><div class="mv">${EpiP.toFixed(5)}</div></div>`;
   }
 }
 
@@ -1026,15 +1045,15 @@ function drawEnvelope(){
     ctx.fillText('Infeasible parameters',W/2-80,H/2); return;
   }
 
-  const ci  = CI(R,r), cii = CII(R,beta,eta);
+  const ci  = CI(R,r);
   const sb  = sigBar(beta,R,r,eta);
   const sA  = sighatA(R,r,eta,rb);
   const sB  = sighatB(R,beta,eta,rb);
-  const bw  = cii/2 > ci;
+  const bw  = BW_holds(R,r,beta,eta);
   const sbClamped = Math.min(Math.max(sb, 0), 1);
 
   const pA = s => piA_env(s, ci, A, D);
-  const pB = s => piB_env(s, cii, A, D);
+  const pB = s => piB_env(s, R, A, D, beta, eta);
 
   // Y-range
   const N=300;
@@ -1186,41 +1205,41 @@ function drawEnvelope(){
 
   // Legend
   ctx.font='10px sans-serif';
-  ctx.fillStyle='#2563eb'; ctx.fillText('— Π^A(σ), Sol.A (x = x̃)',pad.l+5,pad.t+14);
-  ctx.fillStyle='#DC3C37'; ctx.fillText(`${bw?'—':'- -'} Π^B(σ), Sol.B (x = x^II*)  [${bw?'(BW)':'¬(BW)'}]`,pad.l+5,pad.t+25);
+  ctx.fillStyle='#2563eb'; ctx.fillText('— Π^I(σ), Regime I (x = x̃)',pad.l+5,pad.t+14);
+  ctx.fillStyle='#DC3C37'; ctx.fillText(`${bw?'—':'- -'} Π^II(σ), Regime II (x = 1)  [${bw?'(BW)':'¬(BW)'}]`,pad.l+5,pad.t+25);
 
   // Update sidebar cards
-  updateEnvCards(R,r,beta,eta,rb,rg,sb,sA,sB,ci,cii,bw,D,A,res);
+  updateEnvCards(R,r,beta,eta,rb,rg,sb,sA,sB,ci,bw,D,A,res);
 }
 
-function updateEnvCards(R,r,beta,eta,rb,rg,sb,sA,sB,ci,cii,bw,D,A,res){
-  const xi=xTilde(R,r), xii=xIIstar(R,beta,eta);
+function updateEnvCards(R,r,beta,eta,rb,rg,sb,sA,sB,ci,bw,D,A,res){
+  const xi=xTilde(R,r);
+  const ncB=netCarryB(beta,eta,R);
   const pA_peak=piA_env(Math.max(0,sA),ci,A,D);
-  const pB_peak=piB_env(Math.max(sb,sB),cii,A,D);
-  const wG=1+eta/2+ci, wB=1+eta/2+cii/2;
+  const pB_peak=piB_env(Math.max(sb,sB),R,A,D,beta,eta);
+  const wG=1+eta/2+ci, wB=wII(R,beta,eta);
 
   document.getElementById('envCards').innerHTML=`
     <div class="mcard"><div class="ml">C<sub>I</sub> = r(R−1)²/[2(R−r)]</div><div class="mv">${ci.toFixed(5)}</div></div>
-    <div class="mcard"><div class="ml">C<sub>II</sub>/2 = β(R−1)²/[2(1−β−η)]</div><div class="mv">${(cii/2).toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">(R−1)−T*/2 at x=1</div><div class="mv">${ncB.toFixed(5)}</div></div>
     <div class="mcard"><div class="ml">σ̄ = (1−β−η)r/[β(R−r)]</div><div class="mv">${sb.toFixed(5)}</div></div>
-    <div class="mcard"><div class="ml">σ̂<sup>A</sup> = ½ − A/(2C<sub>I</sub>)</div><div class="mv">${sA.toFixed(5)}</div></div>
-    <div class="mcard"><div class="ml">σ̂<sup>B</sup> = ¾ − AT*/(2(R−1)²)</div><div class="mv">${sB.toFixed(5)}</div></div>
-    <div class="mcard"><div class="ml">(BW): C<sub>II</sub>/2 > C<sub>I</sub></div><div class="mv ${bw?'good':'zero'}">${bw?'Yes ✓':'No'}</div></div>
-    <div class="mcard"><div class="ml">Π<sup>A*</sup> (peak of A branch)</div><div class="mv">${pA_peak.toFixed(5)}</div></div>
-    <div class="mcard"><div class="ml">Π<sup>B*</sup> (peak of B branch)</div><div class="mv">${pB_peak.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">σ̂<sup>I</sup> = ½ − A/(2C<sub>I</sub>)</div><div class="mv">${sA.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">σ̂<sup>II</sup> = ½ − (A−T*/2)/(2(R−1))</div><div class="mv">${sB.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">(BW): (R−1)−T*/2 > C<sub>I</sub></div><div class="mv ${bw?'good':'zero'}">${bw?'Yes ✓':'No'}</div></div>
+    <div class="mcard"><div class="ml">Π<sup>I*</sup> (peak of I branch)</div><div class="mv">${pA_peak.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">Π<sup>II*</sup> (peak of II branch)</div><div class="mv">${pB_peak.toFixed(5)}</div></div>
     <div class="mcard"><div class="ml">x̃ = x<sup>I*</sup></div><div class="mv">${xi.toFixed(4)}</div></div>
-    <div class="mcard"><div class="ml">x<sup>II*</sup></div><div class="mv">${xii.toFixed(4)}</div></div>`;
+    <div class="mcard"><div class="ml">x<sup>II*</sup></div><div class="mv">1</div></div>`;
 
   document.getElementById('envNote').innerHTML=
     `Jump at σ̄ = ${sb.toFixed(4)}: &nbsp;
-    Π<sup>A</sup>(σ̄) = ${piA_env(Math.min(sb,1),ci,A,D).toFixed(5)}  &nbsp;|&nbsp;
-    Π<sup>B</sup>(σ̄) = ${piB_env(Math.min(sb,1),cii,A,D).toFixed(5)}<br>
-    Jump = ${(piB_env(Math.min(sb,1),cii,A,D)-piA_env(Math.min(sb,1),ci,A,D)).toFixed(5)}
+    Π<sup>I</sup>(σ̄) = ${piA_env(Math.min(sb,1),ci,A,D).toFixed(5)}  &nbsp;|&nbsp;
+    Π<sup>II</sup>(σ̄) = ${piB_env(Math.min(sb,1),R,A,D,beta,eta).toFixed(5)}<br>
+    Jump = ${(piB_env(Math.min(sb,1),R,A,D,beta,eta)-piA_env(Math.min(sb,1),ci,A,D)).toFixed(5)}
     (${bw?'upward — (BW) holds':'downward — (BW) fails'})<br>
     Global optimum: σ* = ${res.cfg}, &nbsp;
-    w<sup>G</sup> = ${(1+eta/2+ci).toFixed(4)}, &nbsp; w<sup>B</sup> = ${(1+eta/2+cii/2).toFixed(4)}<br>
-    Structural symmetry: Π<sup>k*</sup> = (A + C<sup>k</sup>/2)²/(4Δ)
-    where C<sup>A</sup>=C<sub>I</sub>, C<sup>B</sup>=C<sub>II</sub>/2.`;
+    w<sup>G</sup> = ${(1+eta/2+ci).toFixed(4)}, &nbsp; w<sup>II</sup> = ${wB.toFixed(4)}<br>
+    Π<sup>II*</sup> = (A+(R−1)−T*/2)²/(4Δ); &nbsp; Π<sup>I*</sup> = (A+C<sub>I</sub>)²/(4Δ).`;
 }
 
 /* ── W vs β diagram (Tab 5) ──────────────────────────────────────────── */
@@ -1248,8 +1267,9 @@ function drawWbeta(){
   if(betaMax<0.07){ ctx.fillStyle='#888'; ctx.font='13px sans-serif';
     ctx.fillText('η too large',CW/2-40,CH/2); return; }
 
-  const betaStar=r*(1-eta)/R;  // BW threshold
   const ci=CI(R,r);
+  const Kbw=(R-1)-ci;
+  const betaStar=Kbw>0?betaBWthreshold(R,r,eta):Infinity;
   const wG=1+eta/2+ci;
   const WGv=(wG>rb)?(wG-rb)*wG/(2*D):0;  // constant in β
 
@@ -1260,9 +1280,8 @@ function drawWbeta(){
   for(let i=0;i<=N;i++){
     const beta=0.05+(i/N)*(betaMax-0.05);
     const res=computeWP(R,r,beta,eta,rb,rg);
-    const cii=CII(R,beta,eta);
-    const wII=1+eta/2+cii/2;
-    const WP_int=(wII>rb&&D>0)?(wII-rb)*wII/(2*D):0;
+    const wIIval=wII(R,beta,eta);
+    const WP_int=(wIIval>rb&&D>0)?(wIIval-rb)*wIIval/(2*D):0;
     const WP_act=res.feasible?res.WP:null;
     pts.push({beta,WP_act,WP_int,cfg:res.cfg});
     if(WP_act!==null) yMax=Math.max(yMax,WP_act);
@@ -1299,8 +1318,8 @@ function drawWbeta(){
     ctx.closePath();ctx.fill();
   }
 
-  // β* vertical dashed
-  if(betaStar>=0.05&&betaStar<=betaMax){
+  // β* vertical dashed (BW threshold)
+  if(isFinite(betaStar)&&betaStar>=0.05&&betaStar<=betaMax){
     ctx.save();ctx.setLineDash([6,3]);
     ctx.strokeStyle='rgba(0,0,0,0.40)';ctx.lineWidth=1.5;
     ctx.beginPath();ctx.moveTo(toX(betaStar),pad.t);ctx.lineTo(toX(betaStar),pad.t+iH);ctx.stroke();
@@ -1311,8 +1330,9 @@ function drawWbeta(){
 
   // B-int/B-con boundary (orange dashed)
   let betaBound=null;
+  const bRef=isFinite(betaStar)?betaStar:0;
   for(let i=1;i<pts.length;i++){
-    if(pts[i-1].cfg!=='B-int'&&pts[i].cfg==='B-int'&&pts[i].beta>betaStar+0.01){
+    if(pts[i-1].cfg!=='B-int'&&pts[i].cfg==='B-int'&&pts[i].beta>bRef+0.01){
       betaBound=pts[i].beta; break;
     }
   }
@@ -1353,7 +1373,7 @@ function drawWbeta(){
   ctx.fillText(`W^G = ${WGv.toFixed(4)}`,pad.l+3,toY(WGv)-4);
 
   // Kink at β*
-  if(betaStar>=0.05&&betaStar<=betaMax){
+  if(isFinite(betaStar)&&betaStar>=0.05&&betaStar<=betaMax){
     ctx.beginPath();ctx.arc(toX(betaStar),toY(WGv),4.5,0,2*Math.PI);
     ctx.fillStyle='#DC3C37';ctx.fill();
     ctx.fillStyle='#DC3C37';ctx.font='9px sans-serif';
@@ -1362,9 +1382,9 @@ function drawWbeta(){
 
   // Region annotation
   ctx.fillStyle='rgba(29,158,117,0.60)';ctx.font='10px sans-serif';
-  const bMid=betaStar>=0.05&&betaStar<=betaMax&&betaBound ? (betaStar+betaBound)/2 : betaMax*0.75;
+  const bMid=isFinite(betaStar)&&betaStar>=0.05&&betaStar<=betaMax&&betaBound ? (betaStar+betaBound)/2 : betaMax*0.75;
   if(bMid>=0.05&&bMid<=betaMax) ctx.fillText('W^P > W^G',toX(bMid)-20,toY(WGv*(1+(WGv>0?.3:0)))-10);
-  if(betaStar>0.10){
+  if(isFinite(betaStar)&&betaStar>0.10){
     ctx.fillStyle='rgba(0,0,0,0.35)';
     ctx.fillText('W^P = W^G',toX(0.05+betaStar*0.4),toY(WGv*1.05)-4);
   }
@@ -1387,14 +1407,15 @@ function drawWbeta(){
   ctx.fillStyle='#DC3C37';ctx.fillText('— W^P actual',pad.l+5,pad.t+25);
   ctx.fillStyle='rgba(220,60,55,0.6)';ctx.fillText('- - W^P interior formula: (w^II−r_b)w^II/(2Δ)',pad.l+5,pad.t+36);
 
-  updateWbCards(R,r,eta,rb,rg,betaStar,WGv,wG,ci,D);
+  updateWbCards(R,r,eta,rb,rg,betaStar,WGv,wG,ci,D,Kbw);
 }
 
-function updateWbCards(R,r,eta,rb,rg,betaStar,WGv,wG,ci,D){
+function updateWbCards(R,r,eta,rb,rg,betaStar,WGv,wG,ci,D,Kbw){
   const EUiG=(wG+rb)/2, EpiG=(wG-rb)/2;
   const MG=(wG>rb)?(wG-rb)/(2*D):0;
+  const bStr=!isFinite(betaStar)?'—':betaStar.toFixed(5);
   document.getElementById('wbCards').innerHTML=`
-    <div class="mcard"><div class="ml">β* = r(1−η)/R</div><div class="mv">${betaStar.toFixed(5)}</div></div>
+    <div class="mcard"><div class="ml">β* = (1−η)/[2K+1], K=(R−1)−C<sub>I</sub></div><div class="mv">${bStr}</div></div>
     <div class="mcard"><div class="ml">W<sup>G</sup> = (w<sup>G</sup>−r<sub>b</sub>)w<sup>G</sup>/(2Δ)</div><div class="mv">${WGv.toFixed(5)}</div></div>
     <div class="mcard"><div class="ml">w<sup>G</sup> = 1+η/2+C<sub>I</sub></div><div class="mv">${wG.toFixed(5)}</div></div>
     <div class="mcard"><div class="ml">M<sup>G</sup> = (w<sup>G</sup>−r<sub>b</sub>)/(2Δ)</div><div class="mv">${MG.toFixed(5)}</div></div>
@@ -1402,12 +1423,9 @@ function updateWbCards(R,r,eta,rb,rg,betaStar,WGv,wG,ci,D){
     <div class="mcard"><div class="ml">E[π<sup>G</sup>] = (w<sup>G</sup>−r<sub>b</sub>)/2</div><div class="mv">${EpiG.toFixed(5)}</div></div>`;
   document.getElementById('wbNote').innerHTML=
     `<strong>W<sup>G</sup> is flat in β</strong>: w<sup>G</sup>=1+η/2+C<sub>I</sub> = ${wG.toFixed(4)} (depends on R,r,η,r<sub>b</sub> only).<br>
-    Kink at β*=${betaStar.toFixed(4)}: below → (BW) fails → W<sup>P</sup>=W<sup>G</sup>;
-    above → Regime II → W<sup>P</sup> rises steeply as T*→0.<br>
-    Higher R ↓ β* (Regime II easier). Higher r ↑ β* (fire-sale recovery raises w<sup>G</sup>).
-    Higher η ↓ β* (service flow reduces blocking cost).<br>
-    <strong>Prop. 1:</strong> W<sup>G</sup>&gt;W<sup>P</sup> impossible at interior optima —
-    only in B-constrained (red fill, near β*).`;
+    ${Kbw>0?`Kink at β*≈${isFinite(betaStar)?betaStar.toFixed(4):'—'}: below → (BW) fails → tie; above → Regime II at x=1, w<sup>II</sup> rises as T* falls.`
+    :'(R−1)≤C<sub>I</sub>: (BW) never holds — private stays in Regime I.'}<br>
+    <strong>Note:</strong> W<sup>G</sup>&gt;W<sup>P</sup> can occur under B-constrained (σ=σ̄, x=1), not at interior optima.`;
 }
 
 function loadPaperDefaults(){
@@ -1450,7 +1468,7 @@ function drawPrimCanvas(p){
   const N = 200;
   const piPts = [], uPts = [];
   for(let i = 0; i <= N; i++){
-    const lam = i / N;
+    const lam = (i + 0.5) / (N + 1);
     const pv = piPerDepositor(lam, x, sig, R, r, beta, eta);
     const uv = UiPerDepositor(lam, x, sig, R, r, beta, eta);
     piPts.push(pv); uPts.push(uv);
@@ -1537,8 +1555,6 @@ function updateExpectGovBlock(){
   const {R, r, beta, eta} = p;
   const dg = deltaG(R, beta);
   const rOk = r > dg + 1e-12;
-  const fr = assumptionFR(beta, R, eta);
-  const xiiRaw = beta * (R - 1) / (1 - beta - eta);
 
   const epA = EpiA(sigma, x, R, r);
   const euA = EUiA(sigma, x, R, r, eta);
@@ -1555,13 +1571,12 @@ function updateExpectGovBlock(){
     <div class="mcard"><div class="ml">E[Ω<sup>G</sup>] — (EOmG)</div><div class="mv">${eOmG.toFixed(5)}</div></div>
     <div class="mcard"><div class="ml">δ<sup>G</sup> = R/(2−β)</div><div class="mv">${dg.toFixed(4)}</div></div>
     <div class="mcard"><div class="ml">r &gt; δ<sup>G</sup> (full acc.)</div><div class="mv ${rOk ? 'good' : 'warn'}">${rOk ? 'Yes' : 'No'}</div></div>
-    <div class="mcard"><div class="ml">x<sup>II*</sup> raw / FR (βR+η&lt;1)</div><div class="mv">${xiiRaw.toFixed(4)} / ${fr ? 'interior' : 'corner x=1'}</div></div>
+    <div class="mcard"><div class="ml">x<sup>II*</sup> (timing: M fixed)</div><div class="mv">1</div></div>
     <div class="mcard"><div class="ml">M, Π = M·E[π]</div><div class="mv">σ* tab</div></div>`;
 
   document.getElementById('expectGovNote').innerHTML =
-    `Piecewise total profit Π(x;σ) from §2 switches at σ̄=${sigBar(beta,R,r,eta).toFixed(4)}.
-    Government corner π_g*=n(λ) iff r&gt;δ<sup>G</sup> (independent of σ, x, η, F).
-    Equivalence [G]≡A: E[π<sup>G</sup>]=E[π<sup>A</sup>] and E[U<sup>G</sup>]=E[U<sup>A</sup>] at the same (x,σ) structure.`;
+    `Π(x;σ) switches at σ̄=${sigBar(beta,R,r,eta).toFixed(4)}. Under the timing note, Regime II has x<sup>II*</sup>=1 (not β(R−1)/(1−β−η)).
+    Government: π_g*=n(λ) iff r&gt;δ<sup>G</sup>. [G] replicates Regime I: same E[π], E[U] as Solution A at x̃.`;
 }
 
 function loadUSDCRemark(){
