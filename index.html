@@ -49,11 +49,25 @@
   }
   /* Canvas & readout */
   canvas { border: 1px solid #e0e0de; border-radius: 6px; width: 100%; max-width: 480px; display: block; }
+
+  /* Tabs */
+  .tab-bar { display: flex; gap: 6px; margin-bottom: 18px; }
+  .tab-btn {
+    font-size: 12px; font-weight: 500; padding: 5px 14px; border-radius: 20px; cursor: pointer;
+    border: 1px solid #d0d0ce; background: #f0f0ee; color: #666; transition: all 0.15s;
+  }
+  .tab-btn.active { background: #1a1a18; color: #fff; border-color: #1a1a18; }
+  .tab-btn:hover:not(.active) { background: #e4e4e2; }
 </style>
 </head>
 <body>
 
 <h1>Welfare comparison: W<sup>P</sup> vs W<sup>G</sup></h1>
+
+<div class="tab-bar">
+  <button class="tab-btn active" id="tab-ante" onclick="switchTab('ante')">Ex-ante</button>
+  <button class="tab-btn" id="tab-post" onclick="switchTab('post')">Ex-post (actual equilibrium)</button>
+</div>
 
 <div class="wm-layout">
 
@@ -94,36 +108,73 @@
 
     <div class="sep">
       <div class="wm-section-title">Legend</div>
-      <div class="wm-legend-item">
-        <div class="wm-legend-swatch" style="background:#378ADD"></div>
-        <span>𝒲<sup>P</sup> &gt; 𝒲<sup>G</sup></span>
-        <span style="color:#bbb;font-size:11px">B-interior</span>
+
+      <!-- Ex-ante legend -->
+      <div id="legend-ante">
+        <div class="wm-legend-item">
+          <div class="wm-legend-swatch" style="background:#378ADD"></div>
+          <span>𝒲<sup>P</sup> &gt; 𝒲<sup>G</sup></span>
+          <span style="color:#bbb;font-size:11px">B-interior</span>
+        </div>
+        <div class="wm-legend-item">
+          <div class="wm-legend-swatch" style="background:#EF9F27"></div>
+          <span>𝒲<sup>G</sup> &gt; 𝒲<sup>P</sup></span>
+          <span style="color:#bbb;font-size:11px">B-constrained</span>
+        </div>
+        <div class="wm-legend-item">
+          <div class="wm-legend-swatch" style="background:#888780"></div>
+          <span>𝒲<sup>P</sup> = 𝒲<sup>G</sup></span>
+          <span style="color:#bbb;font-size:11px">chose A</span>
+        </div>
+        <div class="wm-legend-item">
+          <div class="wm-legend-swatch" style="background:#D3D1C7"></div>
+          <span>Infeasible</span>
+        </div>
+        <div class="wm-legend-item" style="margin-top:6px">
+          <div class="wm-legend-dash" style="background:repeating-linear-gradient(90deg,#fff 0,#fff 4px,transparent 4px,transparent 7px)"></div>
+          <span style="font-size:11px;color:#666">BW: w<sup>B</sup>=w<sup>G</sup></span>
+        </div>
+        <div class="wm-legend-item">
+          <div class="wm-legend-swatch" style="background:rgba(60,200,100,0.55);border-radius:2px"></div>
+          <span style="font-size:11px;color:#666">r &gt; δ<sup>G</sup>: govt intervenes</span>
+        </div>
+        <div class="wm-legend-item">
+          <div class="wm-legend-dash" style="background:repeating-linear-gradient(90deg,#ff7850 0,#ff7850 3px,transparent 3px,transparent 6px)"></div>
+          <span style="font-size:11px;color:#666">δ<sup>G</sup>: r=R/(2−β)</span>
+        </div>
       </div>
-      <div class="wm-legend-item">
-        <div class="wm-legend-swatch" style="background:#EF9F27"></div>
-        <span>𝒲<sup>G</sup> &gt; 𝒲<sup>P</sup></span>
-        <span style="color:#bbb;font-size:11px">B-constrained</span>
-      </div>
-      <div class="wm-legend-item">
-        <div class="wm-legend-swatch" style="background:#888780"></div>
-        <span>𝒲<sup>P</sup> = 𝒲<sup>G</sup></span>
-        <span style="color:#bbb;font-size:11px">chose A</span>
-      </div>
-      <div class="wm-legend-item">
-        <div class="wm-legend-swatch" style="background:#D3D1C7"></div>
-        <span>Infeasible</span>
-      </div>
-      <div class="wm-legend-item" style="margin-top:6px">
-        <div class="wm-legend-dash" style="background:repeating-linear-gradient(90deg,#fff 0,#fff 4px,transparent 4px,transparent 7px)"></div>
-        <span style="font-size:11px;color:#666">BW: w<sup>B</sup>=w<sup>G</sup></span>
-      </div>
-      <div class="wm-legend-item">
-        <div class="wm-legend-swatch" style="background:rgba(60,200,100,0.55);border-radius:2px"></div>
-        <span style="font-size:11px;color:#666">r &gt; δ<sup>G</sup>: govt intervenes</span>
-      </div>
-      <div class="wm-legend-item">
-        <div class="wm-legend-dash" style="background:repeating-linear-gradient(90deg,#ff7850 0,#ff7850 3px,transparent 3px,transparent 6px)"></div>
-        <span style="font-size:11px;color:#666">δ<sup>G</sup>: r=R/(2−β)</span>
+
+      <!-- Ex-post legend -->
+      <div id="legend-post" style="display:none">
+        <div class="wm-legend-item">
+          <div class="wm-legend-swatch" style="background:#D24545"></div>
+          <span style="font-size:11px">Welfare gap</span>
+          <span style="color:#bbb;font-size:10px">W<sup>G</sup>&gt;W<sup>P</sup>, no action</span>
+        </div>
+        <div class="wm-legend-item">
+          <div class="wm-legend-swatch" style="background:#378ADD"></div>
+          <span style="font-size:11px">Private efficient</span>
+          <span style="color:#bbb;font-size:10px">W<sup>P</sup>&gt;W<sup>G</sup></span>
+        </div>
+        <div class="wm-legend-item">
+          <div class="wm-legend-swatch" style="background:#888780"></div>
+          <span style="font-size:11px">Neutral</span>
+          <span style="color:#bbb;font-size:10px">W<sup>P</sup>=W<sup>G</sup>, chose A</span>
+        </div>
+        <div class="wm-legend-item">
+          <div class="wm-legend-swatch" style="background:#DBA820"></div>
+          <span style="font-size:11px">Redundant intervention</span>
+          <span style="color:#bbb;font-size:10px">r&gt;δ<sup>G</sup>, W<sup>P</sup>≥W<sup>G</sup></span>
+        </div>
+        <div class="wm-legend-item">
+          <div class="wm-legend-swatch" style="background:#32B464"></div>
+          <span style="font-size:11px">Beneficial intervention</span>
+          <span style="color:#bbb;font-size:10px">r&gt;δ<sup>G</sup>, W<sup>G</sup>&gt;W<sup>P</sup></span>
+        </div>
+        <div class="wm-legend-item">
+          <div class="wm-legend-swatch" style="background:#D3D1C7"></div>
+          <span style="font-size:11px">Infeasible</span>
+        </div>
       </div>
     </div>
 
@@ -217,7 +268,7 @@ function buildSlidersWM() {
     row.querySelector('input').addEventListener('input', e => {
       WM_F[k] = parseFloat(e.target.value);
       document.getElementById('lb_' + k).textContent = WM_F[k].toFixed(2);
-      drawWelfareMap();
+      redrawActive();
     });
   });
 }
@@ -371,13 +422,138 @@ function drawWelfareMap() {
 
 }
 
+/* ── Ex-post welfare map ─────────────────────────────────────── */
+function drawExPostMap() {
+  const { xk, yk } = wmAxes();
+  const cv = document.getElementById('ph');
+  const ctx = cv.getContext('2d');
+  const CW = cv.width, CH = cv.height;
+  const ml = 48, mb = 42, mt = 22, mr = 22;
+  const pw = CW - ml - mr, ph = CH - mt - mb;
+  const px = WM_PAX[xk], py = WM_PAX[yk];
+
+  ctx.clearRect(0, 0, CW, CH);
+
+  /*
+   * Colour key (actual equilibrium given rational govt decision):
+   *  'gap'       red    — r < δ^G, W^G > W^P  (welfare gap: govt absent but needed)
+   *  'private'   blue   — r < δ^G, W^P > W^G  (private outcome is efficient)
+   *  'neutral'   grey   — r < δ^G, W^P = W^G  (Solution A, no difference)
+   *  'redundant' gold   — r > δ^G, W^G ≤ W^P  (govt intervenes but not needed)
+   *  'helpful'   green  — r > δ^G, W^G > W^P  (intervention beneficial)
+   *  null        light  — infeasible
+   */
+  const EP = {
+    gap:       [210,  69,  69, 220],
+    private:   [ 55, 138, 221, 215],
+    neutral:   [136, 135, 128, 185],
+    redundant: [219, 168,  32, 205],
+    helpful:   [ 50, 180, 100, 215],
+    infeas:    [200, 198, 190, 160]
+  };
+
+  const img = ctx.createImageData(pw, ph);
+  for (let j = 0; j < ph; j++) {
+    for (let i = 0; i < pw; i++) {
+      const xv = px.min + (i / (pw - 1)) * (px.max - px.min);
+      const yv = py.max - (j / (ph - 1)) * (py.max - py.min);
+      const a = { ...WM_F, [xk]: xv, [yk]: yv };
+      const s = wm_solve(a.beta, a.R, a.r, a.eta, a.rb, a.rg);
+      let c;
+      if (!s) {
+        c = EP.infeas;
+      } else {
+        const govtActs = a.r > a.R / (2 - a.beta);
+        if (govtActs) {
+          c = s.WG > s.WP + 1e-9 ? EP.helpful : EP.redundant;
+        } else {
+          c = s.reg === -1 ? EP.gap : (s.reg === 1 ? EP.private : EP.neutral);
+        }
+      }
+      const idx = (j * pw + i) * 4;
+      img.data[idx]=c[0]; img.data[idx+1]=c[1]; img.data[idx+2]=c[2]; img.data[idx+3]=c[3];
+    }
+  }
+  const tmp = document.createElement('canvas');
+  tmp.width = pw; tmp.height = ph;
+  tmp.getContext('2d').putImageData(img, 0, 0);
+  ctx.drawImage(tmp, ml, mt);
+
+  /* Grid */
+  ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 0.5;
+  [1,2,3,4].forEach(i => {
+    ctx.beginPath(); ctx.moveTo(ml+i/4*pw, mt); ctx.lineTo(ml+i/4*pw, mt+ph); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ml, mt+i/4*ph); ctx.lineTo(ml+pw, mt+i/4*ph); ctx.stroke();
+  });
+  ctx.strokeStyle = 'rgba(0,0,0,0.15)'; ctx.lineWidth = 0.5;
+  ctx.strokeRect(ml, mt, pw, ph);
+
+  /* δ^G boundary line */
+  {
+    const dgPts = [];
+    for (let i = 0; i < pw; i++) {
+      const xv = px.min + (i / (pw - 1)) * (px.max - px.min);
+      let prev = null, crossJ = null;
+      for (let j = 0; j < ph; j++) {
+        const yv = py.max - (j / (ph - 1)) * (py.max - py.min);
+        const a = { ...WM_F, [xk]: xv, [yk]: yv };
+        if (a.beta <= 0 || a.beta >= 1 || a.R <= 1 || a.r >= 1) { prev = null; continue; }
+        const diff = a.r * (2 - a.beta) - a.R;
+        if (prev !== null && prev * diff < 0) { crossJ = j - diff / (diff - prev); break; }
+        prev = diff;
+      }
+      dgPts.push(crossJ !== null ? { x: ml + i, y: mt + crossJ } : null);
+    }
+    ctx.save();
+    ctx.setLineDash([4, 5]); ctx.lineCap = 'round';
+    [[3,'rgba(0,0,0,0.25)'],[1.5,'rgba(255,255,255,0.9)']].forEach(([lw,style]) => {
+      ctx.lineWidth = lw; ctx.strokeStyle = style;
+      ctx.beginPath(); let on = false;
+      dgPts.forEach(p => { if (!p){on=false;return;} on?ctx.lineTo(p.x,p.y):(ctx.moveTo(p.x,p.y),(on=true)); });
+      ctx.stroke();
+    });
+    ctx.restore();
+  }
+
+  /* Axis labels */
+  ctx.fillStyle = 'rgba(55,55,55,0.9)'; ctx.font = '11px sans-serif'; ctx.textAlign = 'center';
+  for (let i = 0; i <= 5; i++) {
+    const xv = px.min + i/5 * (px.max - px.min);
+    ctx.fillText(xv.toFixed(xv < 2 ? 2 : 1), ml + i/5*pw, mt+ph+17);
+  }
+  ctx.textAlign = 'right';
+  for (let i = 0; i <= 5; i++) {
+    const yv = py.min + i/5 * (py.max - py.min);
+    ctx.fillText(yv.toFixed(yv < 2 ? 2 : 1), ml-5, mt+ph - i/5*ph + 4);
+  }
+  ctx.fillStyle = 'rgba(35,35,35,0.9)'; ctx.font = '500 13px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText(px.label, ml+pw/2, CH-6);
+  ctx.save(); ctx.translate(12, mt+ph/2); ctx.rotate(-Math.PI/2); ctx.fillText(py.label, 0, 0); ctx.restore();
+}
+
+/* ── Tab switching & shared wiring ──────────────────────────── */
+let WM_ACTIVE_TAB = 'ante';
+
+function switchTab(tab) {
+  WM_ACTIVE_TAB = tab;
+  document.getElementById('tab-ante').classList.toggle('active', tab === 'ante');
+  document.getElementById('tab-post').classList.toggle('active', tab === 'post');
+  document.getElementById('legend-ante').style.display = tab === 'ante' ? '' : 'none';
+  document.getElementById('legend-post').style.display = tab === 'post' ? '' : 'none';
+  redrawActive();
+}
+
+function redrawActive() {
+  if (WM_ACTIVE_TAB === 'ante') drawWelfareMap(); else drawExPostMap();
+}
+
 function onAxisChangeWM() {
   const { xk, yk } = wmAxes();
   if (xk === yk) {
     const other = ['beta','R','r','eta'].find(v => v !== xk);
     document.getElementById(xk === 'R' ? 'yax' : 'xax').value = other;
   }
-  buildSlidersWM(); drawWelfareMap();
+  buildSlidersWM(); redrawActive();
 }
 document.getElementById('xax').addEventListener('change', onAxisChangeWM);
 document.getElementById('yax').addEventListener('change', onAxisChangeWM);
@@ -386,12 +562,12 @@ document.getElementById('yax').addEventListener('change', onAxisChangeWM);
   document.getElementById('sl_' + k).addEventListener('input', e => {
     WM_F[k] = parseFloat(e.target.value);
     document.getElementById('lb_' + k).textContent = WM_F[k].toFixed(2);
-    drawWelfareMap();
+    redrawActive();
   });
 });
 
 buildSlidersWM();
-drawWelfareMap();
+redrawActive();
 </script>
 </body>
 </html>
