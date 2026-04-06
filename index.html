@@ -46,11 +46,6 @@
   .wm-legend-swatch { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
   /* Canvas & readout */
   canvas { border: 1px solid #e0e0de; border-radius: 6px; width: 100%; max-width: 480px; display: block; }
-  #rdout {
-    margin-top: 9px; padding: 8px 11px; background: #f0efeb; border-radius: 6px;
-    font-size: 11px; color: #555; font-family: ui-monospace, monospace; line-height: 1.75;
-    max-width: 480px;
-  }
 </style>
 </head>
 <body>
@@ -121,7 +116,6 @@
 
   <div class="wm-canvas-wrap">
     <canvas id="ph" width="480" height="380"></canvas>
-    <div id="rdout">Loading…</div>
   </div>
 
 </div>
@@ -302,20 +296,6 @@ function drawWelfareMap() {
   ctx.fillText(px.label, ml+pw/2, CH-6);
   ctx.save(); ctx.translate(12, mt+ph/2); ctx.rotate(-Math.PI/2); ctx.fillText(py.label, 0, 0); ctx.restore();
 
-  /* Readout */
-  const s0 = wm_solve(WM_F.beta, WM_F.R, WM_F.r, WM_F.eta, WM_F.rb, WM_F.rg);
-  const rdout = document.getElementById('rdout');
-  if (s0) {
-    const rl   = s0.reg===1 ? '𝒲ᴾ > 𝒲ᴳ' : s0.reg===-1 ? '𝒲ᴳ > 𝒲ᴾ' : '𝒲ᴾ = 𝒲ᴳ';
-    const rcol = s0.reg===1 ? '#185FA5' : s0.reg===-1 ? '#854F0B' : '#666';
-    rdout.innerHTML =
-      `β=${WM_F.beta.toFixed(2)}  R=${WM_F.R.toFixed(2)}  r=${WM_F.r.toFixed(2)}  ` +
-      `η=${WM_F.eta.toFixed(2)}  rᵦ=${WM_F.rb.toFixed(2)}  rᵍ=${WM_F.rg.toFixed(2)}<br>` +
-      `σ̄=${s0.sbar.toFixed(3)} · 𝒲ᴾ=${s0.WP.toFixed(3)} · 𝒲ᴳ=${s0.WG.toFixed(3)}<br>` +
-      `<strong style="color:${rcol}">${rl}</strong>`;
-  } else {
-    rdout.textContent = 'Infeasible at current fixed parameter values.';
-  }
 }
 
 function onAxisChangeWM() {
