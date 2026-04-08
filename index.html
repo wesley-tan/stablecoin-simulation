@@ -218,11 +218,16 @@ function wm_solve(beta, R, r, eta, rb, rg) {
     }
   }
 
-  /* Commitment benchmark (§7): issuer commits to x^C=1, no bribe needed.
-     w^C = 1+η/2+(R−1); gap identity: w^C − w^B = (1−β−η)/(2β) ≥ 0. */
-  const xC = 1;
-  const wC = 1 + eta / 2 + (R - 1);
-  const WC = wC > rb ? (wC - rb) * wC / (2 * (rg - rb)) : 0;
+  /* Commitment benchmark: issuer commits to x before M locks in,
+     internalising dx/dM = 0. Maximises E[Ω^II](x) over x ∈ [0,1]:
+       x^C = β(R−1)/(1−β−η)  if < 1, else corner x^C = 1.
+     w^C = 1+η/2+β(R−1)²/[2(1−β−η)] when interior; w^C = w^B at corner. */
+  const wC_den = 1 - beta - eta;
+  const xC    = wC_den > 0 ? Math.min(beta * (R - 1) / wC_den, 1) : 1;
+  const wC    = (wC_den > 0 && xC < 1)
+                ? 1 + eta / 2 + beta * (R - 1) * (R - 1) / (2 * wC_den)
+                : 1 + eta / 2 + (R - 1) - wC_den / (2 * beta);
+  const WC    = wC > rb ? (wC - rb) * wC / (2 * (rg - rb)) : 0;
 
   /* Government non-accommodation (Appendix GA, r ≤ δ^G) */
   const wGno  = 1 + eta / 2 + (R - 1) - (1 - beta) / 2;
