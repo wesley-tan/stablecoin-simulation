@@ -48,7 +48,25 @@
     width: 20px; height: 2px; flex-shrink: 0; margin: 2px 0;
   }
   /* Canvas & readout */
-  canvas { border: 1px solid #e0e0de; border-radius: 6px; width: 100%; max-width: 480px; display: block; }
+  canvas { border: 1px solid #e0e0de; border-radius: 6px; width: 100%; max-width: 480px; display: block; cursor: crosshair; }
+
+  /* Click-to-inspect tooltip */
+  #wm-tip {
+    position: fixed; background: #fff; border: 1px solid #ddd;
+    border-radius: 9px; padding: 11px 13px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.13);
+    font-size: 12px; z-index: 100; min-width: 200px;
+    pointer-events: none; line-height: 1.6; display: none;
+  }
+  #wm-tip .tip-close { pointer-events: all; cursor: pointer; float: right; color: #bbb; font-size: 14px; line-height: 1; margin: -1px -3px 0 8px; }
+  #wm-tip .tip-close:hover { color: #888; }
+  #wm-tip .tip-regime { font-size: 14px; font-weight: 600; margin-bottom: 1px; }
+  #wm-tip .tip-desc { font-size: 11px; color: #999; margin-bottom: 6px; }
+  #wm-tip hr { border: none; border-top: 1px solid #eee; margin: 6px 0; }
+  #wm-tip table { border-collapse: collapse; width: 100%; }
+  #wm-tip .kl { color: #888; padding-right: 2px; white-space: nowrap; }
+  #wm-tip .kv { font-weight: 500; padding-right: 8px; }
+  #wm-tip .tip-note { font-size: 11px; margin-top: 5px; }
 </style>
 </head>
 <body>
@@ -144,6 +162,20 @@
 
 </div>
 
+<!-- Click-to-inspect tooltip -->
+<div id="wm-tip">
+  <span class="tip-close" onclick="hideTooltip()">✕</span>
+  <div class="tip-regime" id="tip-regime"></div>
+  <div class="tip-desc" id="tip-desc"></div>
+  <hr>
+  <table id="tip-params"></table>
+  <hr>
+  <table id="tip-eq"></table>
+  <hr>
+  <table id="tip-welfare"></table>
+  <div class="tip-note" id="tip-govt"></div>
+</div>
+
 <script>
 const WM_PAX = {
   beta: { label: 'β', min: 0.03, max: 0.97, step: 0.01, def: 0.40 },
@@ -167,6 +199,7 @@ function wm_solve(beta, R, r, eta, rb, rg) {
 
   /* Solution A branches */
   const shatA = 0.5 - aA / (2 * CA);
+  const xtilde = r * (R - 1) / (R - r);
   let sigmaA, PiA;
   if (shatA <= 0) {
     sigmaA = 0; PiA = aA * CA / (rg - rb);
@@ -182,16 +215,16 @@ function wm_solve(beta, R, r, eta, rb, rg) {
 
   /* Solution B — only if sbar_raw < 1 */
   const wBrb = aB + (R - 1);
-  let sigmaB, PiB;
+  let sigmaB, shatBval, PiB;
   if (sbar_raw > 1 || wBrb <= 0) {
-    sigmaB = null; PiB = 0;
+    sigmaB = null; shatBval = null; PiB = 0;
   } else {
-    const shatB = 0.5 - aB / (2 * (R - 1));
-    if (shatB < sbar) {
+    shatBval = 0.5 - aB / (2 * (R - 1));
+    if (shatBval < sbar) {
       sigmaB = sbar;
       PiB = Math.max(0, (aB + (R - 1) * sbar) * (1 - sbar) * (R - 1) / (rg - rb));
-    } else if (shatB <= 1) {
-      sigmaB = shatB; PiB = wBrb * wBrb / (4 * (rg - rb));
+    } else if (shatBval <= 1) {
+      sigmaB = shatBval; PiB = wBrb * wBrb / (4 * (rg - rb));
     } else {
       sigmaB = 1; PiB = 0;
     }
@@ -200,25 +233,37 @@ function wm_solve(beta, R, r, eta, rb, rg) {
   /* Commitment benchmark (Regime II with commitment, §5) */
   const wC_den = 1 - beta - eta;
   const xC    = wC_den > 0 ? beta * (R - 1) / wC_den : Infinity;
-  /* w^C = 1+η/2+β(R−1)²/[2(1−β−η)] when xC<1; equals w^B when xC≥1 */
   const wC    = (xC < 1 && wC_den > 0)
                 ? 1 + eta / 2 + beta * (R - 1) * (R - 1) / (2 * wC_den)
                 : 1 + eta / 2 + (R - 1) - (1 - beta - eta) / (2 * beta);
   const WC    = wC > rb ? (wC - rb) * wC / (2 * (rg - rb)) : 0;
 
   /* Government non-accommodation (Appendix GA, r ≤ δ^G) */
-  /* w^{G,no} = 1+η/2+(R−1)−(1−β)/2; beats w^B iff η>(1−β)² */
   const wGno  = 1 + eta / 2 + (R - 1) - (1 - beta) / 2;
   const WGno  = wGno > rb ? (wGno - rb) * wGno / (2 * (rg - rb)) : 0;
 
-  /* Global choice */
-  if (PiB <= PiA) return { reg: 0, WP: WG, WG, WC, wC, xC, wGno, WGno, sigmaA, sigmaB, PiA, PiB, CA, aA, aB, sbar };
+  /* Regime classification */
+  let regime;
+  if (PiB <= PiA) {
+    regime = shatA <= 0 ? 'I-a' : shatA < sbar ? 'I-b' : 'I-c';
+    return { reg: 0, WP: WG, WG, WC, wC, xC, wGno, WGno,
+             sigmaA, sigmaB, PiA, PiB, CA, aA, aB, sbar,
+             regime, shatA, shatBval, xtilde };
+  }
   const euB = aB + sigmaB * (R - 1);
-  if (euB <= 0) return { reg: 0, WP: WG, WG, WC, wC, xC, wGno, WGno, sigmaA, sigmaB, PiA, PiB, CA, aA, aB, sbar };
+  if (euB <= 0) {
+    regime = shatA <= 0 ? 'I-a' : shatA < sbar ? 'I-b' : 'I-c';
+    return { reg: 0, WP: WG, WG, WC, wC, xC, wGno, WGno,
+             sigmaA, sigmaB, PiA, PiB, CA, aA, aB, sbar,
+             regime, shatA, shatBval, xtilde };
+  }
   const wB = 1 + eta / 2 + (R - 1) - (1 - beta - eta) / (2 * beta);
   const WP = (euB / (rg - rb)) * wB;
   const reg = WP > WG + 1e-9 ? 1 : (WP < WG - 1e-9 ? -1 : 0);
-  return { reg, WP, WG, WC, wC, xC, wGno, WGno, sigmaA, sigmaB, PiA, PiB, CA, aA, aB, sbar };
+  regime = (shatBval !== null && shatBval < sbar) ? 'II-a' : 'II-b';
+  return { reg, WP, WG, WC, wC, xC, wGno, WGno,
+           sigmaA, sigmaB, PiA, PiB, CA, aA, aB, sbar,
+           regime, shatA, shatBval, xtilde };
 }
 
 
@@ -452,6 +497,23 @@ function drawWelfareMap() {
   ctx.fillText(px.label, ml+pw/2, CH-6);
   ctx.save(); ctx.translate(12, mt+ph/2); ctx.rotate(-Math.PI/2); ctx.fillText(py.label, 0, 0); ctx.restore();
 
+  /* Crosshair for clicked point */
+  if (WM_CLICK) {
+    const { cx, cy } = WM_CLICK;
+    ctx.save();
+    ctx.beginPath(); ctx.rect(ml, mt, pw, ph); ctx.clip();
+    ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 1;
+    ctx.setLineDash([4, 3]);
+    ctx.beginPath();
+    ctx.moveTo(cx, mt); ctx.lineTo(cx, mt + ph);
+    ctx.moveTo(ml, cy); ctx.lineTo(ml + pw, cy);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.beginPath(); ctx.arc(cx, cy, 4.5, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(20,20,20,0.65)'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.restore();
+  }
 }
 
 function onAxisChangeWM() {
@@ -471,6 +533,128 @@ document.getElementById('yax').addEventListener('change', onAxisChangeWM);
     document.getElementById('lb_' + k).textContent = WM_F[k].toFixed(2);
     drawWelfareMap();
   });
+});
+
+/* ── Click-to-inspect ────────────────────────────────────────── */
+let WM_CLICK = null;
+
+const REGIME_COLORS = {
+  'I-a': '#7a7970', 'I-b': '#7a7970', 'I-c': '#7a7970',
+  'II-a': '#c47e10', 'II-b': '#1f6fbd', 'Infeasible': '#aaa'
+};
+const REGIME_DESCS = {
+  'I-a': 'Liquidation regime — corner σ*=0',
+  'I-b': 'Liquidation regime — interior σ*=σ̂ᴵ',
+  'I-c': 'Liquidation regime — corner σ*=σ̄⁻',
+  'II-a': 'Renegotiation regime — constrained σ*=σ̄',
+  'II-b': 'Renegotiation regime — interior σ*=σ̂ᴵᴵ',
+  'Infeasible': 'Market does not exist'
+};
+
+function f3(v) { return (typeof v === 'number' && isFinite(v)) ? v.toFixed(3) : '—'; }
+function f2(v) { return (typeof v === 'number' && isFinite(v)) ? v.toFixed(2) : '—'; }
+
+function positionTip(tip, ex, ey) {
+  tip.style.display = 'block';
+  const tw = tip.offsetWidth, th = tip.offsetHeight;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  let left = ex + 18, top = ey - 10;
+  if (left + tw > vw - 10) left = ex - tw - 18;
+  if (top + th > vh - 10) top = vh - th - 10;
+  if (top < 10) top = 10;
+  tip.style.left = left + 'px';
+  tip.style.top = top + 'px';
+}
+
+function hideTooltip() {
+  document.getElementById('wm-tip').style.display = 'none';
+  WM_CLICK = null;
+  drawWelfareMap();
+}
+
+function showTooltip(xk, yk, xv, yv, ex, ey) {
+  const a = { ...WM_F, [xk]: xv, [yk]: yv };
+  const s = wm_solve(a.beta, a.R, a.r, a.eta, a.rb, a.rg);
+  const tip = document.getElementById('wm-tip');
+  const regime = s ? s.regime : 'Infeasible';
+
+  document.getElementById('tip-regime').style.color = REGIME_COLORS[regime] || '#888';
+  document.getElementById('tip-regime').textContent = regime;
+  document.getElementById('tip-desc').textContent = REGIME_DESCS[regime] || '';
+
+  /* All four parameters */
+  document.getElementById('tip-params').innerHTML =
+    `<tr><td class="kl">β</td><td class="kv">${f3(a.beta)}</td>
+         <td class="kl">R</td><td class="kv">${f3(a.R)}</td></tr>
+     <tr><td class="kl">r</td><td class="kv">${f3(a.r)}</td>
+         <td class="kl">η</td><td class="kv">${f3(a.eta)}</td></tr>`;
+
+  if (!s) {
+    document.getElementById('tip-eq').innerHTML = '';
+    document.getElementById('tip-welfare').innerHTML = '';
+    document.getElementById('tip-govt').innerHTML = '';
+    positionTip(tip, ex, ey);
+    return;
+  }
+
+  const choseB = s.PiB > s.PiA;
+  const sigma  = choseB ? s.sigmaB : s.sigmaA;
+  const xStar  = choseB ? 1 : s.xtilde;
+  const dG     = a.R / (2 - a.beta);
+  const govtOk = a.r > dG;
+  const xCval  = isFinite(s.xC) && s.xC < 1 ? f3(s.xC) : '≥ 1';
+  const shatDisp = choseB
+    ? (s.shatBval !== null ? f3(s.shatBval) : '—')
+    : f3(s.shatA);
+
+  document.getElementById('tip-eq').innerHTML =
+    `<tr><td class="kl">σ*</td><td class="kv">${f3(sigma)}</td>
+         <td class="kl">x*</td><td class="kv">${choseB ? '1' : f3(xStar)}</td></tr>
+     <tr><td class="kl">σ̄</td><td class="kv">${f3(s.sbar)}</td>
+         <td class="kl">σ̂</td><td class="kv">${shatDisp}</td></tr>
+     <tr><td class="kl">κ</td><td class="kv">${f3(s.CA)}</td>
+         <td class="kl">x<sup>C</sup></td><td class="kv">${xCval}</td></tr>`;
+
+  const wpGap = s.WP - s.WG;
+  const gapStr = Math.abs(wpGap) < 1e-6 ? '𝒲ᴾ = 𝒲ᴳ'
+               : wpGap > 0 ? '𝒲ᴾ &gt; 𝒲ᴳ' : '𝒲ᴳ &gt; 𝒲ᴾ';
+  document.getElementById('tip-welfare').innerHTML =
+    `<tr><td class="kl">𝒲<sup>P</sup></td><td class="kv">${f3(s.WP)}</td>
+         <td class="kl">𝒲<sup>G</sup></td><td class="kv">${f3(s.WG)}</td></tr>
+     <tr><td class="kl">𝒲<sup>C</sup></td><td class="kv">${f3(s.WC)}</td>
+         <td colspan="2" style="font-size:11px;color:#666">${gapStr}</td></tr>`;
+
+  const govtColor = govtOk ? '#1a9944' : '#cc3333';
+  const govtText  = govtOk
+    ? `r=${f2(a.r)} &gt; δᴳ=${f2(dG)} → govt <strong>intervenes</strong>`
+    : `r=${f2(a.r)} ≤ δᴳ=${f2(dG)} → govt <strong>does not</strong> intervene`;
+  document.getElementById('tip-govt').innerHTML =
+    `<span style="color:${govtColor}">${govtText}</span>`;
+
+  positionTip(tip, ex, ey);
+}
+
+document.getElementById('ph').addEventListener('click', e => {
+  const cv = document.getElementById('ph');
+  const rect = cv.getBoundingClientRect();
+  const sx = cv.width / rect.width, sy = cv.height / rect.height;
+  const cx = (e.clientX - rect.left) * sx;
+  const cy = (e.clientY - rect.top)  * sy;
+  const ml = 48, mb = 42, mt = 22, mr = 22;
+  const pw = cv.width - ml - mr, ph = cv.height - mt - mb;
+
+  if (cx < ml || cx > ml + pw || cy < mt || cy > mt + ph) {
+    hideTooltip(); return;
+  }
+
+  const { xk, yk } = wmAxes();
+  const pax = WM_PAX[xk], pay = WM_PAX[yk];
+  const xv = pax.min + ((cx - ml) / pw) * (pax.max - pax.min);
+  const yv = pay.max - ((cy - mt) / ph) * (pay.max - pay.min);
+
+  WM_CLICK = { cx, cy };
+  drawWelfareMap();
+  showTooltip(xk, yk, xv, yv, e.clientX, e.clientY);
 });
 
 buildSlidersWM();
