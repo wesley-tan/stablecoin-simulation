@@ -218,13 +218,11 @@ function wm_solve(beta, R, r, eta, rb, rg) {
     }
   }
 
-  /* Commitment benchmark (Regime II with commitment, §5) */
-  const wC_den = 1 - beta - eta;
-  const xC    = wC_den > 0 ? beta * (R - 1) / wC_den : Infinity;
-  const wC    = (xC < 1 && wC_den > 0)
-                ? 1 + eta / 2 + beta * (R - 1) * (R - 1) / (2 * wC_den)
-                : 1 + eta / 2 + (R - 1) - (1 - beta - eta) / (2 * beta);
-  const WC    = wC > rb ? (wC - rb) * wC / (2 * (rg - rb)) : 0;
+  /* Commitment benchmark (§7): issuer commits to x^C=1, no bribe needed.
+     w^C = 1+η/2+(R−1); gap identity: w^C − w^B = (1−β−η)/(2β) ≥ 0. */
+  const xC = 1;
+  const wC = 1 + eta / 2 + (R - 1);
+  const WC = wC > rb ? (wC - rb) * wC / (2 * (rg - rb)) : 0;
 
   /* Government non-accommodation (Appendix GA, r ≤ δ^G) */
   const wGno  = 1 + eta / 2 + (R - 1) - (1 - beta) / 2;
