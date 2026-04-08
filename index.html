@@ -140,18 +140,6 @@
         <div class="wm-legend-swatch" style="background:rgba(60,200,100,0.55);border-radius:2px"></div>
         <span style="font-size:11px;color:#666">r &gt; δ<sup>G</sup>: govt intervenes</span>
       </div>
-      <div class="wm-legend-item">
-        <div class="wm-legend-dash" style="background:repeating-linear-gradient(90deg,#ff7850 0,#ff7850 3px,transparent 3px,transparent 6px)"></div>
-        <span style="font-size:11px;color:#666">δ<sup>G</sup>: r=R/(2−β)</span>
-      </div>
-      <div class="wm-legend-item" style="margin-top:4px">
-        <div class="wm-legend-dash" style="background:repeating-linear-gradient(90deg,#8230d2 0,#8230d2 5px,transparent 5px,transparent 8px)"></div>
-        <span style="font-size:11px;color:#666">x<sup>C</sup>=1: β(R−1)=1−β−η</span>
-      </div>
-      <div class="wm-legend-item">
-        <div class="wm-legend-dash" style="background:repeating-linear-gradient(90deg,#00aaa0 0,#00aaa0 2px,transparent 2px,transparent 5px)"></div>
-        <span style="font-size:11px;color:#666">η=(1−β)²: priv. reneg. vs. non-acc.</span>
-      </div>
     </div>
 
   </div>
@@ -407,79 +395,6 @@ function drawWelfareMap() {
     }
     ctx.restore();
 
-    /* Step 3: draw the δ^G contour line on top */
-    ctx.save();
-    ctx.setLineDash([3, 5]); ctx.lineCap = 'round';
-    const drawDG = (style, lw) => {
-      ctx.strokeStyle = style; ctx.lineWidth = lw;
-      ctx.beginPath(); let on = false;
-      dgPts.forEach(p => {
-        if (!p) { on = false; return; }
-        on ? ctx.lineTo(p.x, p.y) : (ctx.moveTo(p.x, p.y), (on = true));
-      });
-      ctx.stroke();
-    };
-    drawDG('rgba(0,0,0,0.3)', 3);
-    drawDG('rgba(255,120,80,0.95)', 1.5);
-    ctx.restore();
-  }
-
-  /* Commitment boundary: x^C = 1, i.e. β(R−1) = 1−β−η (§5)
-     Above this curve: x^C < 1, commitment strictly beats renegotiation (W^C > W^P)
-     Below: x^C ≥ 1, commitment portfolio = corner, W^C = W^P              */
-  {
-    const xcPts = [];
-    for (let i = 0; i < pw; i++) {
-      const xv = px.min + (i / (pw - 1)) * (px.max - px.min);
-      let prev = null, crossJ = null;
-      for (let j = 0; j < ph; j++) {
-        const yv = py.max - (j / (ph - 1)) * (py.max - py.min);
-        const a = { ...WM_F, [xk]: xv, [yk]: yv };
-        if (a.beta <= 0 || a.beta >= 1 || a.R <= 1 || 1 - a.beta - a.eta <= 0) { prev = null; continue; }
-        const diff = a.beta * (a.R - 1) - (1 - a.beta - a.eta);
-        if (prev !== null && prev * diff < 0) { crossJ = j - diff / (diff - prev); break; }
-        prev = diff;
-      }
-      xcPts.push(crossJ !== null ? { x: ml + i, y: mt + crossJ } : null);
-    }
-    ctx.save();
-    ctx.setLineDash([5, 4]); ctx.lineCap = 'round';
-    [[2.5, 'rgba(0,0,0,0.25)'], [1.5, 'rgba(130,60,210,0.95)']].forEach(([lw, style]) => {
-      ctx.lineWidth = lw; ctx.strokeStyle = style;
-      ctx.beginPath(); let on = false;
-      xcPts.forEach(p => { if (!p){on=false;return;} on?ctx.lineTo(p.x,p.y):(ctx.moveTo(p.x,p.y),(on=true)); });
-      ctx.stroke();
-    });
-    ctx.restore();
-  }
-
-  /* Non-accommodation threshold: η = (1−β)² (Appendix GA)
-     Above this curve: w^B > w^{G,no} — private renegotiation beats non-accommodation
-     Below: w^{G,no} > w^B — non-accommodation benchmark dominates                   */
-  {
-    const gnoPts = [];
-    for (let i = 0; i < pw; i++) {
-      const xv = px.min + (i / (pw - 1)) * (px.max - px.min);
-      let prev = null, crossJ = null;
-      for (let j = 0; j < ph; j++) {
-        const yv = py.max - (j / (ph - 1)) * (py.max - py.min);
-        const a = { ...WM_F, [xk]: xv, [yk]: yv };
-        if (a.beta <= 0 || a.beta >= 1) { prev = null; continue; }
-        const diff = a.eta - (1 - a.beta) * (1 - a.beta);
-        if (prev !== null && prev * diff < 0) { crossJ = j - diff / (diff - prev); break; }
-        prev = diff;
-      }
-      gnoPts.push(crossJ !== null ? { x: ml + i, y: mt + crossJ } : null);
-    }
-    ctx.save();
-    ctx.setLineDash([2, 5]); ctx.lineCap = 'round';
-    [[2.5, 'rgba(0,0,0,0.20)'], [1.5, 'rgba(0,170,160,0.90)']].forEach(([lw, style]) => {
-      ctx.lineWidth = lw; ctx.strokeStyle = style;
-      ctx.beginPath(); let on = false;
-      gnoPts.forEach(p => { if (!p){on=false;return;} on?ctx.lineTo(p.x,p.y):(ctx.moveTo(p.x,p.y),(on=true)); });
-      ctx.stroke();
-    });
-    ctx.restore();
   }
 
   /* Axis tick labels */
@@ -602,18 +517,11 @@ function showTooltip(xk, yk, xv, yv, ex, ey) {
   const xStar  = choseB ? 1 : s.xtilde;
   const dG     = a.R / (2 - a.beta);
   const govtOk = a.r > dG;
-  const xCval  = isFinite(s.xC) && s.xC < 1 ? f3(s.xC) : '≥ 1';
-  const shatDisp = choseB
-    ? (s.shatBval !== null ? f3(s.shatBval) : '—')
-    : f3(s.shatA);
 
   document.getElementById('tip-eq').innerHTML =
     `<tr><td class="kl">σ*</td><td class="kv">${f3(sigma)}</td>
          <td class="kl">x*</td><td class="kv">${choseB ? '1' : f3(xStar)}</td></tr>
-     <tr><td class="kl">σ̄</td><td class="kv">${f3(s.sbar)}</td>
-         <td class="kl">σ̂</td><td class="kv">${shatDisp}</td></tr>
-     <tr><td class="kl">κ</td><td class="kv">${f3(s.CA)}</td>
-         <td class="kl">x<sup>C</sup></td><td class="kv">${xCval}</td></tr>`;
+     <tr><td class="kl">σ̄</td><td class="kv">${f3(s.sbar)}</td></tr>`;
 
   const wpGap = s.WP - s.WG;
   const gapStr = Math.abs(wpGap) < 1e-6 ? '𝒲ᴾ = 𝒲ᴳ'
@@ -621,13 +529,12 @@ function showTooltip(xk, yk, xv, yv, ex, ey) {
   document.getElementById('tip-welfare').innerHTML =
     `<tr><td class="kl">𝒲<sup>P</sup></td><td class="kv">${f3(s.WP)}</td>
          <td class="kl">𝒲<sup>G</sup></td><td class="kv">${f3(s.WG)}</td></tr>
-     <tr><td class="kl">𝒲<sup>C</sup></td><td class="kv">${f3(s.WC)}</td>
-         <td colspan="2" style="font-size:11px;color:#666">${gapStr}</td></tr>`;
+     <tr><td colspan="4" style="font-size:11px;color:#888;padding-top:1px">${gapStr}</td></tr>`;
 
   const govtColor = govtOk ? '#1a9944' : '#cc3333';
   const govtText  = govtOk
-    ? `r=${f2(a.r)} &gt; δᴳ=${f2(dG)} → govt <strong>intervenes</strong>`
-    : `r=${f2(a.r)} ≤ δᴳ=${f2(dG)} → govt <strong>does not</strong> intervene`;
+    ? `r &gt; δᴳ=${f2(dG)} → govt <strong>intervenes</strong>`
+    : `r ≤ δᴳ=${f2(dG)} → govt <strong>does not</strong> intervene`;
   document.getElementById('tip-govt').innerHTML =
     `<span style="color:${govtColor}">${govtText}</span>`;
 
