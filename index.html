@@ -83,7 +83,6 @@
         <option value="R" selected>R (risky return)</option>
         <option value="beta">β (patience share)</option>
         <option value="r">r (fire-sale price)</option>
-        <option value="eta">η (liquidity value)</option>
       </select>
     </div>
 
@@ -93,7 +92,6 @@
         <option value="beta" selected>β (patience share)</option>
         <option value="R">R (risky return)</option>
         <option value="r">r (fire-sale price)</option>
-        <option value="eta">η (liquidity value)</option>
       </select>
     </div>
 
@@ -116,17 +114,14 @@
       <div class="wm-legend-item">
         <div class="wm-legend-swatch" style="background:#378ADD"></div>
         <span>𝒲<sup>P</sup> &gt; 𝒲<sup>G</sup></span>
-        <span style="color:#bbb;font-size:11px">B-interior</span>
       </div>
       <div class="wm-legend-item">
         <div class="wm-legend-swatch" style="background:#EF9F27"></div>
         <span>𝒲<sup>G</sup> &gt; 𝒲<sup>P</sup></span>
-        <span style="color:#bbb;font-size:11px">B-constrained</span>
       </div>
       <div class="wm-legend-item">
         <div class="wm-legend-swatch" style="background:#888780"></div>
         <span>𝒲<sup>P</sup> = 𝒲<sup>G</sup></span>
-        <span style="color:#bbb;font-size:11px">chose A</span>
       </div>
       <div class="wm-legend-item">
         <div class="wm-legend-swatch" style="background:#D3D1C7"></div>
@@ -158,94 +153,89 @@
 <script>
 const WM_PAX = {
   beta: { label: 'β', min: 0.03, max: 0.97, step: 0.01, def: 0.40 },
-  R:    { label: 'R', min: 1.05, max: 5.00, step: 0.05, def: 2.50 },
-  r:    { label: 'r', min: 0.01, max: 0.99, step: 0.01, def: 0.20 },
-  eta:  { label: 'η', min: 0.00, max: 0.90, step: 0.01, def: 0.10 }
+  R:    { label: 'R', min: 1.05, max: 2.00, step: 0.01, def: 1.50 },
+  r:    { label: 'r', min: 0.01, max: 0.99, step: 0.01, def: 0.20 }
 };
-/* A6 requires r_b >= 1, r_g > r_b — defaults reflect this */
-const WM_F = { beta: 0.40, R: 2.50, r: 0.20, eta: 0.10, rb: 1.00, rg: 1.50 };
+const WM_F = { beta: 0.40, R: 1.50, r: 0.20, rb: 1.00, rg: 1.50 };
 
-function wm_solve(beta, R, r, eta, rb, rg) {
-  if (r >= 1 || R <= 1 || beta <= 0 || beta >= 1 || rb >= rg) return null;
-  const aA = 1 + eta / 2 - rb;  /* can be ≤ 0 under A6 when η is small */
-  const CA = r * (R - 1) * (R - 1) / (2 * (R - r));
-  if (CA <= 0) return null;
-  /* Infeasible only if even full carry (σ→1) yields no participation */
-  if (aA + CA <= 0) return null;
-  const aB = 1 + eta / 2 - (1 - beta - eta) / (2 * beta) - rb;
-  const sbar_raw = (1 - beta - eta) * r / (beta * (R - r));
-  const sbar = Math.min(Math.max(sbar_raw, 0), 0.99999);
+function wm_solve(beta, R, r, rb, rg) {
+  if (r >= 1 || R <= 1 || beta <= 0 || beta >= 1 || rb >= rg || R <= r) return null;
 
-  /* Solution A branches */
-  const shatA = 0.5 - aA / (2 * CA);
+  const kappa  = r * (R - 1) * (R - 1) / (2 * (R - r));
   const xtilde = r * (R - 1) / (R - r);
-  let sigmaA, PiA;
-  if (shatA <= 0) {
-    sigmaA = 0; PiA = aA * CA / (rg - rb);
-  } else if (shatA < sbar) {
-    sigmaA = shatA; PiA = (CA + aA) * (CA + aA) / (4 * (rg - rb));
-  } else {
-    sigmaA = sbar; PiA = (aA + CA * sbar) * (1 - sbar) * CA / (rg - rb);
-  }
-  PiA = Math.max(0, PiA);
-  const euA = aA + sigmaA * CA;
-  if (euA <= 0) return null;
-  const WG = (euA / (rg - rb)) * (1 + eta / 2 + CA);
+  const sbar   = (1 - beta) * r / (beta * (R - r));
+  const dG     = R / (2 - beta);
 
-  /* Solution B — only if sbar_raw < 1 */
-  const wBrb = aB + (R - 1);
-  let sigmaB, shatBval, PiB;
-  if (sbar_raw > 1 || wBrb <= 0) {
-    sigmaB = null; shatBval = null; PiB = 0;
-  } else {
-    shatBval = 0.5 - aB / (2 * (R - 1));
-    if (shatBval < sbar) {
-      sigmaB = sbar;
-      PiB = Math.max(0, (aB + (R - 1) * sbar) * (1 - sbar) * (R - 1) / (rg - rb));
-    } else if (shatBval <= 1) {
-      sigmaB = shatBval; PiB = wBrb * wBrb / (4 * (rg - rb));
+  /* Per-depositor surplus (σ-free) */
+  const wF  = 1 + kappa;
+  const wR  = R - (1 - beta) / (2 * beta);
+  const wC  = 1 + (R - 1) * (R - 1) / (2 * (1 - beta));
+  const wG1 = R - (1 - beta) / 2;
+  const wG2 = wF;
+
+  /* ── Filing branch: σ ∈ [0, σ̄) ─────────────────── */
+  const aF = 1 - rb;
+  const shatF = 0.5 - aF / (2 * kappa);
+  const sbar_clip = Math.min(Math.max(sbar, 0), 0.99999);
+  let sigF;
+  if (shatF <= 0) sigF = 0;
+  else if (shatF < sbar_clip) sigF = shatF;
+  else sigF = Math.max(0, sbar_clip - 1e-5);
+  const euF = 1 + sigF * kappa;
+  const mF  = Math.max(0, (euF - rb) / (rg - rb));
+  const PiF = mF * (1 - sigF) * kappa;
+
+  /* ── Renegotiation branch: σ ∈ [σ̄, 1] ──────────── */
+  const aR = 1 - (1 - beta) / (2 * beta) - rb;
+  const shatR = 0.5 - aR / (2 * (R - 1));
+  let sigR = null, PiR = 0, euR = 0, isConstrained = false;
+  if (sbar < 1 && wR > rb) {
+    if (shatR >= sbar && shatR <= 1) {
+      sigR = shatR;
+    } else if (shatR < sbar) {
+      sigR = sbar; isConstrained = true;
     } else {
-      sigmaB = 1; PiB = 0;
+      sigR = 1;
     }
+    euR = 1 + sigR * (R - 1) - (1 - beta) / (2 * beta);
+    const mR = Math.max(0, (euR - rb) / (rg - rb));
+    PiR = mR * (1 - sigR) * (R - 1);
   }
 
-  /* Commitment benchmark: issuer commits to x before M locks in,
-     internalising dx/dM = 0. Maximises E[Ω^II](x) over x ∈ [0,1]:
-       x^C = β(R−1)/(1−β−η)  if < 1, else corner x^C = 1.
-     w^C = 1+η/2+β(R−1)²/[2(1−β−η)] when interior; w^C = w^B at corner. */
-  const wC_den = 1 - beta - eta;
-  const xC    = wC_den > 0 ? Math.min(beta * (R - 1) / wC_den, 1) : 1;
-  const wC    = (wC_den > 0 && xC < 1)
-                ? 1 + eta / 2 + beta * (R - 1) * (R - 1) / (2 * wC_den)
-                : 1 + eta / 2 + (R - 1) - wC_den / (2 * beta);
-  const WC    = wC > rb ? (wC - rb) * wC / (2 * (rg - rb)) : 0;
-
-  /* Government non-accommodation (Appendix GA, r ≤ δ^G) */
-  const wGno  = 1 + eta / 2 + (R - 1) - (1 - beta) / 2;
-  const WGno  = wGno > rb ? (wGno - rb) * wGno / (2 * (rg - rb)) : 0;
-
-  /* Regime classification */
-  let regime;
-  if (PiB <= PiA) {
-    regime = shatA <= 0 ? 'I-a' : shatA < sbar ? 'I-b' : 'I-c';
-    return { reg: 0, WP: WG, WG, WC, wC, xC, wGno, WGno,
-             sigmaA, sigmaB, PiA, PiB, CA, aA, aB, sbar,
-             regime, shatA, shatBval, xtilde };
+  /* ── Private equilibrium selection ──────────────── */
+  let privRegime, sigmaP, xP, wP, euP;
+  if (PiR > PiF && PiR > 0) {
+    privRegime = isConstrained ? 'CR' : 'R';
+    sigmaP = sigR; xP = 1; wP = wR; euP = euR;
+  } else if (mF > 0) {
+    privRegime = 'F';
+    sigmaP = sigF; xP = xtilde; wP = wF; euP = euF;
+  } else {
+    return null;
   }
-  const euB = aB + sigmaB * (R - 1);
-  if (euB <= 0) {
-    regime = shatA <= 0 ? 'I-a' : shatA < sbar ? 'I-b' : 'I-c';
-    return { reg: 0, WP: WG, WG, WC, wC, xC, wGno, WGno,
-             sigmaA, sigmaB, PiA, PiB, CA, aA, aB, sbar,
-             regime, shatA, shatBval, xtilde };
+  const MP = Math.max(0, (euP - rb) / (rg - rb));
+  const WP = MP * wP + (rg * rg - euP * euP) / (2 * (rg - rb));
+
+  /* ── Government equilibrium ─────────────────────── */
+  const govAccommodates = r > dG;
+  const govRegime = govAccommodates ? 'G2' : 'G1';
+  const wG = govAccommodates ? wG2 : wG1;
+  let WG;
+  if (wG > rb) {
+    WG = (3 * wG * wG - 6 * wG * rb + 4 * rg * rg - rb * rb) / (8 * (rg - rb));
+  } else {
+    WG = (rg + rb) / 2;
   }
-  const wB = 1 + eta / 2 + (R - 1) - (1 - beta - eta) / (2 * beta);
-  const WP = (euB / (rg - rb)) * wB;
-  const reg = WP > WG + 1e-9 ? 1 : (WP < WG - 1e-9 ? -1 : 0);
-  regime = (shatBval !== null && shatBval < sbar) ? 'II-a' : 'II-b';
-  return { reg, WP, WG, WC, wC, xC, wGno, WGno,
-           sigmaA, sigmaB, PiA, PiB, CA, aA, aB, sbar,
-           regime, shatA, shatBval, xtilde };
+
+  const gap = WP - WG;
+  const reg = gap > 1e-9 ? 1 : (gap < -1e-9 ? -1 : 0);
+
+  return {
+    reg, WP, WG, wP, wG, wF, wR, wC, wG1, wG2,
+    privRegime, govRegime,
+    sigmaP, xP, sbar, shatF, shatR, dG, kappa, xtilde,
+    PiF, PiR, MP
+  };
 }
 
 
@@ -257,7 +247,7 @@ function buildSlidersWM() {
   const { xk, yk } = wmAxes();
   const d = document.getElementById('sldrs');
   d.innerHTML = '';
-  ['beta', 'R', 'r', 'eta'].forEach(k => {
+  ['beta', 'R', 'r'].forEach(k => {
     if (k === xk || k === yk) return;
     const p = WM_PAX[k];
     const row = document.createElement('div');
@@ -294,7 +284,7 @@ function drawWelfareMap() {
       const xv = px.min + (i / (pw - 1)) * (px.max - px.min);
       const yv = py.max - (j / (ph - 1)) * (py.max - py.min);
       const a = { ...WM_F, [xk]: xv, [yk]: yv };
-      const s = wm_solve(a.beta, a.R, a.r, a.eta, a.rb, a.rg);
+      const s = wm_solve(a.beta, a.R, a.r, a.rb, a.rg);
       const c = s === null ? COLS['null'] : COLS[String(s.reg)];
       const idx = (j * pw + i) * 4;
       img.data[idx]=c[0]; img.data[idx+1]=c[1]; img.data[idx+2]=c[2]; img.data[idx+3]=c[3];
@@ -351,7 +341,7 @@ function drawWelfareMap() {
 function onAxisChangeWM() {
   const { xk, yk } = wmAxes();
   if (xk === yk) {
-    const other = ['beta','R','r','eta'].find(v => v !== xk);
+    const other = ['beta','R','r'].find(v => v !== xk);
     document.getElementById(xk === 'R' ? 'yax' : 'xax').value = other;
   }
   buildSlidersWM(); drawWelfareMap();
@@ -371,16 +361,17 @@ document.getElementById('yax').addEventListener('change', onAxisChangeWM);
 let WM_CLICK = null;
 
 const REGIME_COLORS = {
-  'I-a': '#7a7970', 'I-b': '#7a7970', 'I-c': '#7a7970',
-  'II-a': '#c47e10', 'II-b': '#1f6fbd', 'Infeasible': '#aaa'
+  'F': '#7a7970', 'R': '#1f6fbd', 'CR': '#c47e10', 'Infeasible': '#aaa'
 };
 const REGIME_DESCS = {
-  'I-a': 'Liquidation regime — corner σ*=0',
-  'I-b': 'Liquidation regime — interior σ*=σ̂ᴵ',
-  'I-c': 'Liquidation regime — corner σ*=σ̄⁻',
-  'II-a': 'Renegotiation regime — constrained σ*=σ̄',
-  'II-b': 'Renegotiation regime — interior σ*=σ̂ᴵᴵ',
+  'F':  'Private filing — x*=x̃, liquidation at r',
+  'R':  'Private renegotiation — x*=1, interior σ*',
+  'CR': 'Constrained renegotiation — x*=1, σ*=σ̄',
   'Infeasible': 'Market does not exist'
+};
+const GOV_DESCS = {
+  'G1': 'Govt deferral (r ≤ δᴳ) — x=1, no liquidation',
+  'G2': 'Govt accommodation (r > δᴳ) — x=x̃, liquidation at r'
 };
 
 function f3(v) { return (typeof v === 'number' && isFinite(v)) ? v.toFixed(3) : '—'; }
@@ -405,20 +396,21 @@ function hideTooltip() {
 
 function showTooltip(xk, yk, xv, yv, ex, ey) {
   const a = { ...WM_F, [xk]: xv, [yk]: yv };
-  const s = wm_solve(a.beta, a.R, a.r, a.eta, a.rb, a.rg);
+  const s = wm_solve(a.beta, a.R, a.r, a.rb, a.rg);
   const tip = document.getElementById('wm-tip');
-  const regime = s ? s.regime : 'Infeasible';
+  const priv = s ? s.privRegime : 'Infeasible';
 
-  document.getElementById('tip-regime').style.color = REGIME_COLORS[regime] || '#888';
-  document.getElementById('tip-regime').textContent = regime;
-  document.getElementById('tip-desc').textContent = REGIME_DESCS[regime] || '';
+  document.getElementById('tip-regime').style.color = REGIME_COLORS[priv] || '#888';
+  document.getElementById('tip-regime').textContent = s
+    ? `Private: ${priv}  ·  Govt: ${s.govRegime}` : 'Infeasible';
+  document.getElementById('tip-desc').textContent = s
+    ? (REGIME_DESCS[priv] || '') : REGIME_DESCS['Infeasible'];
 
-  /* All four parameters */
   document.getElementById('tip-params').innerHTML =
     `<tr><td class="kl">β</td><td class="kv">${f3(a.beta)}</td>
          <td class="kl">R</td><td class="kv">${f3(a.R)}</td></tr>
      <tr><td class="kl">r</td><td class="kv">${f3(a.r)}</td>
-         <td class="kl">η</td><td class="kv">${f3(a.eta)}</td></tr>`;
+         <td class="kl">δᴳ</td><td class="kv">${s ? f3(s.dG) : '—'}</td></tr>`;
 
   if (!s) {
     document.getElementById('tip-eq').innerHTML = '';
@@ -427,14 +419,12 @@ function showTooltip(xk, yk, xv, yv, ex, ey) {
     return;
   }
 
-  const choseB = s.PiB > s.PiA;
-  const sigma  = choseB ? s.sigmaB : s.sigmaA;
-  const xStar  = choseB ? 1 : s.xtilde;
-
   document.getElementById('tip-eq').innerHTML =
-    `<tr><td class="kl">σ*</td><td class="kv">${f3(sigma)}</td>
-         <td class="kl">x*</td><td class="kv">${choseB ? '1' : f3(xStar)}</td></tr>
-     <tr><td class="kl">σ̄</td><td class="kv">${f3(s.sbar)}</td></tr>`;
+    `<tr><td class="kl">σ*</td><td class="kv">${f3(s.sigmaP)}</td>
+         <td class="kl">x*</td><td class="kv">${s.xP === 1 ? '1' : f3(s.xP)}</td></tr>
+     <tr><td class="kl">σ̄</td><td class="kv">${f3(s.sbar)}</td>
+         <td class="kl">w<sup>P</sup></td><td class="kv">${f3(s.wP)}</td></tr>
+     <tr><td class="kl">w<sup>G</sup></td><td class="kv">${f3(s.wG)}</td></tr>`;
 
   const wpGap = s.WP - s.WG;
   const gapStr = Math.abs(wpGap) < 1e-6 ? '𝒲ᴾ = 𝒲ᴳ'
